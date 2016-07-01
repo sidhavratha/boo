@@ -1,5 +1,7 @@
 package com.wm.bfd.oo.workflow;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -147,5 +149,62 @@ public abstract class AbstractWorkflow {
 	op = null;
 	design = null;
 	assembly = null;
+    }
+
+    public boolean isAssemblyExist() {
+	JsonPath response = null;
+	try {
+	    response = assembly.getAssembly(assemblyName);
+	} catch (OneOpsClientAPIException e) {
+	    String msg = String.format("The assembly %s is not exist!",
+		    assemblyName);
+	    System.err.println(msg);
+	}
+	return response == null ? false : true;
+    }
+
+    public boolean createAssemblyIfNotExist() throws OneOpsClientAPIException {
+	boolean isExist = this.isAssemblyExist();
+	if (!isExist) {
+	    assembly.createAssembly(assemblyName, config.getConfig().getBoo()
+		    .getEmail(), "", "");
+	}
+	return true;
+    }
+
+    public boolean isEnvExist() {
+	JsonPath response = null;
+	try {
+	    response = transition.getEnvironment(envName);
+	} catch (OneOpsClientAPIException e) {
+	    String msg = String.format("The environment %s is not exist! %s",
+		    platformName, e.getMessage());
+	    System.err.println(msg);
+	}
+	return (response == null ? false : true);
+    }
+
+    public boolean createEnv() throws OneOpsClientAPIException {
+	boolean isExist = this.isEnvExist();
+	JsonPath response = null;
+	if (!isExist) {
+	    Map<String, String> cloudMap = new HashMap<String, String>();
+	    cloudMap.put(config.getConfig().getBoo().getCloudId(), "1");
+	    System.out.println("Creating a new");
+	    response = transition.createEnvironment(envName, "DEV",
+		    "redundant", null, cloudMap, false, true, "");
+	    response = transition.getEnvironment(envName);
+
+	    transition.commitEnvironment(envName, null,
+		    "Committed by bfd oneops automation!");
+	}
+	return response == null ? false : true;
+    }
+
+    public boolean deploy() throws OneOpsClientAPIException {
+
+	JsonPath response = transition.deploy(envName,
+		"Created by bfd oneops automation!");
+	return response == null ? false : true;
     }
 }

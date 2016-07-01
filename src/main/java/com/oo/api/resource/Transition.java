@@ -694,12 +694,12 @@ public class Transition extends APIClient {
 			throw new OneOpsClientAPIException(msg);
 		}
 		RequestSpecification request = createRequest();
-		Response response = request.get(TRANSITION_ENV_URI + environmentName + "/platforms/" + platformName + "/components/" + componentName);
+		Response response = request.get(TRANSITION_ENV_URI + environmentName + "platforms/" + platformName + "/components/" + componentName);
 		if(response != null) {
 			if(response.getStatusCode() == 200 || response.getStatusCode() == 302) {
 				return response.getBody().jsonPath();
 			} else {
-				String msg = String.format("Failed to get enviornment platform component details due to %s", response.getStatusLine());
+				String msg = String.format("Failed to get enviornment platform component details due to %s", response.getBody().asString());
 				throw new OneOpsClientAPIException(msg);
 			}
 		} 

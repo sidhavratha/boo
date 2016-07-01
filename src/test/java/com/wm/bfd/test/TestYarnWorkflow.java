@@ -6,12 +6,13 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.wm.bfd.oo.JaywayHttpModule;
+import com.wm.bfd.oo.Main;
 import com.wm.bfd.oo.workflow.YarnWorkflow;
 
 public class TestYarnWorkflow extends BFDOOTest {
 
     YarnWorkflow flow;
-    Injector injector = Guice.createInjector(new JaywayHttpModule());
+    Injector injector = Guice.createInjector(new JaywayHttpModule(Main.TEMPLATE));
 
     @Override
     protected void setUp() throws Exception {

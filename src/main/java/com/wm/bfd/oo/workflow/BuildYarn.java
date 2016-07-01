@@ -90,13 +90,8 @@ public class BuildYarn extends AbstractWorkflow {
 		// Json in a array here.
 		attributes.put(ClientConfig.SSH_KEY,
 			"[\"" + keys.get(ClientConfig.SSH_KEY) + "\"]");
-		System.out.println(entry.getKey() + "::"
-			+ keys.get(ClientConfig.SSH_KEY));
-		// JsonPath response = design.getPlatformComponent(platformName,
-		// ClientConfig.USER);
-		// System.out.println( "getPlatformComponent>>" +
-		// response.prettyPrint());
-		design.addPlatformComponent(platformName, ClientConfig.USER,
+		
+		this.addPlatformComponent(platformName, ClientConfig.USER,
 			entry.getKey(), attributes);
 
 	    }
@@ -105,6 +100,17 @@ public class BuildYarn extends AbstractWorkflow {
 
 	design.commitDesign();
 	return true;
+    }
+
+    private void addPlatformComponent(String platformName,
+	    String componentName, String uniqueName,
+	    Map<String, String> attributes) {
+	try {
+	    design.addPlatformComponent(platformName, componentName,
+		    uniqueName, attributes);
+	} catch (OneOpsClientAPIException e) {
+	    System.err.printf("User %s exists. Skip this step.", uniqueName);
+	}
     }
 
     public boolean updateScaling(int current, int min, int max)
@@ -120,8 +126,13 @@ public class BuildYarn extends AbstractWorkflow {
 
     @Override
     public boolean process() throws OneOpsClientAPIException {
+	this.createAssemblyIfNotExist();
+	this.bar.update(35, 100);
 	boolean status = this.createPlatform();
 	this.bar.update(40, 100);
+	
+	this.createEnv();
+	this.bar.update(45, 100);
 	if (status) {
 	    status = this.updatePlatformVariables();
 	    this.bar.update(50, 100);
@@ -129,9 +140,9 @@ public class BuildYarn extends AbstractWorkflow {
 		    .getScale();
 	    status = this.updateScaling(scale.getCurrent(), scale.getMin(),
 		    scale.getMax());
-
-	    this.bar.update(60, 100);
 	}
+	this.deploy();
+	this.bar.update(60, 100);
 	return status;
     }
 }

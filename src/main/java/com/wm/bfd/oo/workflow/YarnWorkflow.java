@@ -8,12 +8,8 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.jayway.restassured.path.json.JsonPath;
 import com.oo.api.OOInstance;
 import com.oo.api.exception.OneOpsClientAPIException;
-import com.oo.api.resource.Assembly;
-import com.oo.api.resource.Design;
-import com.oo.api.resource.Operation;
 import com.oo.api.resource.Transition;
 import com.wm.bfd.oo.ClientConfig;
-import com.wm.bfd.oo.utils.ProgressBar;
 
 /**
  * Install yarn pack in one run. Include all dependencies.
@@ -62,25 +58,29 @@ public class YarnWorkflow extends AbstractWorkflow {
 	    System.out.println("Start to build zookeeper cluster...");
 	    // Build zookeeper
 	    boolean status = zookeeper.process();
+	    System.out.println(status);
 	    if (status) {
 		String state = this.waitForActiveDeployment(instance,
 			assemblyName, envName, zookeeper.getDeploymentId());
-		if (state.equalsIgnoreCase("success")) {
+		System.out.println(state);
+		if (state.equalsIgnoreCase("complete")
+			|| state.equalsIgnoreCase("success")) {
 		    // Build yarn
 		    isBuildYarn = true;
 		}
 	    }
+	    zkHost = zookeeper.getIpsForYarn();
 	} else {
-	    System.out.println("Using zookeeper " + zookeeper);
 	    isBuildYarn = true;
 	}
 	this.bar.update(30, 100);
 
 	if (isBuildYarn) {
 	    BuildYarn yarn = new BuildYarn(instance, assemblyName,
-		    platformName, envName, config, zookeeper.getIpsForYarn());
-	    System.out.println("Start to build the yarn cluster, zk_host = "
-		    + zookeeper.getIpsForYarn());
+		    platformName, envName, config, zkHost);
+	    System.out
+		    .printf("Start to build the yarn cluster with zk_host: $s ",
+			    zkHost);
 	    yarn.process();
 	}
 

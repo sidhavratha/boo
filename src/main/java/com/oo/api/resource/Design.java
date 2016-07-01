@@ -151,7 +151,7 @@ public class Design extends APIClient {
 			if(response.getStatusCode() == 200 || response.getStatusCode() == 302) {
 				return response.getBody().jsonPath();
 			} else {
-				String msg = String.format("Failed to create platform with name %s due to %s", platformName, response.getStatusLine());
+				String msg = String.format("Failed to create platform with name %s due to %s", platformName, response.getBody().asString());
 				throw new OneOpsClientAPIException(msg);
 			}
 		} 
