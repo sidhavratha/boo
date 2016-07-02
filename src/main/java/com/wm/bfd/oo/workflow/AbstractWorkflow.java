@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.jayway.restassured.path.json.JsonPath;
 import com.oo.api.OOInstance;
@@ -16,6 +19,7 @@ import com.wm.bfd.oo.ClientConfig;
 import com.wm.bfd.oo.utils.ProgressBar;
 
 public abstract class AbstractWorkflow {
+    private static Logger LOG = LoggerFactory.getLogger(AbstractWorkflow.class);
     String assemblyName;
     String platformName;
     String envName;
@@ -38,6 +42,7 @@ public abstract class AbstractWorkflow {
 	this.platformName = platformName;
 	this.envName = envName;
 	this.instance = instance;
+	this.config = config;
 
 	assembly = new Assembly(instance);
 	design = new Design(instance, assemblyName);
@@ -55,27 +60,30 @@ public abstract class AbstractWorkflow {
     public boolean cleanup() {
 	if (design == null)
 	    return true;
-	System.out.println("Clean up...");
+	this.bar.update(5, 100);
 	this.cancelDeployment();
+	this.bar.update(20, 100);
 	this.disableAllPlatforms();
-
+	this.bar.update(40, 100);
 	try {
 	    transition.deleteEnvironment(envName);
 	} catch (Exception e) {
 	    // Ignore
 	    e.printStackTrace();
 	}
+	this.bar.update(60, 100);
 	this.deleteDesign();
 	// Don't add the following part to one try block as transition.
 	try {
-
 	    assembly.deleteAssembly(assemblyName);
 	} catch (Exception e) {
 	    // Ignore
 	}
+	this.bar.update(90, 100);
 	op = null;
 	design = null;
 	assembly = null;
+	this.bar.update(100, 100);
 	return true;
     }
 
@@ -85,14 +93,14 @@ public abstract class AbstractWorkflow {
 	    String deploymentId = response.getString("deploymentId");
 	    response = transition.getLatestRelease(envName);
 	    String releaseId = response.getString("releaseId");
-	    System.out.println("deploymentId:" + deploymentId + "; releaseId: "
+	    LOG.debug("deploymentId:" + deploymentId + "; releaseId: "
 		    + releaseId);
 	    response = transition.getDeploymentStatus(envName, deploymentId);
 	    Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
 	    response = transition.cancelDeployment(envName, deploymentId,
 		    releaseId);
 
-	    System.out.println("cancelDeployment: "
+	    LOG.debug("cancelDeployment: "
 		    + (response == null ? "" : response.prettyPrint()));
 	} catch (Exception e) {
 	    // Ignore
@@ -113,42 +121,16 @@ public abstract class AbstractWorkflow {
     void deleteDesign() {
 	JsonPath response = null;
 	try {
-	    System.out.println("deleteEnvironment log:"
+	    LOG.debug("deleteEnvironment log:"
 		    + (response == null ? "" : response.prettyPrint()));
 	    response = design.commitDesign();
-	    System.out.println("commitDesign log:"
+	    LOG.debug("commitDesign log:"
 		    + (response == null ? "" : response.prettyPrint()));
 	    design.deletePlatform(platformName);
 	} catch (Exception e) {
 	    // Ignore
 	    e.printStackTrace();
 	}
-    }
-
-    void cleanUp() {
-	if (design == null)
-	    return;
-	System.out.println("Clean up...");
-	this.cancelDeployment();
-	this.disableAllPlatforms();
-
-	try {
-	    transition.deleteEnvironment(envName);
-	} catch (Exception e) {
-	    // Ignore
-	    e.printStackTrace();
-	}
-	this.deleteDesign();
-	// Don't add the following part to one try block as transition.
-	try {
-
-	    assembly.deleteAssembly(assemblyName);
-	} catch (Exception e) {
-	    // Ignore
-	}
-	op = null;
-	design = null;
-	assembly = null;
     }
 
     public boolean isAssemblyExist() {

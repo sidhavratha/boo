@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.path.json.JsonPath;
@@ -13,8 +16,7 @@ import com.wm.bfd.oo.ClientConfig;
 import com.wm.bfd.oo.bean.Compute;
 
 public class BuildZookeeper extends AbstractWorkflow {
-
-    final static String PLATFORM_NAME = "zookeeper";
+    private static Logger LOG = LoggerFactory.getLogger(BuildZookeeper.class);
 
     public BuildZookeeper(OOInstance instance, String assemblyName,
 	    String platformName, String envName, ClientConfig config)
@@ -48,8 +50,6 @@ public class BuildZookeeper extends AbstractWorkflow {
 
 	return true;
     }
-
-    
 
     public String getDeploymentId() {
 	String id = null;
@@ -95,15 +95,22 @@ public class BuildZookeeper extends AbstractWorkflow {
 
 	    result = new ObjectMapper().writeValueAsString(compute);
 	} catch (JsonProcessingException e) {
+	    System.err.println(e.getMessage());
 	    // Ignore
 	} catch (OneOpsClientAPIException e) {
+	    e.printStackTrace();
+	    System.err.println(e.getMessage());
 	    // Ignore
 	}
 	return result;
     }
 
     List<Map<String, String>> getIpsInternal() throws OneOpsClientAPIException {
-	JsonPath response = op.listInstances(platformName, "compute");
+	JsonPath response = op.listInstances(config.getConfig().getPlatforms().getZookeeper()
+		.getName(), "compute");
+	if (LOG.isDebugEnabled())
+	    LOG.debug("Get json response {} while reading compute instances",
+		    response == null ? "" : response.prettyPrint());
 	return response.getList("ciAttributes");
     }
 

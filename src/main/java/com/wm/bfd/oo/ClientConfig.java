@@ -34,7 +34,7 @@ public class ClientConfig {
 
     public ClientConfig(String file) throws JsonParseException,
 	    JsonMappingException, FileNotFoundException, IOException {
-	System.out.println("ClientConfig initializing...");
+	//System.out.println("ClientConfig initializing...");
 	this.config = MAPPER.readValue(new FileInputStream(new File(file)),
 		YamlBean.class);
 	MAPPER.readValue(new FileInputStream(new File(file)),

@@ -64,21 +64,18 @@ public class TestBuildZookeeper extends BFDOOTest {
     @Test
     public void testGetStatus() throws OneOpsClientAPIException {
 	String status = zoo.getStatus();
-	System.out.print(status);
 	assertNotNull(status);
     }
 
     @Test
     public void testGetIpsJson() throws OneOpsClientAPIException {
 	String ips = zoo.getIpsJson();
-	System.out.print(ips);
 	assertNotNull(ips);
     }
 
     @Test
     public void testGetIpsForYarn() throws OneOpsClientAPIException {
 	String ips = zoo.getIpsForYarn();
-	System.out.print(ips);
 	assertNotNull(ips);
     }
 

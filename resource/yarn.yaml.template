@@ -41,6 +41,7 @@ platforms:
       user/User:
         - rzhan33: {'authorized_keys':''}
   zookeeper:
+    name: zookeeper
     pack: main/zookeeper:1
     major_version: '1'
     components: # Optional

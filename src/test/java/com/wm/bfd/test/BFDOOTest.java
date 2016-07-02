@@ -1,5 +1,8 @@
 package com.wm.bfd.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.ProvisionException;
@@ -14,33 +17,39 @@ import com.wm.bfd.oo.utils.BFDUtils;
 import junit.framework.TestCase;
 
 public abstract class BFDOOTest extends TestCase {
-    Injector injector;
+    final private static Logger LOG = LoggerFactory.getLogger(BFDOOTest.class);
+    final private static Injector injector = Guice
+	    .createInjector(new JaywayHttpModule(Main.TEMPLATE));
     ClientConfig config;
     OOInstance oo;
     String assemblyName;
     String platformName;
     String envName;
     JaywayHttpModule module;
-    BFDUtils bfdUtils;
+    BFDUtils bfdUtils = new BFDUtils();
 
     public BFDOOTest() {
-
-	this.module = new JaywayHttpModule(Main.TEMPLATE);
-	injector = Guice.createInjector(this.module);
 	try {
 	    this.init();
 	} catch (BFDOOException e) {
-	    System.out.printf("Fatal error %s, quit!", e.getMessage());
+	    LOG.error("BFDOOException: Fatal error {}, quit!",
+		    e.getMessage());
+	    System.exit(-1);
 	} catch (ProvisionException e) {
-	    System.out.printf("Fatal error %s, quit!", e.getMessage());
+	    LOG.error("ProvisionException: Fatal error {}, quit!",
+		    e.getMessage());
+	    System.exit(-2);
+	} catch (Exception e) {
+	    LOG.error("Exception: Fatal error {}, quit!",
+		    e.getMessage());
+	    System.exit(-3);
 	}
 	RestAssured.useRelaxedHTTPSValidation(); // Disable SSL check.
-	bfdUtils = new BFDUtils();
+
     }
 
     void init() throws BFDOOException, ProvisionException {
 	if (oo == null) {
-	    System.out.println("set up ...");
 	    config = injector.getInstance(ClientConfig.class);
 	    bfdUtils.verifyTemplate(config);
 	    oo = injector.getInstance(OOInstance.class);

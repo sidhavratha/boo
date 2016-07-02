@@ -1,19 +1,29 @@
 package com.wm.bfd.oo.workflow;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.path.json.JsonPath;
 import com.oo.api.OOInstance;
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.oo.api.resource.model.RedundancyConfig;
 import com.wm.bfd.oo.ClientConfig;
+import com.wm.bfd.oo.bean.Compute;
 import com.wm.bfd.oo.yaml.ScalBean;
 import com.wm.bfd.oo.yaml.Users;
 import com.wm.bfd.oo.yaml.YarnBean;
 
 public class BuildYarn extends AbstractWorkflow {
-
+    final private static Logger LOG = LoggerFactory.getLogger(BuildYarn.class);
+    final private static String COMPUTE = "compute";
+    final private static String CLIENT_COMPUTE = "client-compute";
+    final private static String PRM_COMPUTE = "prm-compute";
     String zookeepers;
     YarnBean yarn;
 
@@ -46,7 +56,7 @@ public class BuildYarn extends AbstractWorkflow {
 	    if (response != null)
 		design.commitDesign();
 	} else {
-	    System.out.println("Platform exist, skip create platform "
+	    LOG.warn("Platform exist, skip create platform "
 		    + platformName);
 	}
 	return true;
@@ -90,7 +100,7 @@ public class BuildYarn extends AbstractWorkflow {
 		// Json in a array here.
 		attributes.put(ClientConfig.SSH_KEY,
 			"[\"" + keys.get(ClientConfig.SSH_KEY) + "\"]");
-		
+
 		this.addPlatformComponent(platformName, ClientConfig.USER,
 			entry.getKey(), attributes);
 
@@ -130,7 +140,7 @@ public class BuildYarn extends AbstractWorkflow {
 	this.bar.update(35, 100);
 	boolean status = this.createPlatform();
 	this.bar.update(40, 100);
-	
+
 	this.createEnv();
 	this.bar.update(45, 100);
 	if (status) {
@@ -144,5 +154,50 @@ public class BuildYarn extends AbstractWorkflow {
 	this.deploy();
 	this.bar.update(60, 100);
 	return status;
+    }
+
+    public String getIpsJson() {
+	String result = null;
+	try {
+	    Map<String, String> all = new HashMap<String, String>();
+	    all.put(CLIENT_COMPUTE, this.getJsonInternal(CLIENT_COMPUTE));
+	    all.put(COMPUTE, this.getJsonInternal(COMPUTE));
+	    all.put(PRM_COMPUTE, this.getJsonInternal(PRM_COMPUTE));
+	    Compute compute = new Compute(all);
+
+	    result = new ObjectMapper().writeValueAsString(compute);
+	} catch (JsonProcessingException e) {
+	    e.printStackTrace();
+	    // Ignore
+	} catch (OneOpsClientAPIException e) {
+	    e.printStackTrace();
+	    // Ignore
+	}
+	return result;
+    }
+
+    private String getJsonInternal(String componentName)
+	    throws OneOpsClientAPIException {
+	List<Map<String, String>> ips = this.getIpsInternal(componentName);
+	StringBuilder str = new StringBuilder();
+	LOG.debug("Get ips for component {} in {}", componentName, ips);
+	for (Map<String, String> ip : ips) {
+	    str.append(",");
+	    // Cannot get public_ip sometimes, so temporary using private_ip
+	    // instead.
+	    str.append(ip.get("private_ip"));
+	}
+
+	if (str.length() > 0)
+	    str.deleteCharAt(0);
+	return str.toString();
+    }
+
+    private List<Map<String, String>> getIpsInternal(String componentName)
+	    throws OneOpsClientAPIException {
+	JsonPath response = op.listInstances(config.getConfig().getPlatforms().getYarn()
+		.getName(), componentName);
+	LOG.debug("Trying to get ip from {}", platformName);
+	return response.getList("ciAttributes");
     }
 }

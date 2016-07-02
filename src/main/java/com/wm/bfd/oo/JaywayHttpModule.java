@@ -3,6 +3,9 @@ package com.wm.bfd.oo;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.inject.AbstractModule;
@@ -11,12 +14,13 @@ import com.google.inject.Singleton;
 import com.oo.api.OOInstance;
 
 public class JaywayHttpModule extends AbstractModule {
-
+    private static Logger LOG = LoggerFactory.getLogger(JaywayHttpModule.class);
     private static ClientConfig CLIENT = null;
     private String yaml;
 
     public JaywayHttpModule(String yaml) {
 	this.yaml = yaml;
+	LOG.info("Using config {}", yaml);
     }
 
     @Override

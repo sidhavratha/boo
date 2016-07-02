@@ -10,7 +10,6 @@ import com.oo.api.exception.OneOpsClientAPIException;
 import com.wm.bfd.oo.exception.BFDOOException;
 import com.wm.bfd.oo.utils.BFDUtils;
 import com.wm.bfd.oo.workflow.YarnWorkflow;
-import com.wm.bfd.test.Test;
 
 public class Main {
     final public static String TEMPLATE = "/etc/oneops-tool-bfd/yarn.yaml";
@@ -23,9 +22,10 @@ public class Main {
 	if (args.length < 2) {
 	    System.out
 		    .println("Usage: \nboo create yarn -c <template_fullpath> \nboo create yarn "
-			    + "\nboo cleanup yarn -c <template_fullpath> \nboo cleanup yarn "
+			    + "\nboo cleanup yarn "
 			    + "\nboo getip zookeeper"
-			    + "\nDefault template: /etc/oneops-tool-bfd/yarn.yaml");
+			    + "\nboo getip yarn"
+			    + "\n-c template_fullpath: If not set, will use the default template: /etc/oneops-tool-bfd/yarn.yaml");
 	    System.exit(0);
 	}
 
@@ -47,6 +47,8 @@ public class Main {
 	} else if (args[0].equals("getip")) {
 	    if (args[1].equals("zookeeper")) {
 		System.out.println(main.getIpZookeeper());
+	    } else if (args[1].equals("yarn")) {
+		System.out.println(main.getIpYarn());
 	    }
 	}
 
@@ -75,7 +77,11 @@ public class Main {
     }
 
     public String getIpZookeeper() {
-	return flow.getIp();
+	return flow.getZookeeperIp();
+    }
+    
+    public String getIpYarn() {
+	return flow.getYarnIp();
     }
 
 }

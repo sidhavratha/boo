@@ -6,6 +6,8 @@ import java.util.Map;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.wm.bfd.oo.yaml.Users;
@@ -14,7 +16,7 @@ import com.wm.bfd.oo.yaml.ZookeeperBean;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestYaml extends BFDOOTest {
-
+    final private static Logger LOG = LoggerFactory.getLogger(TestYaml.class);
     @Test
     public void testConfig() throws OneOpsClientAPIException {
 	YamlBean yaml = config.getConfig();
@@ -35,7 +37,7 @@ public class TestYaml extends BFDOOTest {
 
 		Map<String, String> keys = entry.getValue();
 		for (Map.Entry<String, String> ssh : keys.entrySet()) {
-		    System.out.printf("Key: %s: Key : %s and Value: %s %n\n",
+		    LOG.debug("{}: key : {} and value: {} \n",
 			    entry.getKey(), ssh.getKey(), ssh.getValue());
 		    assertNotNull(ssh.getValue());
 		}
@@ -47,7 +49,6 @@ public class TestYaml extends BFDOOTest {
     @Test
     public void testGetAllvariables() throws OneOpsClientAPIException {
 	YamlBean yaml = config.getConfig();
-	System.out.println(yaml.getPlatforms().getYarn().getSecureVariables());
 	assertNotNull(yaml.getPlatforms().getYarn().getVariables());
 	assertNotNull(yaml.getPlatforms().getYarn().getSecureVariables());
 	assertNotNull(yaml.getPlatforms().getYarn().getComponents().getComputeSize());
