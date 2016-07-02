@@ -10,6 +10,8 @@ boo cleanup yarn
 
 boo getip zookeeper
 
+boo getip yarn
+
 
 -c template_fullpath:
 
