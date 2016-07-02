@@ -10,6 +10,7 @@ import com.oo.api.OOInstance;
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.oo.api.resource.Transition;
 import com.wm.bfd.oo.ClientConfig;
+import com.wm.bfd.oo.Main;
 
 /**
  * Install yarn pack in one run. Include all dependencies.
@@ -21,6 +22,7 @@ public class YarnWorkflow extends AbstractWorkflow {
 
     final private static int WAIT_TIME = 10; // seconds
     String zkHost;
+    BuildZookeeper zookeeper;
 
     public YarnWorkflow(OOInstance instance, String assemblyName,
 	    String platformName, String envName, ClientConfig config)
@@ -28,6 +30,8 @@ public class YarnWorkflow extends AbstractWorkflow {
 	super(instance, assemblyName, platformName, envName, config);
 	zkHost = config.getConfig().getPlatforms().getYarn().getVariables()
 		.get(ClientConfig.ZK_HOST);
+	zookeeper = new BuildZookeeper(instance, assemblyName, platformName,
+		envName, config);
     }
 
     String waitForActiveDeployment(OOInstance instance, String assembly,
@@ -49,9 +53,16 @@ public class YarnWorkflow extends AbstractWorkflow {
 
     }
 
+    public String getIp() {
+	if (config.getConfig().getBoo().getIpOutput()
+		.equalsIgnoreCase(Main.IP_OUTPUT)) {
+	    return zookeeper.getIpsJson();
+	}
+	return "";
+    }
+
     public boolean process() throws OneOpsClientAPIException {
-	BuildZookeeper zookeeper = new BuildZookeeper(instance, assemblyName,
-		platformName, envName, config);
+
 	this.bar.update(0, 100);
 	boolean isBuildYarn = false;
 	if (StringUtils.isEmpty(zkHost)) {

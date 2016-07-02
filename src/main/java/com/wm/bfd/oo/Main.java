@@ -1,5 +1,8 @@
 package com.wm.bfd.oo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.oo.api.OOInstance;
@@ -7,31 +10,49 @@ import com.oo.api.exception.OneOpsClientAPIException;
 import com.wm.bfd.oo.exception.BFDOOException;
 import com.wm.bfd.oo.utils.BFDUtils;
 import com.wm.bfd.oo.workflow.YarnWorkflow;
+import com.wm.bfd.test.Test;
 
 public class Main {
     final public static String TEMPLATE = "/etc/oneops-tool-bfd/yarn.yaml";
+    final public static String IP_OUTPUT = "json";
+    private YarnWorkflow flow;
+    static Logger LOG = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws BFDOOException,
 	    OneOpsClientAPIException {
 	if (args.length < 2) {
-	    System.out.println("Usage: boo create yarn -c <template_fullpath> \nor boo create yarn \nDefault template: /etc/oneops-tool-bfd/yarn.yaml");
+	    System.out
+		    .println("Usage: \nboo create yarn -c <template_fullpath> \nboo create yarn "
+			    + "\nboo cleanup yarn -c <template_fullpath> \nboo cleanup yarn "
+			    + "\nboo getip zookeeper"
+			    + "\nDefault template: /etc/oneops-tool-bfd/yarn.yaml");
 	    System.exit(0);
 	}
 
-	Main main = new Main();
 	String template = TEMPLATE;
 	if (args.length > 2) {
 	    template = args[3];
+	    LOG.debug("Using template file %s", args[3]);
 	}
-	if (args[0].equals("create")) {
+	// Will move over to option handler in future.
+	Main main = new Main(template);
+	if (args[0].equals("cleanup")) {
 	    if (args[1].equals("yarn")) {
-		main.createYarn(template);
+		main.cleanupYarn();
+	    }
+	} else if (args[0].equals("create")) {
+	    if (args[1].equals("yarn")) {
+		main.createYarn();
+	    }
+	} else if (args[0].equals("getip")) {
+	    if (args[1].equals("zookeeper")) {
+		System.out.println(main.getIpZookeeper());
 	    }
 	}
 
     }
 
-    public void createYarn(String template) throws BFDOOException,
+    public Main(String template) throws BFDOOException,
 	    OneOpsClientAPIException {
 	Injector injector = Guice
 		.createInjector(new JaywayHttpModule(template));
@@ -42,9 +63,19 @@ public class Main {
 	String platformName = config.getConfig().getPlatforms().getYarn()
 		.getName();
 	String envName = config.getConfig().getBoo().getEnvName();
-	YarnWorkflow flow = new YarnWorkflow(oo, assemblyName, platformName,
-		envName, config);
+	flow = new YarnWorkflow(oo, assemblyName, platformName, envName, config);
+    }
+
+    public void createYarn() throws BFDOOException, OneOpsClientAPIException {
 	flow.process();
+    }
+
+    public void cleanupYarn() throws BFDOOException, OneOpsClientAPIException {
+	flow.cleanup();
+    }
+
+    public String getIpZookeeper() {
+	return flow.getIp();
     }
 
 }

@@ -190,7 +190,6 @@ public abstract class AbstractWorkflow {
 	if (!isExist) {
 	    Map<String, String> cloudMap = new HashMap<String, String>();
 	    cloudMap.put(config.getConfig().getBoo().getCloudId(), "1");
-	    System.out.println("Creating a new");
 	    response = transition.createEnvironment(envName, "DEV",
 		    "redundant", null, cloudMap, false, true, "");
 	    response = transition.getEnvironment(envName);
