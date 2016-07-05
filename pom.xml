@@ -2,13 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.oo</groupId>
+	<groupId>com.bfd.oo</groupId>
 	<artifactId>BFDOneOpsAutomation</artifactId>
-	<version>1.1.6</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<name>OneOpsAPIClient</name>
-	<url>http://maven.apache.org</url>
+	<name>boo</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,7 +19,6 @@
 			<groupId>com.jayway.restassured</groupId>
 			<artifactId>rest-assured</artifactId>
 			<version>2.9.0</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -101,22 +99,33 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.5.2</version>
 			</plugin>
+			<!-- Maven Assembly Plugin -->
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
-					<formats>
-						<format>xml</format>
-					</formats>
+					<!-- get all project dependencies -->
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<!-- MainClass in mainfest make a executable jar -->
+					<archive>
+					  <manifest>
+						<mainClass>com.wm.bfd.oo.Main</mainClass>
+					  </manifest>
+					</archive>
+
 				</configuration>
 				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>cobertura</goal>
-						</goals>
-					</execution>
+				  <execution>
+					<id>make-assembly</id>
+                    <!-- bind to the packaging phase -->
+					<phase>package</phase> 
+					<goals>
+						<goal>single</goal>
+					</goals>
+				  </execution>
 				</executions>
 			</plugin>
 		</plugins>
