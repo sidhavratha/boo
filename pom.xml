@@ -12,7 +12,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<main-class>com.wm.bfd.oo.Main</main-class>
 		<scm.field>scm:git:git@gecgithub01.walmart.com:platform/platform-archetypes.git</scm.field>
-	</properties>
+                <rpmversion>1.0.0</rpmversion>
+        </properties>
 
         <developers>
             <developer>
