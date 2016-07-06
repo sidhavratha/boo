@@ -1,0 +1,52 @@
+---
+# This template guides you to create a yarn cluster automatically, include zookeeper platform.
+# Except the fields that labeled optional all other fields are required.
+boo:
+  oneops_host: https://web.bfd.dev.cloud.wal-mart.com/
+  organization: ''
+  cloud_id: ''
+  api_key: ''
+  email: ''
+  environment_name: 'dev-yarn' # All the deployment in this template adds to this environment.
+  ip_output: json
+assembly:
+  name: ''
+variables: # Optional, global variables.
+platforms:
+  yarn:
+    name: yarn
+    pack: oneops/hadoop_yarn_vrc3:1
+    major_version: '1'
+    variables:
+      additional_libraries: ''
+      yarn_tarball: ''
+      swift_username: ''
+      swift_url: ''
+      swift_tenant: ''
+      s3_endpoint: ''
+      hive_connect_url: ''
+      hive_tarball_url: ''
+      zk_hosts: '' # Optional, if you set this value, then automation doesn't create a zookeeper cluster anymore.
+    encrypted_variables:
+      swift_password: ''
+      hive_db_password: ''
+    scale:
+      current: 3
+      min: 3
+      max: 3
+    components: # Optional
+      compute/Compute:
+        compute:
+          size: XXL
+      user/User:
+        - rzhan33: {'authorized_keys':''}
+  zookeeper:
+    name: zookeeper
+    pack: main/zookeeper:1
+    major_version: '1'
+    components: # Optional
+      user/User:
+        rzhan33: {'authorized_keys':''}
+#environments:
+  
+  
