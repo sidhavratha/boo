@@ -1,5 +1,6 @@
 ---
 # This template guides you to create a yarn cluster automatically, include zookeeper platform.
+# Except the fields that labeled optional all other fields are required.
 boo:
   oneops_host: https://web.bfd.dev.cloud.wal-mart.com/
   organization: ''
@@ -8,12 +9,8 @@ boo:
   email: ''
   environment_name: 'dev-yarn' # All the deployment in this template adds to this environment.
   ip_output: json
-  custom: # Optional
-    custom_host1: '[public_ip]:2181{3}' # The number in {} means the number of repetition you expect.
-    custom_split1: ','
 assembly:
   name: ''
-  auto_gen: true # If turn on, then this tool will generate random assembly name for you.
 variables: # Optional, global variables.
 platforms:
   yarn:
@@ -29,7 +26,7 @@ platforms:
       s3_endpoint: ''
       hive_connect_url: ''
       hive_tarball_url: ''
-      zk_hosts: '$zookeeper' # Optional, if you set this value, then automation doesn't create a zookeeper cluster anymore.
+      zk_hosts: '' # Optional, if you set this value, then automation doesn't create a zookeeper cluster anymore.
     encrypted_variables:
       swift_password: ''
       hive_db_password: ''
@@ -51,11 +48,5 @@ platforms:
       user/User:
         rzhan33: {'authorized_keys':''}
 #environments:
-operate: # Optional
-  zookeeper:
-    output:
-      custom_format: '$custom_host1'
-      custom_split: '$custom_split1'
-  
   
   
