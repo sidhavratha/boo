@@ -6,8 +6,8 @@ Build:
 
 1. mvn clean package
 
-2. move the /target/BFDOneOpsAutomation-1.0-executable.jar to your own folder, for example: mv ./target/BFDOneOpsAutomation-1.0-executable.jar /tmp/boo
-3. run boo directly in tmp folder: ./boo
+2. move the ./target/BFDOneOpsAutomation-1.0-executable.jar to your own folder, for example: mv ./target/BFDOneOpsAutomation-1.0-executable.jar /tmp/boo
+3. run boo directly: ./tmp/boo
 
 Usage:
 
