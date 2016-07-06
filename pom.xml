@@ -86,6 +86,12 @@
 	</dependencies>
 
 	<build>
+	    <resources>
+           <resource>
+               <directory>${project.basedir}/scripts</directory>
+               <filtering>true</filtering>
+           </resource>
+        </resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -143,4 +149,66 @@
             </plugin>
 		</plugins>
 	</build>
+	
+	<profiles>
+        <!-- Add a profile to build RPM as part of packging phase. -->
+        <profile>
+            <id>build-rpms</id>
+            <activation>
+                <file> <exists>/bin/rpm</exists> </file>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- rpm-maven-plugin builds rpm honoring all the mappings specified. -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>rpm-maven-plugin</artifactId>
+                        <version>2.1-alpha-3</version>
+                        <executions>
+                            <execution>
+                                <goals> <goal>rpm</goal> </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <name>${project.artifactId}</name>
+                            <group>Applications/System</group>
+                            <defaultFilemode>0644</defaultFilemode>
+                            <defaultDirmode>0755</defaultDirmode>
+                            <defaultUsername>root</defaultUsername>
+                            <defaultGroupname>root</defaultGroupname>
+                            <provides><provide>boo</provide></provides>
+                                                        <defineStatements>
+                                <!-- disable jar repackaging: https://bugzilla.redhat.com/show_bug.cgi?id=219731 -->
+                                <defineStatement>__jar_repack 0</defineStatement>
+                            </defineStatements>
+                            <mappings>
+                                <mapping>
+                                    <directory>/usr/local/boo/${rpmversion}</directory>
+                                    <sources>
+                                        <source>
+                                            <location>${project.build.outputDirectory}/../BFDOneOpsAutomation-${project.version}.jar</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <mapping>
+                                    <directory>/usr/local/bin/</directory>
+                                    <filemode>0755</filemode>
+                                    <sources>
+                                        <source>
+                                            <location>${project.build.outputDirectory}/boo</location>
+                                            <destination>BFDOneOpsAutomation.${rpmversion}</destination>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                            </mappings>
+                            <postinstallScriptlet>
+                                <scriptFile>${project.build.outputDirectory}/postInstallScript.sh</scriptFile>
+                                <fileEncoding>utf-8</fileEncoding>
+                            </postinstallScriptlet>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>    
+    </profiles>    
 </project>
