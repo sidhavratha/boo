@@ -6,7 +6,6 @@
 	<artifactId>BFDOneOpsAutomation</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
-
 	<name>boo</name>
 
 	<properties>
@@ -14,6 +13,21 @@
 		<main-class>com.wm.bfd.oo.Main</main-class>
 		<scm.field>scm:git:git@gecgithub01.walmart.com:platform/platform-archetypes.git</scm.field>
 	</properties>
+
+        <developers>
+            <developer>
+                <id>yliu28</id>
+                <name>Yanchen Liu</name>
+                <email>yliu@walmartlabs.com</email>
+                <timezone>-6</timezone>
+                <roles>
+                    <role>Developer</role>
+                </roles>
+            </developer>
+        </developers>
+        <organization>
+            <name>Walmart Labs</name>
+        </organization>
 
 	<dependencies>
 		<dependency>
