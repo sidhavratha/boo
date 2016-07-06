@@ -9,7 +9,7 @@ boo:
   environment_name: 'dev-yarn' # All the deployment in this template adds to this environment.
   ip_output: json
   custom: # Optional
-    custom_host1: 'public_ip:2181{3}' # The number in {} means the number of repetition you expect.
+    custom_host1: '[public_ip]:2181{3}' # The number in {} means the number of repetition you expect.
     custom_split1: ','
 assembly:
   name: ''
