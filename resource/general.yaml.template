@@ -18,6 +18,7 @@ variables: # Optional, global variables.
 platforms:
   yarn:
     name: yarn
+    priority: 2 # If the priority number is the same, then they have the same priorities and can be executed in parallel.
     pack: oneops/hadoop_yarn_vrc3:1
     major_version: '1'
     variables:
@@ -45,6 +46,7 @@ platforms:
         - rzhan33: {'authorized_keys':''}
   zookeeper:
     name: zookeeper
+    priority: 1
     pack: main/zookeeper:1
     major_version: '1'
     components: # Optional
