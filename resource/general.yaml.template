@@ -45,6 +45,18 @@ platforms:
           size: XXL
       user/User:
         - rzhan33: {'authorized_keys':''}
+      hadoop_yarn_attributes:
+        additional_libraries: ''
+        yarn_tarball: ''
+        swift_username: ''
+        swift_url: ''
+        swift_tenant: ''
+        s3_endpoint: ''
+        hive_connect_url: ''
+        hive_tarball_url: ''
+        encrypted:
+          swift_password: ''
+          hive_db_password: ''
   zookeeper:
     name: zookeeper
     deploy_order: 1

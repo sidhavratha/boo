@@ -1,6 +1,5 @@
 package com.wm.bfd.test;
 
-import java.util.List;
 import java.util.Map;
 
 import org.junit.FixMethodOrder;
@@ -10,56 +9,63 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.oo.api.exception.OneOpsClientAPIException;
-import com.wm.bfd.oo.yaml.Users;
-import com.wm.bfd.oo.yaml.YamlBean;
-import com.wm.bfd.oo.yaml.ZookeeperBean;
+import com.wm.bfd.oo.yaml.Yaml;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestYaml extends BFDOOTest {
-    final private static Logger LOG = LoggerFactory.getLogger(TestYaml.class);
-    @Test
-    public void testConfig() throws OneOpsClientAPIException {
-	YamlBean yaml = config.getConfig();
-	assertNotNull(yaml.getBoo().getApikey());
-	assertNotNull(yaml.getBoo().getHost());
-	assertNotNull(yaml.getBoo().getCloudId());
-	assertNotNull(yaml.getBoo().getOrg());
-    }
+  final private static Logger LOG = LoggerFactory.getLogger(TestYaml.class);
 
-    @Test
-    public void testGetSshKey() throws OneOpsClientAPIException {
-	YamlBean yaml = config.getConfig();
-	List<Users> users = yaml.getPlatforms().getYarn().getComponents()
-		.getUsers();
-	for (Users user : users) {
-	    Map<String, Map<String, String>> map = user.getUsers();
-	    for (Map.Entry<String, Map<String, String>> entry : map.entrySet()) {
+  @Test
+  public void testGetAssembly() throws OneOpsClientAPIException {
+    assertNotNull(config.getYaml().getAssembly());
+  }
 
-		Map<String, String> keys = entry.getValue();
-		for (Map.Entry<String, String> ssh : keys.entrySet()) {
-		    LOG.debug("{}: key : {} and value: {} \n",
-			    entry.getKey(), ssh.getKey(), ssh.getValue());
-		    assertNotNull(ssh.getValue());
-		}
-	    }
-	}
+  @Test
+  public void testGetBoo() throws OneOpsClientAPIException {
+    assertNotNull(config.getYaml().getBoo().getApikey());
+  }
+
+  @Test
+  public void testGetPlatforms() throws OneOpsClientAPIException {
+    Yaml yaml = config.getYaml();
+    assertNotNull(yaml.getPlatforms());
+  }
+
+  @Test
+  public void testGetEnvironments() throws OneOpsClientAPIException {
+    assertNotNull(config.getYaml().getEnvironments());
+    this.printMap(config.getYaml().getEnvironments(), 0);
+  }
+
+  @Test
+  public void testGetOthers() throws OneOpsClientAPIException {
+
+    Yaml yaml = config.getYaml();
+    assertNotNull(yaml.getOthers());
+    // this.printMap(yaml.getOthers(), 0);
+  }
+
+  @SuppressWarnings("unchecked")
+  void printMap(Map<String, Object> map, int depth) {
+    String log = "Parent";
+    if (depth > 0)
+      log = "Children";
+    StringBuilder str = new StringBuilder();
+    int loop = depth;
+    while (loop > 0) {
+      str.append('\t');
+      loop--;
+    }
+    for (Map.Entry<String, Object> entry : map.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      LOG.debug("{} {}: key: {}; value:{}: \n", str.toString(), log, key, value == null ? ""
+          : value.getClass());
+      if (value instanceof Map) {
+        this.printMap((Map<String, Object>) value, ++depth);
+      }
 
     }
-    
-    @Test
-    public void testGetAllvariables() throws OneOpsClientAPIException {
-	YamlBean yaml = config.getConfig();
-	assertNotNull(yaml.getPlatforms().getYarn().getVariables());
-	assertNotNull(yaml.getPlatforms().getYarn().getSecureVariables());
-	assertNotNull(yaml.getPlatforms().getYarn().getComponents().getComputeSize());
-    }
+  }
 
-    @Test
-    public void testGetZookeeper() throws OneOpsClientAPIException {
-	YamlBean yaml = config.getConfig();
-	ZookeeperBean zoo = yaml.getPlatforms().getZookeeper();
-	assertNotNull(zoo.getPack());
-	assertNotNull(zoo.getPackVersion());
-	assertNotNull(zoo.getPackSource());
-    }
 }
