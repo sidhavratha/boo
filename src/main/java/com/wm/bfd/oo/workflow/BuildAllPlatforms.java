@@ -94,6 +94,14 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return (j == null ? false : true);
   }
 
+  private boolean updatePlatformVariables(String platformName, boolean isSecure,
+      Map<String, String> variables) throws OneOpsClientAPIException {
+    design.updatePlatformVariable(platformName, variables, isSecure);
+    design.commitDesign();
+    this.bar.update(40, 100);
+    return true;
+  }
+
   private boolean updateComponentVariables(String platformName, String componentName,
       Map<String, String> attributes) throws OneOpsClientAPIException {
     String uniqueName = componentName;
@@ -107,7 +115,12 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     if (this.isComponentExist(platformName, componentName)) {
       design.updatePlatformComponent(platformName, componentName, attributes);
     } else {
-      design.addPlatformComponent(platformName, componentName, uniqueName, attributes);
+      try {
+        design.addPlatformComponent(platformName, componentName, uniqueName, attributes);
+      } catch (Exception e) {
+        // Ignore
+        System.err.println(e.getMessage());
+      }
     }
     design.commitDesign();
     this.bar.update(45, 100);

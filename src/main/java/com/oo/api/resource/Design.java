@@ -233,7 +233,7 @@ public class Design extends APIClient {
       } else {
         String msg =
             String.format("Failed to delete platform with name %s due to %s", platformName,
-                response.getStatusLine());
+                response.getBody().prettyPrint());
         throw new OneOpsClientAPIException(msg);
       }
     }
