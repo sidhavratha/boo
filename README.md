@@ -17,9 +17,14 @@ Build to a RPM:
 2. Then install the BFDOneOpsAutomation-<version>.noarch.rpm to your server
 3. After that, you can run boo command
 
-```usage: boo [-cf <yaml>] [-cleanup] [-create] [-h] [-s]
+usage: boo [-cf <yaml>] [-cleanup] [-create] [-h] [-s]
+
  -cf,--config_file <yaml>   Use specified template.
+
  -cleanup                   Remove all deployment in OneOps.
+
  -create                    Create a new deployment in OneOps.
+
  -h,--help                  show help.
- -s,--status                Check deployment status.i```
+
+ -s,--status                Check deployment status.i
