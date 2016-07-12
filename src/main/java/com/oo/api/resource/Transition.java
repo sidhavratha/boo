@@ -661,7 +661,7 @@ public class Transition extends APIClient {
       } else {
         String msg =
             String.format("Failed to delete environment with name %s due to %s", environmentName,
-                response.getStatusLine());
+                response.getBody().prettyPrint());
         throw new OneOpsClientAPIException(msg);
       }
     }

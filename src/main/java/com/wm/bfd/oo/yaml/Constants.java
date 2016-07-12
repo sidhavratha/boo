@@ -15,6 +15,8 @@ public class Constants {
   final public static String VARIABLES = "variables";
   final public static String DESCRIPTIONS = "description";
   final public static String YAML_ERROR = "The template file not found or has wrong format!";
+  
+  final public static String BFD_TOOL = "The tool is managed by BFD team.";
 
   // Components
   final public static String USER = "user";

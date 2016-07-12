@@ -25,6 +25,15 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     super(instance, config);
   }
 
+  public boolean process() throws OneOpsClientAPIException {
+    this.createAssemblyIfNotExist();
+    this.createPlatforms();
+    this.createEnv();
+    this.updateScaling();
+    this.deploy();
+    return true;
+  }
+
   public boolean isPlatformExist(String platformName) {
     JsonPath response = null;
     try {

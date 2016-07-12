@@ -42,7 +42,7 @@ public class TestYaml extends BFDOOTest {
 
     Yaml yaml = config.getYaml();
     assertNotNull(yaml.getOthers());
-    // this.printMap(yaml.getOthers(), 0);
+    this.printMap(yaml.getOthers(), 0);
   }
 
   @SuppressWarnings("unchecked")

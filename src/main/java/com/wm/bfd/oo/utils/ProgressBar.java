@@ -20,7 +20,7 @@ public class ProgressBar {
     char[] workchars = {'|', '/', '-', '\\'};
     // String format = "\r%3d%% %s %c";
     String format = "\r%3d%% %s \n";
-    int percent = (++done * 100) / total;
+    int percent = (done++ * 100) / total;
     int extrachars = (percent / 2) - this.progress.length();
 
     while (extrachars-- > 0) {

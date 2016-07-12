@@ -52,10 +52,6 @@ public abstract class AbstractWorkflow {
     this.bar = new ProgressBar();
   }
 
-  public boolean process() throws OneOpsClientAPIException {
-    return false;
-  }
-
   public boolean cleanup() {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
       this.cleanupInt(platform.getName());
