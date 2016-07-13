@@ -3,50 +3,71 @@
 # Except the fields that labeled optional all other fields are required.
 boo:
   oneops_host: https://web.bfd.dev.cloud.wal-mart.com/
-  organization: ''
-  cloud_id: ''
+  organization: 'bfd'
+  #cloud_id: '2180660' #dev-cdc002
+  cloud_id: '2259378' #dev-cdc003
   api_key: ''
   email: ''
-  environment_name: 'dev-yarn' # All the deployment in this template adds to this environment.
+  environment_name: 'test' # All the deployment in this template adds to this environment.
   ip_output: json
+  custom: # Optional
+    custom_host1: '[public_ip]:2181{3}' # The number in {} means the number of repetition you expect.
+    cutom_component1: 'compute' # Which component in OneOps
+    custom_split1: ','
+
 assembly:
-  name: ''
+  name: 'boo-test'
+  auto_gen: true # If turn on, then this tool will generate random assembly name for you.
 variables: # Optional, global variables.
-platforms:
+
+platforms: # In OneOps design.
   yarn:
-    name: yarn
-    pack: oneops/hadoop_yarn_vrc3:1
-    major_version: '1'
-    variables:
-      additional_libraries: ''
-      yarn_tarball: ''
-      swift_username: ''
-      swift_url: ''
-      swift_tenant: ''
-      s3_endpoint: ''
-      hive_connect_url: ''
-      hive_tarball_url: ''
-      zk_hosts: '' # Optional, if you set this value, then automation doesn't create a zookeeper cluster anymore.
-    encrypted_variables:
-      swift_password: ''
-      hive_db_password: ''
-    scale:
-      current: 3
-      min: 3
-      max: 3
+    deploy_order: 1
+    pack: oneops/hadoop_yarn_vrc3
+    pack_version: '1'
     components: # Optional
-      compute/Compute:
+      hadoop_yarn_attributes:
+        additional_libraries: ''
+        yarn_tarball: ''
+        swift_username: ''
+        swift_url: ''
+        swift_tenant: ''
+        s3_endpoint: ''
+        hive_connect_url: ''
+        hive_tarball_url: ''
+        swift_password: ''
+        hive_db_password: '' # New cloud
+      #yarn-cluster-rc3:
+      compute:
+        size: XXL
+      prm-compute:
+        size: XXL
+      client-user:
+        ciName: client-rzhan33
+        username: rzhan33
+        authorized_keys: '[""]'
+      dn-admin-user:
+        ciName: dn-rzhan33
+        username: rzhan33-dn
+        authorized_keys: '[""]'
+      prm-admin-user:
+        ciName: prm-rzhan33
+        username: rzhan33-prm
+        authorized_keys: '[""]'
+  #zookeeper: # Add more packs in the same YAML
+    #name: zookeeper
+environments: # In OneOps transition.
+    yarn:
+      scaling: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.
         compute:
-          size: XXL
-      user/User:
-        - rzhan33: {'authorized_keys':''}
+          current: 3
+          min: 3
+          max: 3
+
+extract: # Optional, means extract informations from previous deployment
   zookeeper:
-    name: zookeeper
-    pack: main/zookeeper:1
-    major_version: '1'
-    components: # Optional
-      user/User:
-        rzhan33: {'authorized_keys':''}
-#environments:
+      custom_format: '$custom_host1'
+      custom_split: '$custom_split1'
+      custom_component: '$cutom_component1'
   
   

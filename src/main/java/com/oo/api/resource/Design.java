@@ -232,8 +232,7 @@ public class Design extends APIClient {
         return response.getBody().jsonPath();
       } else {
         String msg =
-            String.format("Failed to delete platform with name %s due to %s", platformName,
-                response.getBody().prettyPrint());
+            String.format("Failed to delete platform with name %s", platformName);
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -297,9 +296,8 @@ public class Design extends APIClient {
         return response.getBody().jsonPath();
       } else {
         String msg =
-            String.format("Failed to get platform component details due to %s, url is %s", response
-                .getBody().prettyPrint(), DESIGN_URI + "platforms/" + platformName + "/components/"
-                + componentName);
+            String.format("Failed to get platform component details due to %s", response
+                .getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -369,7 +367,7 @@ public class Design extends APIClient {
         } else {
           String msg =
               String.format("Failed to get update component %s due to %s", componentName, response
-                  .getBody().prettyPrint());
+                  .getStatusLine());
           throw new OneOpsClientAPIException(msg);
         }
       }
@@ -435,7 +433,7 @@ public class Design extends APIClient {
         } else {
           String msg =
               String.format("Failed to get update component %s due to %s", componentName, response
-                  .getBody().prettyPrint());
+                  .getStatusLine());
           throw new OneOpsClientAPIException(msg);
         }
       }

@@ -19,6 +19,8 @@ import com.wm.bfd.oo.yaml.ScalBean;
 public class BuildAllPlatforms extends AbstractWorkflow {
   final private static Logger LOG = LoggerFactory.getLogger(BuildAllPlatforms.class);
   final private static String NAME = "ciName"; // Get component name.
+  final private static String ACTIVE = "active";
+  final private static String FAILED = "failed";
 
   public BuildAllPlatforms(OOInstance instance, ClientConfig config)
       throws OneOpsClientAPIException {
@@ -26,11 +28,30 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
   public boolean process() throws OneOpsClientAPIException {
+    this.bar.update(1, 100);
     this.createAssemblyIfNotExist();
+    this.bar.update(5, 100);
     this.createPlatforms();
+    this.bar.update(15, 100);
+    this.updatePlatformVariables();
+    this.bar.update(20, 100);
     this.createEnv();
+    this.bar.update(30, 100);
+    String status = this.getStatus();
+    if (ACTIVE.equalsIgnoreCase(status)){
+      System.out.println("An active deployment has been running, cancel this one!");
+      return false;
+    }
+    
+    if (FAILED.equalsIgnoreCase(status)){
+      System.out.println("An failed deployment has been running, cancel this one!");
+      return false;
+    }
     this.updateScaling();
+    this.bar.update(50, 100);
     this.deploy();
+    this.bar.update(100, 100);
+    System.out.println("Deployment is running...");
     return true;
   }
 
@@ -49,7 +70,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   public boolean createPlatforms() throws OneOpsClientAPIException {
     List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
     Collections.sort(platforms);
-    this.bar.update(20, 100);
     for (PlatformBean platform : platforms) {
       LOG.info("Creating platform {}", platform.getName());
       this.createPlatform(platform);
@@ -94,11 +114,18 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return (j == null ? false : true);
   }
 
-  private boolean updatePlatformVariables(String platformName, boolean isSecure,
-      Map<String, String> variables) throws OneOpsClientAPIException {
-    design.updatePlatformVariable(platformName, variables, isSecure);
+
+  private boolean updatePlatformVariables() throws OneOpsClientAPIException {
+    List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
+    for (PlatformBean platform : platforms) {
+      Map<String, String> secureVariables = platform.getSecureVariables();
+      if (secureVariables != null && secureVariables.size() > 0)
+        design.updatePlatformVariable(platform.getName(), secureVariables, true);
+      Map<String, String> variables = platform.getVariables();
+      if (variables != null && variables.size() > 0)
+        design.updatePlatformVariable(platform.getName(), variables, false);
+    }
     design.commitDesign();
-    this.bar.update(40, 100);
     return true;
   }
 
@@ -119,11 +146,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
         design.addPlatformComponent(platformName, componentName, uniqueName, attributes);
       } catch (Exception e) {
         // Ignore
-        System.err.println(e.getMessage());
+        System.err.println("Update component variables failed!");
+        //System.err.println(e.getMessage());
       }
     }
     design.commitDesign();
-    this.bar.update(45, 100);
     return true;
   }
 

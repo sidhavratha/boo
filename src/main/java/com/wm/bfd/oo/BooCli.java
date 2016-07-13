@@ -72,16 +72,20 @@ public class BooCli {
     RestAssured.useRelaxedHTTPSValidation();
   }
 
-  public void init(String template) throws BFDOOException, OneOpsClientAPIException {
+  public void init(String template) throws BFDOOException {
     LOG.info("Loading {}", template);
     Injector injector = Guice.createInjector(new JaywayHttpModule(template));
     ClientConfig config = injector.getInstance(ClientConfig.class);
     new BFDUtils().verifyTemplate(config);
     OOInstance oo = injector.getInstance(OOInstance.class);
-    flow = new BuildAllPlatforms(oo, config);
+    try {
+      flow = new BuildAllPlatforms(oo, config);
+    } catch (OneOpsClientAPIException e) {
+      System.err.println("Init failed! Quit!");
+    }
   }
 
-  public void parse() throws ParseException, BFDOOException, OneOpsClientAPIException {
+  public void parse() throws ParseException, BFDOOException {
     CommandLineParser parser = new DefaultParser();
     // CommandLineParser parser = new GnuParser();
     CommandLine cmd = parser.parse(options, args);
@@ -101,13 +105,18 @@ public class BooCli {
       this.configFile = cmd.getOptionValue("cf");
       this.init(this.configFile);
     }
+
     if (cmd.hasOption("cd")) {
       this.configDir = cmd.getOptionValue("cd");
       if (cmd.hasOption("l")) {
         this.listFiles(this.configDir);
       }
-    } else {
-      this.help(null, "No YAML file specified");
+    }
+
+    if (this.configDir == null && this.configFile != null) {
+      this.configDir = this.configFile.substring(0, this.configFile.lastIndexOf('/'));
+    } else if (this.configDir == null && this.configFile == null) {
+      this.help(null, "No YAML file found.");
       System.exit(-1);
     }
 
@@ -142,7 +151,7 @@ public class BooCli {
     File dirs = new File(dir);
     File ori = new File(file);
     File[] files = dirs.listFiles();
-    list.add(ori.getName());
+    // list.add(ori.getName());
     String startWith = ori.getName() + FILE_NAME_SPLIT;
     for (File f : files) {
       if (StringUtils.startsWithIgnoreCase(f.getName(), startWith))
@@ -190,20 +199,43 @@ public class BooCli {
     formatter.printHelp("boo", options);
   }
 
-  public void createPacks() throws BFDOOException, OneOpsClientAPIException {
+  public void createPacks() throws BFDOOException {
     this.copyFile(this.configFile);
-    flow.process();
+    try {
+      flow.process();
+    } catch (OneOpsClientAPIException e) {
+      //Ignore
+      e.printStackTrace();
+    }
   }
 
-  public void cleanup() throws BFDOOException, OneOpsClientAPIException {
+  private void deleteFile(String dir, String file) {
+    if (StringUtils.isEmpty(file))
+      return;
+    LOG.warn("Deleting yaml file {}", file);
+    File f = new File(dir + "/" + file);
+    if (f.exists()) {
+      f.deleteOnExit();
+    }
+  }
+
+  public void cleanup() {
     List<String> files = this.listFilesStartWith(this.configDir, this.configFile);
     for (String file : files) {
-      LOG.warn("Destroying OneOps instance {}", file);
+      System.out.printf("Destroying OneOps instance %s", file);
+      try {
+        this.init(file);
+        flow.cleanup();
+      } catch (BFDOOException e) {
+        // Ignore
+      } finally {
+        this.deleteFile(this.configDir, file);
+      }
     }
-    // flow.cleanup();
+   System.out.printf("Destroyed!");
   }
 
-  public String getStatus() throws BFDOOException, OneOpsClientAPIException {
+  public String getStatus() throws BFDOOException {
     return flow.getStatus();
   }
 

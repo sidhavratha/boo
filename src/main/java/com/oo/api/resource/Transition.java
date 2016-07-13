@@ -167,7 +167,7 @@ public class Transition extends APIClient {
       } else {
         String msg =
             String.format("Failed to create environment with name %s due to %s", environmentName,
-                response.getBody().prettyPrint());
+                response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -661,7 +661,7 @@ public class Transition extends APIClient {
       } else {
         String msg =
             String.format("Failed to delete environment with name %s due to %s", environmentName,
-                response.getBody().prettyPrint());
+                response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -1299,8 +1299,6 @@ public class Transition extends APIClient {
 
     JSONObject dependsOn = new JSONObject();
     dependsOn.put("depends_on", jo);
-
-    System.out.println(dependsOn);
     Response response =
         request.body(dependsOn.toString()).put(
             TRANSITION_ENV_URI + environmentName + "/platforms/" + platformName);

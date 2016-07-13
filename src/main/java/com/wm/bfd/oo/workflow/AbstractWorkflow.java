@@ -52,6 +52,8 @@ public abstract class AbstractWorkflow {
     this.bar = new ProgressBar();
   }
 
+  public abstract boolean process() throws OneOpsClientAPIException;
+
   public boolean cleanup() {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
       this.cleanupInt(platform.getName());
@@ -62,18 +64,14 @@ public abstract class AbstractWorkflow {
   private boolean cleanupInt(String platformName) {
     if (design == null)
       return true;
-    this.bar.update(5, 100);
     this.cancelDeployment();
-    this.bar.update(20, 100);
     this.disableAllPlatforms();
-    this.bar.update(40, 100);
     try {
       transition.deleteEnvironment(envName);
     } catch (Exception e) {
       // Ignore
       e.printStackTrace();
     }
-    this.bar.update(60, 100);
     this.deleteDesign(platformName);
     // Don't add the following part to one try block as transition.
     try {
@@ -81,11 +79,9 @@ public abstract class AbstractWorkflow {
     } catch (Exception e) {
       // Ignore
     }
-    this.bar.update(90, 100);
     op = null;
     design = null;
     assembly = null;
-    this.bar.update(100, 100);
     return true;
   }
 
@@ -99,8 +95,8 @@ public abstract class AbstractWorkflow {
       response = transition.getDeploymentStatus(envName, deploymentId);
       Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
       response = transition.cancelDeployment(envName, deploymentId, releaseId);
-
-      LOG.debug("cancelDeployment: " + (response == null ? "" : response.prettyPrint()));
+      if (LOG.isDebugEnabled())
+        LOG.debug("cancelDeployment: " + (response == null ? "" : response.prettyPrint()));
     } catch (Exception e) {
       // Ignore
     }
@@ -120,9 +116,11 @@ public abstract class AbstractWorkflow {
   void deleteDesign(String platformName) {
     JsonPath response = null;
     try {
-      LOG.debug("deleteEnvironment log:" + (response == null ? "" : response.prettyPrint()));
+      if (LOG.isDebugEnabled())
+        LOG.debug("deleteEnvironment log:" + (response == null ? "" : response.prettyPrint()));
       response = design.commitDesign();
-      LOG.debug("commitDesign log:" + (response == null ? "" : response.prettyPrint()));
+      if (LOG.isDebugEnabled())
+        LOG.debug("commitDesign log:" + (response == null ? "" : response.prettyPrint()));
       design.deletePlatform(platformName);
     } catch (Exception e) {
       // Ignore
@@ -136,7 +134,7 @@ public abstract class AbstractWorkflow {
       response = assembly.getAssembly(assemblyName);
     } catch (OneOpsClientAPIException e) {
       String msg = String.format("The assembly %s is not exist!", assemblyName);
-      System.err.println(msg);
+      // System.err.println(msg);
     }
     return response == null ? false : true;
   }
@@ -146,7 +144,6 @@ public abstract class AbstractWorkflow {
     if (!isExist) {
       assembly.createAssembly(assemblyName, config.getYaml().getBoo().getEmail(), "", "");
     }
-    this.bar.update(10, 100);
     return true;
   }
 
@@ -175,14 +172,12 @@ public abstract class AbstractWorkflow {
 
       transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
     }
-    this.bar.update(50, 100);
     return response == null ? false : true;
   }
 
   public boolean deploy() throws OneOpsClientAPIException {
 
     JsonPath response = transition.deploy(envName, Constants.DESCRIPTION);
-    this.bar.update(60, 100);
     return response == null ? false : true;
   }
 
