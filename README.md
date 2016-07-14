@@ -19,7 +19,7 @@ Run boo as a bash script:
 ##Install RPM:
 
 1. On Linux: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm```
-2. On Mac: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm --nodeps```
+2. On Mac: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm --nodeps``` (Ignore errors if any.)
 
 ####The precompiled executable jar and RPM under intall/.
 
