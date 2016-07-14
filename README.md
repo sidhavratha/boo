@@ -18,10 +18,17 @@ Build to a RPM:
 3. After that, you can run boo command
 
 usage: boo [-cd <yaml>] [-cf <yaml>] [-cleanup] [-create] [-h] [-l] [-s]
+
  -cd,--config_dir <yaml>    Use the config dir.
+ 
  -cf,--config_file <yaml>   Use specified template.
+ 
  -cleanup                   Remove all deployment in OneOps.
+ 
  -create                    Create a new deployment in OneOps.
+ 
  -h,--help                  show help.
+ 
  -l,--list                  List all YAML files.
+ 
  -s,--status                Check deployment status.
