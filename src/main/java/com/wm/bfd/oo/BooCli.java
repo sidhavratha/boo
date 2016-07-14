@@ -1,5 +1,6 @@
 package com.wm.bfd.oo;
 
+import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
@@ -35,6 +37,8 @@ public class BooCli {
   final private static Logger LOG = LoggerFactory.getLogger(BooCli.class);
   final private static String YAML = "yaml";
   final private static String FILE_NAME_SPLIT = "-";
+  final private static String YES_NO =
+      "WARNING! There are %s instances using the yarn-cluster configuration. Do you want to destroy all of them? (y/n) ";
   private String configDir;
   private String configFile;
   private BuildAllPlatforms flow;
@@ -128,8 +132,17 @@ public class BooCli {
     } else if (cmd.hasOption("create")) {
       this.createPacks();
     } else if (cmd.hasOption("cleanup")) {
+
       this.cleanup();
     }
+  }
+
+  @SuppressWarnings("resource")
+  private String userInput(String msg) {
+    System.out.println(msg);
+    Scanner inputReader = new Scanner(System.in);
+    String input = inputReader.nextLine();
+    return input;
   }
 
   private void help(String header, String footer) {
@@ -204,7 +217,7 @@ public class BooCli {
     try {
       flow.process();
     } catch (OneOpsClientAPIException e) {
-      //Ignore
+      // Ignore
       e.printStackTrace();
     }
   }
@@ -221,6 +234,11 @@ public class BooCli {
 
   public void cleanup() {
     List<String> files = this.listFilesStartWith(this.configDir, this.configFile);
+    String str = String.format(YES_NO, files.size());
+    str = this.userInput(str);
+    if (!"y".equalsIgnoreCase(str.trim()))
+      return;
+
     for (String file : files) {
       System.out.printf("Destroying OneOps instance %s", file);
       try {
@@ -232,7 +250,7 @@ public class BooCli {
         this.deleteFile(this.configDir, file);
       }
     }
-   System.out.printf("Destroyed!");
+    System.out.printf("Destroyed!");
   }
 
   public String getStatus() throws BFDOOException {
