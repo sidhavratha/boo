@@ -4,7 +4,7 @@
 ##Build to a executable command:
 Run boo as a bash script:
 
-1. Run: mvn clean package
+1. Run: mvn clean package -DskipTests
 
 2. Move the ./target/BFDOneOpsAutomation-1.0-executable.jar to your target server, and rename to boo.
 
