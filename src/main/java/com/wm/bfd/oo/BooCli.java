@@ -71,10 +71,6 @@ public class BooCli {
     options.addOption(cleanup);
   }
 
-  static {
-    RestAssured.useRelaxedHTTPSValidation();
-  }
-
   public void init(String template) throws BFDOOException {
     LOG.info("Loading {}", template);
     Injector injector = Guice.createInjector(new JaywayHttpModule(template));
