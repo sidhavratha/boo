@@ -1,6 +1,9 @@
 # bfd-oneops-automation
 [BFD OneOps Automation Tool](https://confluence.walmart.com/pages/viewpage.action?pageId=163659806)
 
+####The precompiled executable jar and RPM under intall/, skip the build steps if you don't want to compile java.
+####If you want to run mvn test, make sure have a valid yarn.yaml under src/test/resources.
+
 ##Build to a executable command:
 Run boo as a bash script:
 
@@ -21,7 +24,6 @@ Run boo as a bash script:
 1. On Linux: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm```
 2. On Mac: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm --nodeps``` (Ignore errors if any)
 
-####The precompiled executable jar and RPM under intall/.
 
 ## Usage:
 usage: boo [-cd <yaml>] [-cf <yaml>] [-cleanup] [-create] [-h] [-l] [-s]
