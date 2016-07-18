@@ -40,6 +40,8 @@ platforms: # In OneOps design.
       #yarn-cluster-rc3:
       compute:
         size: XXL
+      client-compute:
+        size: XXL
       prm-compute:
         size: XXL
       client-user:

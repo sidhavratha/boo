@@ -1,5 +1,7 @@
 package com.wm.bfd.oo.yaml;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -23,6 +25,8 @@ public class BooBean {
 
   @JsonProperty("description")
   private String description;
+  
+  private Map<String, String> config;
 
   public String getEnvName() {
     return envName;
@@ -78,5 +82,13 @@ public class BooBean {
 
   public void setCloudId(String cloudId) {
     this.cloudId = cloudId;
+  }
+
+  public Map<String, String> getConfig() {
+    return config;
+  }
+
+  public void setConfig(Map<String, String> config) {
+    this.config = config;
   }
 }

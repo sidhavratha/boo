@@ -1,5 +1,7 @@
 package com.wm.bfd.test;
 
+import java.net.URL;
+
 import junit.framework.TestCase;
 
 import org.slf4j.Logger;
@@ -18,8 +20,7 @@ import com.wm.bfd.oo.yaml.Constants;
 
 public abstract class BFDOOTest extends TestCase {
   final private static Logger LOG = LoggerFactory.getLogger(BFDOOTest.class);
-  final private static Injector injector = Guice.createInjector(new JaywayHttpModule(
-      Constants.TEMPLATE));
+  final private static Injector injector = Guice.createInjector(new JaywayHttpModule(getConfig()));
   ClientConfig config;
   OOInstance oo;
   String assemblyName;
@@ -43,6 +44,17 @@ public abstract class BFDOOTest extends TestCase {
     }
     RestAssured.useRelaxedHTTPSValidation(); // Disable SSL check.
 
+  }
+
+  static String getConfig() {
+    URL url = BFDOOTest.class.getResource(Constants.TEMPLATE);
+    LOG.info("Using config file {}", url);
+    if (url == null) {
+      System.err.println("The test.yaml not found!");
+      System.exit(-1);
+    }
+    String config = url.getFile();
+    return config;
   }
 
   void init() throws BFDOOException, ProvisionException {
