@@ -1,6 +1,7 @@
 package com.wm.bfd.oo.workflow;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -180,6 +181,22 @@ public abstract class AbstractWorkflow {
     JsonPath response = transition.deploy(envName, Constants.DESCRIPTION);
     return response == null ? false : true;
   }
+
+
+  /**
+   * Get ip address from oneops operate.
+   * 
+   * @param platformName
+   * @param componentName
+   * @return
+   * @throws OneOpsClientAPIException
+   */
+  List<Map<String, String>> getIpsInternal(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    JsonPath response = op.listInstances(platformName, componentName);
+    return response.getList("ciAttributes");
+  }
+
 
   String getDeploymentId() {
     String id = null;

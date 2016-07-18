@@ -88,6 +88,11 @@ public class BooCli {
     }
   }
 
+  /**
+   * Paser user's input
+   * @throws ParseException
+   * @throws BFDOOException
+   */
   public void parse() throws ParseException, BFDOOException {
     CommandLineParser parser = new DefaultParser();
     // CommandLineParser parser = new GnuParser();
