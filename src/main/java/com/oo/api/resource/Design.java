@@ -357,7 +357,7 @@ public class Design extends APIClient {
       ro.setProperties(properties);
       JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_dj_ci");
       jsonObject.put("template_name", componentName);
-      LOG.info("Json in addPlatformComponent {}", jsonObject.toString());
+      LOG.debug("Json in addPlatformComponent {}", jsonObject.toString());
       Response response =
           request.body(jsonObject.toString()).post(
               DESIGN_URI + "platforms/" + platformName + "/components/");

@@ -46,8 +46,8 @@ public class TestBuildAllPlatforms extends BFDOOTest {
   }
 
   @Test
-  public void testEDeploy() throws OneOpsClientAPIException {
-    boolean isSuc = build.deploy();
+  public void testECleanup() throws OneOpsClientAPIException {
+    boolean isSuc = build.cleanup();
     assertEquals(isSuc, true);
   }
 

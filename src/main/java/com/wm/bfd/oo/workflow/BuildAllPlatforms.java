@@ -38,12 +38,12 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.createEnv();
     this.bar.update(30, 100);
     String status = this.getStatus();
-    if (ACTIVE.equalsIgnoreCase(status)){
+    if (ACTIVE.equalsIgnoreCase(status)) {
       System.out.println("An active deployment has been running, cancel this one!");
       return false;
     }
-    
-    if (FAILED.equalsIgnoreCase(status)){
+
+    if (FAILED.equalsIgnoreCase(status)) {
       System.out.println("An failed deployment has been running, cancel this one!");
       return false;
     }
@@ -60,7 +60,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     try {
       response = design.getPlatform(platformName);
     } catch (OneOpsClientAPIException e) {
-      String msg = String.format("The platform %s is not exist! %s", platformName, e.getMessage());
+      String msg = String.format("The platform %s is not exist!", platformName);
       System.err.println(msg);
     }
     return response == null ? false : true;
@@ -137,7 +137,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       uniqueName = attributes.get(NAME);
       attributes.remove(NAME);
     }
-    LOG.info("Update component {}, attributes {}", componentName, attributes);
+    LOG.debug("Update component {}, attributes {}", componentName, attributes);
 
     if (this.isComponentExist(platformName, componentName)) {
       design.updatePlatformComponent(platformName, componentName, attributes);
@@ -147,7 +147,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       } catch (Exception e) {
         // Ignore
         System.err.println("Update component variables failed!");
-        //System.err.println(e.getMessage());
+        // System.err.println(e.getMessage());
       }
     }
     design.commitDesign();

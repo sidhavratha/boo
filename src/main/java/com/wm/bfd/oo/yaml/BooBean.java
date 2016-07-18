@@ -26,7 +26,8 @@ public class BooBean {
   @JsonProperty("description")
   private String description;
   
-  private Map<String, String> config;
+  @JsonProperty("custom")
+  private Map<String, String> custom;
 
   public String getEnvName() {
     return envName;
@@ -84,11 +85,11 @@ public class BooBean {
     this.cloudId = cloudId;
   }
 
-  public Map<String, String> getConfig() {
-    return config;
+  public Map<String, String> getCustom() {
+    return custom;
   }
 
-  public void setConfig(Map<String, String> config) {
-    this.config = config;
+  public void setCustom(Map<String, String> custom) {
+    this.custom = custom;
   }
 }

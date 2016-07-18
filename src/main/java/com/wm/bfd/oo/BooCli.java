@@ -1,6 +1,5 @@
 package com.wm.bfd.oo;
 
-import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
