@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.wm.bfd.oo.yaml.helper.EnvironmentBeanHelper;
 import com.wm.bfd.oo.yaml.helper.PlatformBeanHelper;
+import com.wm.bfd.oo.yaml.helper.PlatformConfigBeanHelper;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Yaml {
@@ -79,6 +80,11 @@ public class Yaml {
   public Map<String, Object> getExtract() {
     //return (Map<String, Object>) this.others.get(Constants.EXTRACT);
     return extract;
+  }
+  
+  @JsonIgnore
+  public List<PlatformConfigBean> getExtractBean() {
+    return PlatformConfigBeanHelper.getExtractBeans(this.extract);
   }
 
   @JsonIgnore

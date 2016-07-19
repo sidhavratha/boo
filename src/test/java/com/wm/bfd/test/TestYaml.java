@@ -24,11 +24,10 @@ public class TestYaml extends BFDOOTest {
   public void testGetBoo() throws OneOpsClientAPIException {
     assertNotNull(config.getYaml().getBoo().getApikey());
   }
-  
+
   @Test
   public void testGetEnvironmentBean() throws OneOpsClientAPIException {
     assertNotNull(config.getYaml().getEnvironmentBean().getOthers());
-    System.out.println(config.getYaml().getEnvironmentBean().getOthers());
   }
 
   @Test
