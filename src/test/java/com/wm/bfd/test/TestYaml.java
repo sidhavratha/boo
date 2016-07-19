@@ -24,6 +24,12 @@ public class TestYaml extends BFDOOTest {
   public void testGetBoo() throws OneOpsClientAPIException {
     assertNotNull(config.getYaml().getBoo().getApikey());
   }
+  
+  @Test
+  public void testGetEnvironmentBean() throws OneOpsClientAPIException {
+    assertNotNull(config.getYaml().getEnvironmentBean().getOthers());
+    System.out.println(config.getYaml().getEnvironmentBean().getOthers());
+  }
 
   @Test
   public void testGetPlatforms() throws OneOpsClientAPIException {
@@ -33,8 +39,8 @@ public class TestYaml extends BFDOOTest {
 
   @Test
   public void testGetEnvironments() throws OneOpsClientAPIException {
-    assertNotNull(config.getYaml().getEnvironments());
-    this.printMap(config.getYaml().getEnvironments(), 0);
+    assertNotNull(config.getYaml().getEnvironment());
+    this.printMap(config.getYaml().getEnvironment(), 0);
   }
 
   @Test

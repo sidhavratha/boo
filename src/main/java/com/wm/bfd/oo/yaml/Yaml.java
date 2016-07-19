@@ -15,7 +15,9 @@ import com.wm.bfd.oo.yaml.helper.PlatformBeanHelper;
 public class Yaml {
   private AssemblyBean assembly;
   private BooBean boo;
-  private Map<String, Object> environments;
+  private Map<String, Object> environment;
+  private Map<String, Object> scale;
+  private Map<String, Object> extract;
   private Map<String, Object> others = new HashMap<String, Object>();
 
   // Build
@@ -24,6 +26,9 @@ public class Yaml {
 
   @JsonIgnore
   private List<ScalBean> envList;
+  
+  @JsonIgnore
+  private EnvironmentBean environmentBean;
 
   public AssemblyBean getAssembly() {
     return assembly;
@@ -65,29 +70,45 @@ public class Yaml {
   }
 
   @JsonIgnore
-  public List<ScalBean> getEnvList() {
+  public List<ScalBean> getScales() {
     if (envList == null)
-      envList = EnvironmentBeanHelper.getEnvironments(this.getEnvironments());
+      envList = EnvironmentBeanHelper.getScales(this.getScale());
     return envList;
   }
 
-  @SuppressWarnings("unchecked")
-  @JsonIgnore
   public Map<String, Object> getExtract() {
-    return (Map<String, Object>) this.others.get(Constants.EXTRACT);
+    //return (Map<String, Object>) this.others.get(Constants.EXTRACT);
+    return extract;
   }
 
+  @JsonIgnore
+  public EnvironmentBean getEnvironmentBean() {
+    return EnvironmentBeanHelper.getEnvironment(this.environment);
+  }
+  
   @SuppressWarnings("unchecked")
   @JsonIgnore
   public Map<String, Object> getGlobalVariables() {
     return (Map<String, Object>) this.others.get(Constants.VARIABLES);
   }
 
-  public Map<String, Object> getEnvironments() {
-    return environments;
+  public Map<String, Object> getEnvironment() {
+    return environment;
   }
 
-  public void setEnvironments(Map<String, Object> environments) {
-    this.environments = environments;
+  public void setEnvironment(Map<String, Object> environments) {
+    this.environment = environments;
+  }
+
+  public Map<String, Object> getScale() {
+    return scale;
+  }
+
+  public void setScale(Map<String, Object> scale) {
+    this.scale = scale;
+  }
+
+  public void setExtract(Map<String, Object> extract) {
+    this.extract = extract;
   }
 }

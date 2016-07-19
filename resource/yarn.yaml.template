@@ -4,25 +4,23 @@
 boo:
   oneops_host: https://web.bfd.dev.cloud.wal-mart.com/
   organization: 'bfd'
-  #cloud_id: '2180660' #dev-cdc002
-  cloud_id: '2259378' #dev-cdc003
   api_key: ''
   email: ''
-  environment_name: 'test' # All the deployment in this template adds to this environment.
-  ip_output: json
+  environment_name: 'env-dev-cdc003-test' # All the deployment in this template adds to this environment.
+  ip_output: 'json'
   custom: # Optional
     custom_host1: '[public_ip]:2181{3}' # The number in {} means the number of repetition you expect.
     cutom_component1: 'compute' # Which component in OneOps
     custom_split1: ','
 
 assembly:
-  name: 'boo-test'
+  name: 'boo-maven-test-only'
   auto_gen: true # If turn on, then this tool will generate random assembly name for you.
 variables: # Optional, global variables.
 
 platforms: # In OneOps design.
-  yarn:
-    deploy_order: 1
+  yarn: # This is as your platform name as well
+    deploy_order: 2
     pack: oneops/hadoop_yarn_vrc3
     pack_version: '1'
     components: # Optional
@@ -37,12 +35,13 @@ platforms: # In OneOps design.
         hive_tarball_url: ''
         swift_password: ''
         hive_db_password: '' # New cloud
+        #hive_db_password: '' # old colud
       #yarn-cluster-rc3:
       compute:
         size: XXL
-      client-compute:
-        size: XXL
       prm-compute:
+        size: XXL
+      client-compute:
         size: XXL
       client-user:
         ciName: client-rzhan33
@@ -50,21 +49,37 @@ platforms: # In OneOps design.
         authorized_keys: '[""]'
       dn-admin-user:
         ciName: dn-rzhan33
-        username: rzhan33-dn
+        username: rzhan33
         authorized_keys: '[""]'
       prm-admin-user:
         ciName: prm-rzhan33
-        username: rzhan33-prm
+        username: rzhan33
         authorized_keys: '[""]'
-  #zookeeper: # Add more packs in the same YAML
-    #name: zookeeper
-environments: # In OneOps transition.
+ 
+scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.   
     yarn:
-      scaling: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.
+      scaling: 
         compute:
-          current: 3
-          min: 3
-          max: 3
+          current: 2
+          min: 2
+          max: 2
+
+environment: # Only support one environment for now.
+  global_dns: 'true'
+  availability: 'redundant'
+  subdomain: 'env-dev-cdc003.boo-test'
+  profile: 'DEV'
+  clouds: # Can support multiple clouds.
+    #cloud_id: '2180660' #dev-cdc002
+    dev-cdc003:
+      priority: '1' # 1 or 2
+      dpmt_order: '1'
+      pct_scale: '100'
+    dev-cdc002:
+      priority: '2' # 1 or 2
+      dpmt_order: '1'
+      pct_scale: '100'
+  
 
 extract: # Optional, means extract informations from previous deployment
   zookeeper:

@@ -155,7 +155,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
   public boolean updateScaling() throws OneOpsClientAPIException {
-    List<ScalBean> scales = this.config.getYaml().getEnvList();
+    List<ScalBean> scales = this.config.getYaml().getScales();
     for (ScalBean scale : scales) {
       RedundancyConfig config = new RedundancyConfig();
       config.setCurrent(scale.getCurrent());

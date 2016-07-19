@@ -71,6 +71,10 @@ public class BooCli {
     options.addOption(cleanup);
   }
 
+  static {
+    RestAssured.useRelaxedHTTPSValidation();
+  }
+
   public void init(String template) throws BFDOOException {
     LOG.info("Loading {}", template);
     Injector injector = Guice.createInjector(new JaywayHttpModule(template));
@@ -86,6 +90,7 @@ public class BooCli {
 
   /**
    * Paser user's input
+   * 
    * @throws ParseException
    * @throws BFDOOException
    */
@@ -132,7 +137,6 @@ public class BooCli {
     } else if (cmd.hasOption("create")) {
       this.createPacks();
     } else if (cmd.hasOption("cleanup")) {
-
       this.cleanup();
     }
   }
@@ -205,11 +209,6 @@ public class BooCli {
       e.printStackTrace();
     }
     return des;
-  }
-
-  private void helpOld() {
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("boo", options);
   }
 
   public void createPacks() throws BFDOOException {

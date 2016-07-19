@@ -13,8 +13,15 @@ public class Constants {
   final public static String VARIABLES = "variables";
   final public static String DESCRIPTIONS = "description";
   final public static String YAML_ERROR = "The template file not found or has wrong format!";
-  
+  final public static String AVAILABILITY = "availability";
+  final public static String GLOBAL_DNS = "global_dns";
+  final public static String SUBDOMAIN = "subdomain";
+  final public static String ENV_NAME = "environment_name";
+  final public static String TRUE = "true";
+
+
   final public static String BFD_TOOL = "The tool is managed by BFD team.";
+  final public static String NO_AVAILABILITY = "You don't set the availability, please check your yaml config.";
 
   // Components
   final public static String USER = "user";

@@ -108,12 +108,12 @@ public class Transition extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath createEnvironment(String environmentName, String envprofile, String availability,
-      Map<String, String> platformAvailability, Map<String, String> cloudMap, boolean debugFlag,
-      boolean gdnsFlag, String description) throws OneOpsClientAPIException {
+  public JsonPath createEnvironment(String environmentName, String availability, Map<String, String> attributes,
+      Map<String, String> platformAvailability, Map<String, Map<String, String>> cloudMap,
+      String description) throws OneOpsClientAPIException {
 
     ResourceObject ro = new ResourceObject();
-    Map<String, String> attributes = new HashMap<String, String>();
+    // Map<String, String> attributes = new HashMap<String, String>();
     Map<String, String> properties = new HashMap<String, String>();
 
     if (environmentName != null && environmentName.length() > 0) {
@@ -123,18 +123,18 @@ public class Transition extends APIClient {
       throw new OneOpsClientAPIException(msg);
     }
     properties.put("nsPath", instance.getOrgname() + "/" + assemblyName);
-    if (availability != null && availability.length() > 0) {
-      attributes.put("availability", availability);
-    } else {
-      String msg = String.format("Missing availability to create environment");
-      throw new OneOpsClientAPIException(msg);
-    }
+     if (availability != null && availability.length() > 0) {
+     attributes.put("availability", availability);
+     } else {
+     String msg = String.format("Missing availability to create environment");
+     throw new OneOpsClientAPIException(msg);
+     }
 
     ro.setProperties(properties);
-    attributes.put("profile", envprofile);
+//    attributes.put("profile", envprofile);
     attributes.put("description", description);
-    attributes.put("debug", String.valueOf(debugFlag));
-    attributes.put("global_dns", String.valueOf(gdnsFlag));
+//    attributes.put("debug", String.valueOf(debugFlag));
+//    attributes.put("global_dns", String.valueOf(gdnsFlag));
     ro.setAttributes(attributes);
 
     RequestSpecification request = createRequest();
@@ -158,7 +158,7 @@ public class Transition extends APIClient {
       throw new OneOpsClientAPIException(msg);
     }
     jsonObject.put("clouds", cloudMap);
-
+    System.out.println(jsonObject.toString());
     Response response = request.body(jsonObject.toString()).post(TRANSITION_ENV_URI);
 
     if (response != null) {

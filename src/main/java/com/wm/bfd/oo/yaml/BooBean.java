@@ -14,9 +14,9 @@ public class BooBean {
   @JsonProperty("api_key")
   private String apikey;
   private String email;
-  @JsonProperty("cloud_id")
-  private String cloudId;
-
+  @JsonProperty("cloud")
+  private Map<String, Object> cloud;
+  
   @JsonProperty("ip_output")
   private String ipOutput;
 
@@ -77,12 +77,12 @@ public class BooBean {
     this.email = email;
   }
 
-  public String getCloudId() {
-    return cloudId;
+  public Map<String, Object> getCloud() {
+    return cloud;
   }
 
-  public void setCloudId(String cloudId) {
-    this.cloudId = cloudId;
+  public void setCloud(Map<String, Object> cloud) {
+    this.cloud = cloud;
   }
 
   public Map<String, String> getCustom() {

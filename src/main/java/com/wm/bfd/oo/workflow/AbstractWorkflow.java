@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,13 +14,16 @@ import com.jayway.restassured.path.json.JsonPath;
 import com.oo.api.OOInstance;
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.oo.api.resource.Assembly;
+import com.oo.api.resource.Cloud;
 import com.oo.api.resource.Design;
 import com.oo.api.resource.Operation;
 import com.oo.api.resource.Transition;
 import com.wm.bfd.oo.ClientConfig;
 import com.wm.bfd.oo.utils.ProgressBar;
+import com.wm.bfd.oo.yaml.CloudBean;
 import com.wm.bfd.oo.yaml.Constants;
 import com.wm.bfd.oo.yaml.PlatformBean;
+import com.wm.bfd.oo.yaml.helper.EnvironmentBeanHelper;
 
 public abstract class AbstractWorkflow {
   private static Logger LOG = LoggerFactory.getLogger(AbstractWorkflow.class);
@@ -35,6 +39,8 @@ public abstract class AbstractWorkflow {
 
   OOInstance instance;
 
+  Cloud cloud;
+
   ProgressBar bar;
 
   public AbstractWorkflow(OOInstance instance, ClientConfig config) throws OneOpsClientAPIException {
@@ -43,6 +49,7 @@ public abstract class AbstractWorkflow {
     this.config = config;
     this.assemblyName = config.getYaml().getAssembly().getName();
     this.envName = config.getYaml().getBoo().getEnvName();
+    this.cloud = new Cloud(instance);
 
     assembly = new Assembly(instance);
     design = new Design(instance, assemblyName);
@@ -71,7 +78,7 @@ public abstract class AbstractWorkflow {
       transition.deleteEnvironment(envName);
     } catch (Exception e) {
       // Ignore
-      e.printStackTrace();
+      //e.printStackTrace();
     }
     this.deleteDesign(platformName);
     // Don't add the following part to one try block as transition.
@@ -134,8 +141,9 @@ public abstract class AbstractWorkflow {
     try {
       response = assembly.getAssembly(assemblyName);
     } catch (OneOpsClientAPIException e) {
-      String msg = String.format("The assembly %s is not exist!", assemblyName);
+      // String msg = String.format("The assembly %s is not exist!", assemblyName);
       // System.err.println(msg);
+      // Ignore
     }
     return response == null ? false : true;
   }
@@ -164,11 +172,27 @@ public abstract class AbstractWorkflow {
     boolean isExist = this.isEnvExist(envName);
     JsonPath response = null;
     if (!isExist) {
-      Map<String, String> cloudMap = new HashMap<String, String>();
-      cloudMap.put(config.getYaml().getBoo().getCloudId(), "1");
+
+      Map<String, Map<String, String>> cloudMaps = new HashMap<String, Map<String, String>>();
+
+      List<CloudBean> clouds = config.getYaml().getEnvironmentBean().getClouds();
+      for (CloudBean cloud : clouds) {
+        Map<String, String> cloudMap = new HashMap<String, String>();
+        cloudMap.put(EnvironmentBeanHelper.PRIORITY, cloud.getPriority());
+        cloudMap.put(EnvironmentBeanHelper.DPMT_ORDER, cloud.getDpmtOrder());
+        cloudMap.put(EnvironmentBeanHelper.PCT_SCALE, cloud.getPctScale());
+        cloudMaps.put(this.getCloudId(cloud.getCloudName()), cloudMap);
+      }
+
+
+      // config.getYaml().getBoo().getCloud();
+
+      // boolean isGlobalDns = Constants.TRUE.equalsIgnoreCase(cloudMap.get(Constants.GLOBAL_DNS));
+      // String availability = cloudMap.get(Constants.AVAILABILITY);
+      // if (StringUtils.isEmpty(availability))
+      // throw new OneOpsClientAPIException(Constants.NO_AVAILABILITY);
       response =
-          transition.createEnvironment(envName, "DEV", "redundant", null, cloudMap, false, true,
-              Constants.DESCRIPTION);
+          transition.createEnvironment(envName, config.getYaml().getEnvironmentBean().getOthers().get(Constants.AVAILABILITY), config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps, Constants.DESCRIPTION);
       response = transition.getEnvironment(envName);
 
       transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
@@ -197,6 +221,10 @@ public abstract class AbstractWorkflow {
     return response.getList("ciAttributes");
   }
 
+  public String getCloudId(String cloudName) throws OneOpsClientAPIException {
+    JsonPath response = cloud.getCloud(cloudName);
+    return response.getString("ciId");
+  }
 
   String getDeploymentId() {
     String id = null;

@@ -56,4 +56,11 @@ public class TestBuildAllPlatforms extends BFDOOTest {
     String status = build.getStatus();
     LOG.info("The {} deploy {}", this.envName, status);
   }
+  
+  @Test
+  public void testEGetCloud() throws OneOpsClientAPIException {
+    String testCloud = "dev-cdc003";
+    String id = build.getCloudId(testCloud);
+    LOG.info("The {} id {}", testCloud, id);
+  }
 }
