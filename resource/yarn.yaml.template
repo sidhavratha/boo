@@ -39,10 +39,13 @@ platforms: # In OneOps design.
       #yarn-cluster-rc3:
       compute:
         size: XXL
+        require_public_ip: true
       prm-compute:
         size: XXL
+        require_public_ip: true
       client-compute:
         size: XXL
+        require_public_ip: true
       client-user:
         ciName: client-rzhan33
         username: rzhan33
