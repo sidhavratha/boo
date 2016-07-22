@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory;
 import com.jayway.restassured.path.json.JsonPath;
 import com.oo.api.OOInstance;
 import com.oo.api.exception.OneOpsClientAPIException;
+import com.oo.api.exception.OneOpsComponentExistException;
 import com.oo.api.resource.model.RedundancyConfig;
+import com.oo.api.util.LogUtils;
 import com.wm.bfd.oo.ClientConfig;
 import com.wm.bfd.oo.yaml.Constants;
 import com.wm.bfd.oo.yaml.PlatformBean;
@@ -39,29 +41,37 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.bar.update(30, 100);
     String status = this.getStatus();
     if (ACTIVE.equalsIgnoreCase(status)) {
-      System.out.println("An active deployment has been running, cancel this one!");
+      LogUtils.info(Constants.ACTIVE_DEPLOYMENT_EXISTING);
       return false;
     }
 
     if (FAILED.equalsIgnoreCase(status)) {
-      System.out.println("An failed deployment has been running, cancel this one!");
+      LogUtils.info(Constants.FAIL_DEPLOYMENT_EXISTING);
       return false;
     }
     this.updateScaling();
     this.bar.update(50, 100);
+    LogUtils.info(Constants.START_DEPLOYMENT);
+    try {
+      this.pullDesign();
+    } catch (OneOpsClientAPIException e) {
+      // Ignore
+    }
+    this.bar.update(70, 100);
     this.deploy();
     this.bar.update(100, 100);
-    System.out.println("Deployment is running...");
+    LogUtils.info(Constants.DEPLOYMENT_RUNNING);
     return true;
   }
 
-  public boolean isPlatformExist(String platformName) {
+  public boolean isPlatformExist(String platformName) throws OneOpsClientAPIException,
+      OneOpsComponentExistException {
     JsonPath response = null;
     try {
       response = design.getPlatform(platformName);
     } catch (OneOpsClientAPIException e) {
       String msg = String.format("The platform %s is not exist!", platformName);
-      System.err.println(msg);
+      throw new OneOpsComponentExistException(msg);
     }
     return response == null ? false : true;
   }
@@ -71,7 +81,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
     Collections.sort(platforms);
     for (PlatformBean platform : platforms) {
-      LOG.info("Creating platform {}", platform.getName());
+      LogUtils.info(Constants.CREATING_PLATFORM, platform.getName());
       this.createPlatform(platform);
       if (platform.getComponents() == null)
         continue;
@@ -89,27 +99,34 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
   private boolean createPlatform(PlatformBean platform) throws OneOpsClientAPIException {
-    boolean isExist = this.isPlatformExist(platform.getName());
+    boolean isExist = false;
+    try {
+      isExist = this.isPlatformExist(platform.getName());
+    } catch (OneOpsComponentExistException e) {
+      // Ignore
+    }
     if (!isExist) {
       JsonPath response =
           design.createPlatform(platform.getName(), platform.getPack(), platform.getPackVersion(),
               platform.getPackSource(), Constants.DESCRIPTION, Constants.DESCRIPTION);
       if (response != null)
         design.commitDesign();
+      LogUtils.info(Constants.CREATING_PLATFORM_SUCCEED, platform.getName());
     } else {
-      LOG.warn("Platform exist, skip create platform " + platform.getName());
+      LogUtils.info(Constants.PLATFORM_EXISTING, platform.getName());
     }
     return true;
 
   }
 
-  private boolean isComponentExist(String platformName, String componentName) {
+  private boolean isComponentExist(String platformName, String componentName)
+      throws OneOpsClientAPIException, OneOpsComponentExistException {
     JsonPath j = null;
     try {
       j = design.getPlatformComponent(platformName, componentName);
     } catch (OneOpsClientAPIException e) {
       // e.printStackTrace();
-      return false;
+      throw new OneOpsComponentExistException(e.getMessage());
     }
     return (j == null ? false : true);
   }
@@ -125,7 +142,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       if (variables != null && variables.size() > 0)
         design.updatePlatformVariable(platform.getName(), variables, false);
     }
-    design.commitDesign();
+    if (platforms.size() > 0)
+      design.commitDesign();
     return true;
   }
 
@@ -137,16 +155,22 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       uniqueName = attributes.get(NAME);
       attributes.remove(NAME);
     }
-    LOG.debug("Update component {}, attributes {}", componentName, attributes);
-
-    if (this.isComponentExist(platformName, componentName)) {
+    LogUtils.info(Constants.UPDATE_COMPONENTS, componentName, platformName);
+    boolean isExist = false;
+    try {
+      isExist = this.isComponentExist(platformName, componentName);
+    } catch (OneOpsComponentExistException e1) {
+      // Ignore
+    }
+    if (isExist) {
       design.updatePlatformComponent(platformName, componentName, attributes);
     } else {
       try {
         design.addPlatformComponent(platformName, componentName, uniqueName, attributes);
       } catch (Exception e) {
         // Ignore
-        System.err.println("Update component variables failed!");
+        if (LOG.isDebugEnabled())
+          LOG.debug("Update component variables failed! {}", e.getMessage());
         // System.err.println(e.getMessage());
       }
     }
@@ -161,7 +185,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       config.setCurrent(scale.getCurrent());
       config.setMin(scale.getMin());
       config.setMax(scale.getMax());
-      LOG.info("Updating the compute size in {} - {}", envName, scale.getPlatform());
+      LogUtils.info(Constants.COMPUTE_SIZE, envName, scale.getPlatform());
       transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), config);
     }
     transition.commitEnvironment(envName, null, Constants.DESCRIPTION);

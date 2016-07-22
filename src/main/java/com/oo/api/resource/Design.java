@@ -196,7 +196,6 @@ public class Design extends APIClient {
           }
         } else {
           String msg = String.format("No open release found to perform design commit");
-          System.out.println(msg);
           return response.getBody().jsonPath();
         }
 

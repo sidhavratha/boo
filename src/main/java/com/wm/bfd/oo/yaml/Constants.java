@@ -21,7 +21,8 @@ public class Constants {
 
 
   final public static String BFD_TOOL = "The tool is managed by BFD team.";
-  final public static String NO_AVAILABILITY = "You don't set the availability, please check your yaml config.";
+  final public static String NO_AVAILABILITY =
+      "You don't set the availability, please check your yaml config.";
 
   // Components
   final public static String USER = "user";
@@ -29,4 +30,29 @@ public class Constants {
   // Operate
   final public static String DEPLOYMENT_ID = "deploymentId";
   final public static String DEPLOYMENT_STATE = "deploymentState";
+
+  // Output during deployment
+  final public static String DESTROY_ASSEMBLY = "Destroyed assembly %s!";
+  final public static String PLATFORM_EXISTING = "Platform exist, skip create platform %s.";
+  final public static String CREATING_PLATFORM = "Creating platform %s ...";
+  final public static String DESTROY_PLATFORM = "Destroying platform %s ...";
+
+  final public static String UPDATE_COMPONENTS = "Updating component %s for %s ...";
+
+  final public static String CREATING_PLATFORM_SUCCEED = "Successful creating platform %s...";
+  final public static String START_DEPLOYMENT = "Start the deployment now.";
+  final public static String DEPLOYMENT_RUNNING = "Deployment is running ...";
+  final public static String ACTIVE_DEPLOYMENT_EXISTING =
+      "An active deployment has been running in the same environment, quit!";
+  final public static String FAIL_DEPLOYMENT_EXISTING =
+      "A failed deployment has been running int the same environment, quit!";
+  final public static String CREATE_ENV = "Creating the environment %s.";
+  final public static String ENV_EXISTING = "Environment exist, skip create environment %s.";
+  final public static String COMPUTE_SIZE = "Updating the compute size in %s - %s";
+  
+  // Debug
+  final public static String ENV_NOT_EXISTING = "The environment %s is not exist! %s";
+
+
+
 }

@@ -158,7 +158,6 @@ public class Transition extends APIClient {
       throw new OneOpsClientAPIException(msg);
     }
     jsonObject.put("clouds", cloudMap);
-    System.out.println(jsonObject.toString());
     Response response = request.body(jsonObject.toString()).post(TRANSITION_ENV_URI);
 
     if (response != null) {
@@ -810,7 +809,7 @@ public class Transition extends APIClient {
       } else {
         String msg =
             String.format("Failed to get enviornment platform component details due to %s",
-                response.getBody().asString());
+                response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }

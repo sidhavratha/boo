@@ -20,7 +20,8 @@ public class JaywayHttpModule extends AbstractModule {
 
   public JaywayHttpModule(String yaml) {
     this.yaml = yaml;
-    LOG.info("Using config {}", yaml);
+    if (LOG.isDebugEnabled())
+      LOG.debug("Using config {}", yaml);
   }
 
   @Override

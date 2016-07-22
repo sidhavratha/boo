@@ -63,4 +63,9 @@ public class TestBuildAllPlatforms extends BFDOOTest {
     String id = build.getCloudId(testCloud);
     LOG.info("The {} id {}", testCloud, id);
   }
+  
+  @Test
+  public void testGetIpsInternal() throws OneOpsClientAPIException {
+    System.out.println(build.getIpsInternal("yarn", "compute"));
+  }
 }

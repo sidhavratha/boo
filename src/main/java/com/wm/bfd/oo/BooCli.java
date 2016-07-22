@@ -76,7 +76,8 @@ public class BooCli {
   }
 
   public void init(String template) throws BFDOOException {
-    LOG.info("Loading {}", template);
+    if (LOG.isDebugEnabled())
+      LOG.debug("Loading {}", template);
     Injector injector = Guice.createInjector(new JaywayHttpModule(template));
     ClientConfig config = injector.getInstance(ClientConfig.class);
     new BFDUtils().verifyTemplate(config);
