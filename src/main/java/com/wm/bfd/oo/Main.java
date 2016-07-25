@@ -12,5 +12,4 @@ public class Main {
     BooCli cli = new BooCli(args);
     cli.parse();
   }
-
 }

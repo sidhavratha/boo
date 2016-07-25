@@ -22,6 +22,9 @@ public final class EnvironmentBeanHelper {
   final private static String CURRENT = "current";
   final private static String MIN = "min";
   final private static String MAX = "max";
+  final private static String STEP_UP = "step_up";
+  final private static String STEP_DOWN = "step_down";
+  final private static String PERCENT_DEPLOY = "percent_deploy";
 
   final public static String PRIORITY = "priority";
   final public static String DPMT_ORDER = "dpmt_order";
@@ -35,9 +38,11 @@ public final class EnvironmentBeanHelper {
       Object value = entry.getValue();
       if (value instanceof Map) {
         Map<String, Map> map = (Map<String, Map>) value;
-        Map<String, Integer> map2 = ((Map<String, Map>) map.get(SCALING)).get(COMPUTE);
-        ScalBean scale = new ScalBean(platform, map2.get(CURRENT), map2.get(MAX), map2.get(MIN));
-        scales.add(scale);
+        Map<String, String> map2 = ((Map<String, Map>) map.get(SCALING)).get(COMPUTE);
+        scales.add(new ScalBean.ScalBeanBuilder().setPlatform(platform)
+            .setCurrent(map2.get(CURRENT)).setMax(map2.get(MAX)).setMin(map2.get(MIN))
+            .setStepDown(map2.get(STEP_DOWN)).setStepUp(map2.get(STEP_UP))
+            .setPercentDeploy(map2.get(PERCENT_DEPLOY)).build());
       }
 
     }
@@ -46,7 +51,7 @@ public final class EnvironmentBeanHelper {
 
   @SuppressWarnings("unchecked")
   public static EnvironmentBean getEnvironment(Map<String, Object> environmentsMap) {
-    Map<String, String> attris = new HashMap<String,String>();
+    Map<String, String> attris = new HashMap<String, String>();
     EnvironmentBean env = new EnvironmentBean();
 
     for (Map.Entry<String, Object> entry : environmentsMap.entrySet()) {
@@ -55,12 +60,12 @@ public final class EnvironmentBeanHelper {
       if (value instanceof Map) {
         Map<String, Object> map = (Map<String, Object>) value;
         for (Map.Entry<String, Object> entry1 : map.entrySet()) {
-          Map<String,String> m = (Map<String, String>) entry1.getValue();
+          Map<String, String> m = (Map<String, String>) entry1.getValue();
           CloudBean cloud =
               new CloudBean(entry1.getKey(), m.get(PCT_SCALE), m.get(DPMT_ORDER), m.get(PRIORITY));
           env.addClouds(cloud);
         }
-        
+
       } else if (value instanceof String) {
         attris.put(key, (String) value);
       }

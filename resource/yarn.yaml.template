@@ -63,9 +63,9 @@ scale: # Because OneOps is not standard design to update the Scaling and other c
     yarn:
       scaling: 
         compute:
-          current: 2
-          min: 2
-          max: 2
+          current: '2'
+          min: '2'
+          max: '2'
 
 environment: # Only support one environment for now.
   global_dns: 'true'

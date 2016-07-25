@@ -9,44 +9,108 @@ public class ScalBean {
   private int max;
   private int min;
   private String platform;
+  private int stepUp;
+  private int stepDown;
+  private int percentDeploy;
 
-  public ScalBean(String platform, int current, int max, int min) {
-    this.platform = platform;
-    this.current = current;
-    this.max = max;
-    this.min = min;
+  public int getStepUp() {
+    return stepUp;
+  }
+
+  public int getStepDown() {
+    return stepDown;
+  }
+
+  public int getPercentDeploy() {
+    return percentDeploy;
+  }
+
+
+
+  public ScalBean(ScalBeanBuilder builder) {
+    this.platform = builder.platform;
+    this.current = builder.current;
+    this.max = builder.max;
+    this.min = builder.min;
+    this.stepUp = builder.stepUp;
+    this.stepDown = builder.stepDown;
+    this.percentDeploy = builder.percentDeploy;
   }
 
   public int getCurrent() {
     return current;
   }
 
-  public void setCurrent(int current) {
-    this.current = current;
-  }
-
   public int getMax() {
     return max;
-  }
-
-  public void setMax(int max) {
-    this.max = max;
   }
 
   public int getMin() {
     return min;
   }
 
-  public void setMin(int min) {
-    this.min = min;
-  }
-
   public String getPlatform() {
     return platform;
   }
 
-  public void setPlatform(String platform) {
-    this.platform = platform;
-  }
+  public static class ScalBeanBuilder {
+    private int current = 2;
+    private int max = 10;
+    private int min = 2;
+    private String platform;
+    private int stepUp = 1;
+    private int stepDown = 1;
+    private int percentDeploy = 100;
 
+    public ScalBeanBuilder() {
+
+    }
+    
+    public ScalBean build() {
+      return new ScalBean(this);
+    }
+
+    public ScalBeanBuilder setStepUp(String stepUp) {
+      if (stepUp != null)
+        this.stepUp = Integer.parseInt(stepUp);
+      return this;
+    }
+
+    public ScalBeanBuilder setPercentDeploy(String percentDeploy) {
+      if (percentDeploy != null)
+        this.percentDeploy = Integer.parseInt(percentDeploy);
+      return this;
+    }
+
+    public ScalBeanBuilder setStepDown(String stepDown) {
+      if (stepDown != null)
+        this.stepDown = Integer.parseInt(stepDown);
+      return this;
+    }
+
+    public ScalBeanBuilder setCurrent(String current) {
+      if (current != null)
+        this.current = Integer.parseInt(current);
+      return this;
+    }
+
+    public ScalBeanBuilder setMax(String max) {
+      if (max != null)
+        this.max = Integer.parseInt(max);
+      return this;
+    }
+
+    public ScalBeanBuilder setMin(String min) {
+      if (min != null)
+        this.min = Integer.parseInt(min);
+      return this;
+    }
+
+    public ScalBeanBuilder setPlatform(String platform) {
+      if (platform != null)
+        this.platform = platform;
+      return this;
+    }
+
+  }
 }
