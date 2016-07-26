@@ -18,6 +18,17 @@ public class Constants {
   final public static String SUBDOMAIN = "subdomain";
   final public static String ENV_NAME = "environment_name";
   final public static String TRUE = "true";
+  final public static String PRIVATE_IP = "private_ip";
+  
+  /**
+   * Customize config
+   */
+  final public static String IPTERMINATOR1 = "[";
+  final public static String IPTERMINATOR2 = "]";
+  final public static String NUMTERMINATOR1 = "{";
+  final public static String NUMTERMINATOR2 = "}";
+  final public static String DEDAULT_IPSPLIT = ",";
+  final public static char DOLLAR = '$';
 
 
   final public static String BFD_TOOL = "The tool is managed by BFD team.";

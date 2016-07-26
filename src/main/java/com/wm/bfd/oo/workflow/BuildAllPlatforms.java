@@ -12,8 +12,9 @@ import com.oo.api.OOInstance;
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.oo.api.exception.OneOpsComponentExistException;
 import com.oo.api.resource.model.RedundancyConfig;
-import com.oo.api.util.LogUtils;
 import com.wm.bfd.oo.ClientConfig;
+import com.wm.bfd.oo.LogUtils;
+import com.wm.bfd.oo.utils.BFDUtils;
 import com.wm.bfd.oo.yaml.Constants;
 import com.wm.bfd.oo.yaml.PlatformBean;
 import com.wm.bfd.oo.yaml.ScalBean;
@@ -23,6 +24,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   final private static String NAME = "ciName"; // Get component name.
   final private static String ACTIVE = "active";
   final private static String FAILED = "failed";
+  final private static String NEWLINE = System.getProperty("line.separator");
+  final private BFDUtils utils = new BFDUtils();
 
   public BuildAllPlatforms(OOInstance instance, ClientConfig config)
       throws OneOpsClientAPIException {
@@ -137,14 +140,31 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     for (PlatformBean platform : platforms) {
       Map<String, String> secureVariables = platform.getSecureVariables();
       if (secureVariables != null && secureVariables.size() > 0)
-        design.updatePlatformVariable(platform.getName(), secureVariables, true);
+        this.updateOrAddPlatformVariables(platform.getName(), secureVariables, true);
       Map<String, String> variables = platform.getVariables();
       if (variables != null && variables.size() > 0)
-        design.updatePlatformVariable(platform.getName(), variables, false);
+        this.updateOrAddPlatformVariables(platform.getName(), variables, false);
     }
     if (platforms.size() > 0)
       design.commitDesign();
     return true;
+  }
+
+  /**
+   * Have to add isExist method later
+   * 
+   * @param platformName
+   * @param variables
+   * @param isSecure
+   * @throws OneOpsClientAPIException
+   */
+  private void updateOrAddPlatformVariables(String platformName, Map<String, String> variables,
+      boolean isSecure) throws OneOpsClientAPIException {
+    try {
+      design.updatePlatformVariable(platformName, variables, isSecure);
+    } catch (OneOpsClientAPIException e) {
+      design.addPlatformVariable(platformName, variables, isSecure);
+    }
   }
 
   private boolean updateComponentVariables(String platformName, String componentName,
@@ -176,6 +196,21 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     design.commitDesign();
     return true;
+  }
+
+  public String getCustomIps(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    return utils.getIps(platformName, componentName, this);
+  }
+
+  public String printIps(String platformName, String componentName) throws OneOpsClientAPIException {
+    List<Map<String, String>> ips = this.getIpsInternal(platformName, componentName);
+    StringBuilder str = new StringBuilder();
+    for (Map<String, String> ip : ips) {
+      str.append(ip.get(Constants.PRIVATE_IP));
+      str.append(NEWLINE);
+    }
+    return str.toString();
   }
 
   public boolean updateScaling() throws OneOpsClientAPIException {

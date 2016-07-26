@@ -62,6 +62,10 @@ public class BooCli {
     Option cleanup = Option.builder("cleanup").desc("Remove all deployment in OneOps.").build();
     Option list = new Option("l", "list", false, "List all YAML files.");
 
+    Option getIps =
+        Option.builder("ip").longOpt("get_ips").argName("platform><component").numberOfArgs(2)
+            .desc("Get ips from OneOps.").build();
+
     options.addOption(help);
     options.addOption(config);
     options.addOption(config_dir);
@@ -69,6 +73,7 @@ public class BooCli {
     options.addOption(status);
     options.addOption(list);
     options.addOption(cleanup);
+    options.addOption(getIps);
   }
 
   static {
@@ -139,6 +144,8 @@ public class BooCli {
       this.createPacks();
     } else if (cmd.hasOption("cleanup")) {
       this.cleanup();
+    } else if (cmd.hasOption("ip")) {
+      System.out.println(this.getIps(cmd.getOptionValues("ip")[0], cmd.getOptionValues("ip")[1]));
     }
   }
 
@@ -148,6 +155,15 @@ public class BooCli {
     Scanner inputReader = new Scanner(System.in);
     String input = inputReader.nextLine();
     return input;
+  }
+
+  private String getIps(String platformName, String componentName) {
+    try {
+      return flow.printIps(platformName, componentName);
+    } catch (OneOpsClientAPIException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   private void help(String header, String footer) {

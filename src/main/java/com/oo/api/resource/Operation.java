@@ -64,6 +64,7 @@ public class Operation extends APIClient {
 		Response response = request.queryParam("instances_state", "all").get(OPERATION_ENV_URI 
 				+ "/platforms/" + platformName 
 				+ "/components/" + componentName 
+				//+ "/instances.json?instances_state=all");
 				+ "/instances");
 		if(response != null) {
 			if(response.getStatusCode() == 200 || response.getStatusCode() == 302) {

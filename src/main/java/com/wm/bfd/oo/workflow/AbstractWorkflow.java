@@ -17,8 +17,8 @@ import com.oo.api.resource.Cloud;
 import com.oo.api.resource.Design;
 import com.oo.api.resource.Operation;
 import com.oo.api.resource.Transition;
-import com.oo.api.util.LogUtils;
 import com.wm.bfd.oo.ClientConfig;
+import com.wm.bfd.oo.LogUtils;
 import com.wm.bfd.oo.utils.ProgressBar;
 import com.wm.bfd.oo.yaml.CloudBean;
 import com.wm.bfd.oo.yaml.Constants;
@@ -71,10 +71,15 @@ public abstract class AbstractWorkflow {
     return true;
   }
 
+  public ClientConfig getConfig() {
+    return config;
+  }
+
   private boolean cleanupInt(String platformName) {
     if (design == null)
       return true;
-    this.cancelDeployment();
+    boolean isDisable = this.cancelDeployment();
+    System.out.println("isDisable:" + isDisable);
     this.disableAllPlatforms();
     try {
       transition.deleteEnvironment(envName);
@@ -98,7 +103,8 @@ public abstract class AbstractWorkflow {
     }
   }
 
-  void cancelDeployment() {
+  boolean cancelDeployment() {
+    boolean isSuc = false;
     try {
       JsonPath response = transition.getLatestDeployment(envName);
       String deploymentId = response.getString("deploymentId");
@@ -111,9 +117,12 @@ public abstract class AbstractWorkflow {
       response = transition.cancelDeployment(envName, deploymentId, releaseId);
       if (LOG.isDebugEnabled())
         LOG.debug("cancelDeployment: " + (response == null ? "" : response.prettyPrint()));
+      isSuc = true;
     } catch (Exception e) {
       // Ignore
     }
+
+    return isSuc;
 
   }
 

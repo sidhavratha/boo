@@ -83,7 +83,7 @@ public class Yaml {
   }
   
   @JsonIgnore
-  public List<PlatformConfigBean> getExtractBean() {
+  public Map<String, PlatformConfigBean> getExtractBean() {
     return PlatformConfigBeanHelper.getExtractBeans(this.extract);
   }
 

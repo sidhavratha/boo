@@ -1,4 +1,4 @@
-package com.oo.api.util;
+package com.wm.bfd.oo;
 
 
 public class LogUtils {
