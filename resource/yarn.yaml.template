@@ -66,9 +66,9 @@ platforms: # In OneOps design.
           authorized_keys: '[""]'
  
 scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.   
-    yarn:
-      scaling: 
-        compute:
+    yarn: # Platform name
+      scaling: # Don't change this
+        compute: # Component name
           current: '2'
           min: '2'
           max: '2'
