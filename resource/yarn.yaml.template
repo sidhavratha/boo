@@ -47,17 +47,23 @@ platforms: # In OneOps design.
         size: XXL
         require_public_ip: true
       client-user:
-        ciName: client-rzhan33
-        username: rzhan33
-        authorized_keys: '[""]'
+        client-rzhan33:
+          username: rzhan33
+          authorized_keys: '[""]'
+        client-mli014:
+          username: rzhan33
+          authorized_keys: '[""]'
+        client-yliu28:
+          username: rzhan33
+          authorized_keys: '[""]'
       dn-admin-user:
-        ciName: dn-rzhan33
-        username: rzhan33
-        authorized_keys: '[""]'
+        dn-rzhan33:
+          username: rzhan33
+          authorized_keys: '[""]'
       prm-admin-user:
-        ciName: prm-rzhan33
-        username: rzhan33
-        authorized_keys: '[""]'
+        prm-rzhan33:
+          sername: rzhan33
+          authorized_keys: '[""]'
  
 scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.   
     yarn:

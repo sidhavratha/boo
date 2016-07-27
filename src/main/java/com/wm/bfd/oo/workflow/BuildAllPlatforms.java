@@ -21,7 +21,7 @@ import com.wm.bfd.oo.yaml.ScalBean;
 
 public class BuildAllPlatforms extends AbstractWorkflow {
   final private static Logger LOG = LoggerFactory.getLogger(BuildAllPlatforms.class);
-  final private static String NAME = "ciName"; // Get component name.
+  // final private static String NAME = "ciName"; // Get component name.
   final private static String ACTIVE = "active";
   final private static String FAILED = "failed";
   final private static String NEWLINE = System.getProperty("line.separator");
@@ -92,7 +92,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
         String key = entry.getKey();
         Object value = entry.getValue();
         if (value instanceof Map) {
-          this.updateComponentVariables(platform.getName(), key, (Map<String, String>) value);
+          this.updateComponentVariables(platform.getName(), key, (Map<String, Object>) value);
         } else {
           LOG.info("Unknow type {}.", value.getClass());
         }
@@ -167,14 +167,37 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
   }
 
-  private boolean updateComponentVariables(String platformName, String componentName,
-      Map<String, String> attributes) throws OneOpsClientAPIException {
-    String uniqueName = componentName;
-    if (componentName.endsWith(Constants.USER)) {
-      attributes.put(Constants.DESCRIPTIONS, Constants.DESCRIPTION);
-      uniqueName = attributes.get(NAME);
-      attributes.remove(NAME);
+  /**
+   * Right now support components with two layers config.
+   * 
+   * @param platformName
+   * @param componentName
+   * @param attributes
+   * @throws OneOpsClientAPIException
+   */
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private void updateComponentVariables(String platformName, String componentName,
+      Map<String, Object> attributes) throws OneOpsClientAPIException {
+
+    for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      // Another Map, so key is ciName
+      if (value instanceof Map) {
+        Map<String, String> attris = (Map<String, String>) value;
+        this.updateComponentVariablesInternal(platformName, componentName, key, attris);
+      } else if (value instanceof String) {
+        Map<String, String> att = (Map) attributes;
+        this.updateComponentVariablesInternal(platformName, componentName, componentName, att);
+        break;
+      }
+
     }
+
+  }
+
+  private boolean updateComponentVariablesInternal(String platformName, String componentName,
+      String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
     LogUtils.info(Constants.UPDATE_COMPONENTS, componentName, platformName);
     boolean isExist = false;
     try {

@@ -19,7 +19,7 @@ public class Constants {
   final public static String ENV_NAME = "environment_name";
   final public static String TRUE = "true";
   final public static String PRIVATE_IP = "private_ip";
-  
+
   /**
    * Customize config
    */
@@ -56,11 +56,11 @@ public class Constants {
   final public static String ACTIVE_DEPLOYMENT_EXISTING =
       "An active deployment has been running in the same environment, quit!";
   final public static String FAIL_DEPLOYMENT_EXISTING =
-      "A failed deployment has been running int the same environment, quit!";
+      "A failed deployment has been running in the same environment, quit!";
   final public static String CREATE_ENV = "Creating the environment %s.";
   final public static String ENV_EXISTING = "Environment exist, skip create environment %s.";
   final public static String COMPUTE_SIZE = "Updating the compute size in %s - %s";
-  
+
   // Debug
   final public static String ENV_NOT_EXISTING = "The environment %s is not exist! %s";
 

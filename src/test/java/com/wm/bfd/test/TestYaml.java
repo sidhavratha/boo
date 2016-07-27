@@ -1,5 +1,7 @@
 package com.wm.bfd.test;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.FixMethodOrder;
@@ -9,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.oo.api.exception.OneOpsClientAPIException;
+import com.wm.bfd.oo.yaml.PlatformBean;
 import com.wm.bfd.oo.yaml.Yaml;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -37,9 +40,29 @@ public class TestYaml extends BFDOOTest {
   }
 
   @Test
+  public void testGetPlatformComponents() throws OneOpsClientAPIException {
+    List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
+    for (PlatformBean platform : platforms) {
+      for (Map.Entry<String, Object> entry : platform.getComponents().entrySet()) {
+        Object value = entry.getValue();
+        if (value instanceof Map) {
+          Map<String, String> map = (Map<String, String>) value;
+          for (Map.Entry<String, String> detail : map.entrySet()) {
+            // System.out.printf("Key: %s; value: %s \n", detail.getKey(), detail.getValue());
+            assertNotNull(detail.getValue());
+          }
+        } else {
+          LOG.info("Unknow type {}.", value.getClass());
+        }
+      }
+    }
+  }
+
+
+  @Test
   public void testGetEnvironments() throws OneOpsClientAPIException {
     assertNotNull(config.getYaml().getEnvironment());
-    this.printMap(config.getYaml().getEnvironment(), 0);
+    // this.printMap(config.getYaml().getEnvironment(), 0);
   }
 
   @Test
@@ -47,7 +70,7 @@ public class TestYaml extends BFDOOTest {
 
     Yaml yaml = config.getYaml();
     assertNotNull(yaml.getOthers());
-    this.printMap(yaml.getOthers(), 0);
+    // this.printMap(yaml.getOthers(), 0);
   }
 
   @SuppressWarnings("unchecked")
@@ -64,8 +87,8 @@ public class TestYaml extends BFDOOTest {
     for (Map.Entry<String, Object> entry : map.entrySet()) {
       String key = entry.getKey();
       Object value = entry.getValue();
-      LOG.debug("{} {}: key: {}; value:{}: \n", str.toString(), log, key, value == null ? ""
-          : value.getClass());
+      System.out.printf("%s %s: key: %s; value:%s: \n", str.toString(), log, key,
+          value == null ? "" : value.getClass());
       if (value instanceof Map) {
         this.printMap((Map<String, Object>) value, ++depth);
       }
