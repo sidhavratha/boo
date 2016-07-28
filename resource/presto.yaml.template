@@ -1,17 +1,13 @@
 ---
-# This template guides you to create a yarn cluster automatically, include zookeeper platform.
+# This template guides you to create a yarn cluster automatically.
 # Except the fields that labeled optional all other fields are required.
 boo:
   oneops_host: https://web.bfd.dev.cloud.wal-mart.com/
-  organization: 'bfd'
+  organization: 'bfd' # OneOps org name
   api_key: '' # copy from OneOps UI->profile->authentication->API Token
   email: ''
   environment_name: 'env-presto' # All the deployment in this template adds to this environment.
   ip_output: 'json'
-  custom: # Optional
-    custom_host1: '[public_ip]:2181{3}' # The number in {} means the number of repetition you expect.
-    cutom_component1: 'compute' # Which component in OneOps
-    custom_split1: ','
 
 assembly:
   name: 'boo-test-presto-user'
@@ -32,7 +28,6 @@ platforms: # In OneOps design.
         ganglia_servers: ''
       presto_swift:
         connection_name: 'object_store'
-        nexus_hadoop_openstack_repo: 'labs_snapshots'
       hive-client:
         swift_password: '' 
         hive_db_password: ''
@@ -47,24 +42,18 @@ platforms: # In OneOps design.
       compute:
         size: XXL
         require_public_ip: true
-      prm-compute:
-        size: XXL
-        require_public_ip: true
-      client-compute:
-        size: XXL
-        require_public_ip: true
-      client-user:
-        client-rzhan33:
-          username: rzhan33
+      user: # support multi-user by addding more client users.
+        client-user1: # e.g. client-rzhan33
+          username: user1 # e.g. rzhan33
           authorized_keys: '[""]' # copy the authorized_keys into ""
-        client-yliu28:
-          username: yliu28
-          authorized_keys: '[""]' # copy the authorized_keys into ""
- 
+        client-user2: # e.g. client-mli014
+          username: user2 # e.g. mli014
+          authorized_keys: '[""]' # copy the authorized_keys into "" 
+
 scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.   
-    presto:
-      scaling: 
-        compute:
+    presto: # platform name
+      scaling: # don't change it 
+        compute: # component name
           current: '2'
           min: '2'
           max: '2'
@@ -84,12 +73,3 @@ environment: # Only support one environment for now.
       #priority: '1' # 1 or 2
       #dpmt_order: '1'
       #pct_scale: '100'
-  
-
-extract: # Optional, means extract informations from previous deployment
-  zookeeper:
-      custom_format: '$custom_host1'
-      custom_split: '$custom_split1'
-      custom_component: '$cutom_component1'
-  
-  
