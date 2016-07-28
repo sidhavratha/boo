@@ -3,8 +3,8 @@
 # Except the fields that labeled optional all other fields are required.
 boo:
   oneops_host: https://web.bfd.dev.cloud.wal-mart.com/
-  organization: 'bfd'
-  api_key: ''
+  organization: 'bfd' # OneOps org name
+  api_key: '' # copy from OneOps UI->profile->authentication->API Token
   email: ''
   environment_name: 'env-dev-cdc003-test' # All the deployment in this template adds to this environment.
   ip_output: 'json'
@@ -46,24 +46,21 @@ platforms: # In OneOps design.
       client-compute:
         size: XXL
         require_public_ip: true
-      client-user:
-        client-rzhan33:
-          username: rzhan33
-          authorized_keys: '[""]'
-        client-mli014:
-          username: rzhan33
-          authorized_keys: '[""]'
-        client-yliu28:
-          username: rzhan33
-          authorized_keys: '[""]'
+      client-user: # support multi-user by addding more client users.
+        client-user1: # e.g. client-rzhan33
+          username: user1 # e.g. rzhan33
+          authorized_keys: '[""]' # copy the authorized_keys into ""
+        client-user2: # e.g. client-mli014
+          username: user2 # e.g. mli014
+          authorized_keys: '[""]' # copy the authorized_keys into ""
       dn-admin-user:
         dn-rzhan33:
           username: rzhan33
-          authorized_keys: '[""]'
+          authorized_keys: '[""]' # copy the authorized_keys into ""
       prm-admin-user:
         prm-rzhan33:
           sername: rzhan33
-          authorized_keys: '[""]'
+          authorized_keys: '[""]' # copy the authorized_keys into ""
  
 scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.   
     yarn: # Platform name

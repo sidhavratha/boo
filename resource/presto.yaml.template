@@ -20,7 +20,7 @@ platforms: # In OneOps design.
     pack: oneops/presto
     pack_version: '1'
     variables:
-      strati_cdc_demo_password: '' # same as swfit passport
+      strati_cdc_demo_password: '' # same as swfit_password
     components: # Optional
       presto:
         presto_rpm_install_url: ''
