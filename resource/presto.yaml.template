@@ -1,0 +1,95 @@
+---
+# This template guides you to create a yarn cluster automatically, include zookeeper platform.
+# Except the fields that labeled optional all other fields are required.
+boo:
+  oneops_host: https://web.bfd.dev.cloud.wal-mart.com/
+  organization: 'bfd'
+  api_key: '' # copy from OneOps UI->profile->authentication->API Token
+  email: ''
+  environment_name: 'env-presto' # All the deployment in this template adds to this environment.
+  ip_output: 'json'
+  custom: # Optional
+    custom_host1: '[public_ip]:2181{3}' # The number in {} means the number of repetition you expect.
+    cutom_component1: 'compute' # Which component in OneOps
+    custom_split1: ','
+
+assembly:
+  name: 'boo-test-presto-user'
+  auto_gen: false # If turn on, then this tool will generate random assembly name for you.
+variables: # Optional, global variables.
+  
+platforms: # In OneOps design.
+  presto: # This is as your platform name as well
+    deploy_order: 2
+    pack: oneops/presto
+    pack_version: '1'
+    variables:
+      strati_cdc_demo_password: '' # same as swfit passport
+    components: # Optional
+      presto:
+        presto_rpm_install_url: ''
+        nexus_presto_repo: 'labs_snapshots' 
+        ganglia_servers: ''
+      presto_swift:
+        connection_name: 'object_store'
+        nexus_hadoop_openstack_repo: 'labs_snapshots'
+      hive-client:
+        swift_password: '' 
+        hive_db_password: ''
+        hive_connect_url: ''
+        swift_url: ''
+        additional_libraries: ''
+        yarn_tarball: ''
+        swift_username: ''
+        swift_tenant: ''
+        hive_tarball_url: ''
+        extra_core_site: '<property>     <name>fs.swift.service.strati-cdc-demo.auth.endpoint.prefix</name>     <value>/object_endpoint/</value> </property> <property>     <name>fs.swift.service.strati-cdc-demo.auth.url</name>     <value>http://cdc-001-api-endpoint.prod.walmart.com:5000/v2.0/tokens</value> </property> <property>     <name>fs.swift.service.strati-cdc-demo.username</name>     <value>sw_bfd</value> </property> <property>     <name>fs.swift.service.strati-cdc-demo.password</name>     <value>$OO_LOCAL{strati_cdc_demo_password}</value> </property> <property>     <name>fs.swift.service.strati-cdc-demo.public</name>     <value>false</value> </property> <property>     <name>fs.swift.service.strati-cdc-demo.region</name>     <value>RegionOne</value> </property> <property>     <name>fs.swift.service.strati-cdc-demo.tenant</name>     <value>sw_bfd</value> </property>'
+      compute:
+        size: XXL
+        require_public_ip: true
+      prm-compute:
+        size: XXL
+        require_public_ip: true
+      client-compute:
+        size: XXL
+        require_public_ip: true
+      client-user:
+        client-rzhan33:
+          username: rzhan33
+          authorized_keys: '[""]' # copy the authorized_keys into ""
+        client-yliu28:
+          username: yliu28
+          authorized_keys: '[""]' # copy the authorized_keys into ""
+ 
+scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.   
+    presto:
+      scaling: 
+        compute:
+          current: '2'
+          min: '2'
+          max: '2'
+
+environment: # Only support one environment for now.
+  global_dns: 'true'
+  availability: 'redundant'
+  subdomain: 'env-presto.boo-test-presto-user' # environment_name.assembly_name
+  profile: 'DEV'
+  clouds: # Can support multiple clouds.
+    #cloud_id: '2180660' #dev-cdc002
+    dev-cdc002:
+      priority: '1' # 1 or 2
+      dpmt_order: '1'
+      pct_scale: '100'
+    #dev-cdc003:
+      #priority: '1' # 1 or 2
+      #dpmt_order: '1'
+      #pct_scale: '100'
+  
+
+extract: # Optional, means extract informations from previous deployment
+  zookeeper:
+      custom_format: '$custom_host1'
+      custom_split: '$custom_split1'
+      custom_component: '$cutom_component1'
+  
+  
