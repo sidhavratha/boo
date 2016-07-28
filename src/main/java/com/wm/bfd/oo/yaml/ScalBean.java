@@ -1,5 +1,6 @@
 package com.wm.bfd.oo.yaml;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ScalBean {
@@ -12,6 +13,9 @@ public class ScalBean {
   private int stepUp;
   private int stepDown;
   private int percentDeploy;
+
+  @JsonIgnore
+  private String component;
 
   public int getStepUp() {
     return stepUp;
@@ -28,6 +32,7 @@ public class ScalBean {
 
 
   public ScalBean(ScalBeanBuilder builder) {
+    this.component = builder.component;
     this.platform = builder.platform;
     this.current = builder.current;
     this.max = builder.max;
@@ -53,6 +58,11 @@ public class ScalBean {
     return platform;
   }
 
+  @JsonIgnore
+  public String getComponent() {
+    return component;
+  }
+
   public static class ScalBeanBuilder {
     private int current = 2;
     private int max = 10;
@@ -61,15 +71,21 @@ public class ScalBean {
     private int stepUp = 1;
     private int stepDown = 1;
     private int percentDeploy = 100;
+    private String component;
 
     public ScalBeanBuilder() {
 
     }
-    
+
     public ScalBean build() {
       return new ScalBean(this);
     }
 
+    public ScalBeanBuilder setComponent(String component) {
+      this.component = component;
+      return this;
+    }
+    
     public ScalBeanBuilder setStepUp(String stepUp) {
       if (stepUp != null)
         this.stepUp = Integer.parseInt(stepUp);

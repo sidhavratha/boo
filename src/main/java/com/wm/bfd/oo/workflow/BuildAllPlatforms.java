@@ -124,14 +124,15 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 
   private boolean isComponentExist(String platformName, String componentName)
       throws OneOpsClientAPIException, OneOpsComponentExistException {
-    JsonPath j = null;
+    boolean isExist = false;
     try {
-      j = design.getPlatformComponent(platformName, componentName);
+      design.getPlatformComponent(platformName, componentName);
+      isExist = true;
     } catch (OneOpsClientAPIException e) {
       // e.printStackTrace();
       throw new OneOpsComponentExistException(e.getMessage());
     }
-    return (j == null ? false : true);
+    return isExist;
   }
 
 
@@ -185,6 +186,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       // Another Map, so key is ciName
       if (value instanceof Map) {
         Map<String, String> attris = (Map<String, String>) value;
+        // System.out.println("In map:" + key + ":" + componentName + "; " + attris);
         this.updateComponentVariablesInternal(platformName, componentName, key, attris);
       } else if (value instanceof String) {
         Map<String, String> att = (Map) attributes;
@@ -199,23 +201,17 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   private boolean updateComponentVariablesInternal(String platformName, String componentName,
       String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
     LogUtils.info(Constants.UPDATE_COMPONENTS, componentName, platformName);
-    boolean isExist = false;
+    boolean isExist = Boolean.FALSE;
     try {
-      isExist = this.isComponentExist(platformName, componentName);
+      isExist = this.isComponentExist(platformName, uniqueName);
     } catch (OneOpsComponentExistException e1) {
       // Ignore
+      isExist = Boolean.FALSE;
     }
     if (isExist) {
-      design.updatePlatformComponent(platformName, componentName, attributes);
+      design.updatePlatformComponent(platformName, uniqueName, attributes);
     } else {
-      try {
-        design.addPlatformComponent(platformName, componentName, uniqueName, attributes);
-      } catch (Exception e) {
-        // Ignore
-        if (LOG.isDebugEnabled())
-          LOG.debug("Update component variables failed! {}", e.getMessage());
-        // System.err.println(e.getMessage());
-      }
+      design.addPlatformComponent(platformName, componentName, uniqueName, attributes);
     }
     design.commitDesign();
     return true;
@@ -244,7 +240,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       config.setMin(scale.getMin());
       config.setMax(scale.getMax());
       LogUtils.info(Constants.COMPUTE_SIZE, envName, scale.getPlatform());
-      transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), config);
+      transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(), config);
     }
     transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
     return true;

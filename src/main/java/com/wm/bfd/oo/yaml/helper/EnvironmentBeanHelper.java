@@ -38,11 +38,16 @@ public final class EnvironmentBeanHelper {
       Object value = entry.getValue();
       if (value instanceof Map) {
         Map<String, Map> map = (Map<String, Map>) value;
-        Map<String, String> map2 = ((Map<String, Map>) map.get(SCALING)).get(COMPUTE);
-        scales.add(new ScalBean.ScalBeanBuilder().setPlatform(platform)
-            .setCurrent(map2.get(CURRENT)).setMax(map2.get(MAX)).setMin(map2.get(MIN))
-            .setStepDown(map2.get(STEP_DOWN)).setStepUp(map2.get(STEP_UP))
-            .setPercentDeploy(map2.get(PERCENT_DEPLOY)).build());
+        Map<String, Map> s = (Map<String, Map>) map.get(SCALING);
+        for (Map.Entry<String, Map> scale : s.entrySet()) {
+          String component = scale.getKey();
+          Map<String, String> map2 = scale.getValue();
+          // Map<String, String> map2 = ((Map<String, Map>) map.get(SCALING)).get(COMPUTE);
+          scales.add(new ScalBean.ScalBeanBuilder().setComponent(component).setPlatform(platform)
+              .setCurrent(map2.get(CURRENT)).setMax(map2.get(MAX)).setMin(map2.get(MIN))
+              .setStepDown(map2.get(STEP_DOWN)).setStepUp(map2.get(STEP_UP))
+              .setPercentDeploy(map2.get(PERCENT_DEPLOY)).build());
+        }
       }
 
     }

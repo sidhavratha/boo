@@ -1244,7 +1244,7 @@ public class Transition extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath updatePlatformRedundancyConfig(String environmentName, String platformName,
+  public JsonPath updatePlatformRedundancyConfig(String environmentName, String platformName, String componentName,
       RedundancyConfig config) throws OneOpsClientAPIException {
     if (environmentName == null || environmentName.length() == 0) {
       String msg = String.format("Missing environment name to be updated");
@@ -1289,7 +1289,7 @@ public class Transition extends APIClient {
 
     rconfig.put("relationAttrProps", owner);
 
-    JsonPath computeDetails = getPlatformComponent(environmentName, platformName, "compute");
+    JsonPath computeDetails = getPlatformComponent(environmentName, platformName, componentName);
     int computeId = computeDetails.getInt("ciId");
 
     JSONObject jo = new JSONObject();
