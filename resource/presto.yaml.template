@@ -20,7 +20,7 @@ variables: # Optional, global variables.
   
 platforms: # In OneOps design.
   presto: # This is as your platform name as well
-    deploy_order: 2
+    deploy_order: 1 
     pack: oneops/presto
     pack_version: '1'
     variables:
