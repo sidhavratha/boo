@@ -17,7 +17,7 @@ variables: # Optional, global variables.
 platforms: # In OneOps design.
   spark: # This is as your platform name as well
     deploy_order: 1
-    pack: oneops/spark
+    pack: oneops/spark_vrc1
     pack_version: '1'
     components: # Optional
       spark:
