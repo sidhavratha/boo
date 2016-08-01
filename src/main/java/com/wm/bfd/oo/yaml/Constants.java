@@ -29,6 +29,8 @@ public class Constants {
   final public static String NUMTERMINATOR2 = "}";
   final public static String DEDAULT_IPSPLIT = ",";
   final public static char DOLLAR = '$';
+  final public static char SLASH = '/';
+  final public static char DOT = '.';
 
 
   final public static String BFD_TOOL = "The tool is managed by BFD team.";

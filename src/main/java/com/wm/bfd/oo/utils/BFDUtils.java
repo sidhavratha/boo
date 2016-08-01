@@ -108,5 +108,19 @@ public class BFDUtils {
       return "";
     return customFormat.substring(l + 1, r);
   }
+  
+  public String getAbsolutePath(String template) {
+    if (template == null || template.length() == 0 || template.charAt(0) == Constants.SLASH) {
+      return template;
+    } else if (template.charAt(0) == Constants.DOT && template.length() > 1 && template.charAt(1) == Constants.DOT) {
+      return getAbsolutePath(template.substring(2));
+    } else {
+      StringBuilder sb = new StringBuilder();
+      sb.append(System.getProperty("user.dir"));
+      sb.append(Constants.SLASH);
+      sb.append(template);
+      return sb.toString();
+    }
+  }
 
 }
