@@ -83,9 +83,8 @@ public class BooCli {
   public void init(String template) throws BFDOOException {
     if (LOG.isDebugEnabled())
       LOG.debug("Loading {}", template);
-    String file = (template.length() != 0 && template.charAt(0) != '/') ? 
-    		System.getProperty("user.dir") + "/" + template : template;
-    Injector injector = Guice.createInjector(new JaywayHttpModule(file));
+    this.configFile = new BFDUtils().getAbsolutePath(template);
+    Injector injector = Guice.createInjector(new JaywayHttpModule(this.configFile));
     ClientConfig config = injector.getInstance(ClientConfig.class);
     new BFDUtils().verifyTemplate(config);
     OOInstance oo = injector.getInstance(OOInstance.class);
@@ -131,10 +130,7 @@ public class BooCli {
     }
 
     if (this.configDir == null && this.configFile != null) {
-      if (this.configFile.charAt(0) == '/')
-        this.configDir = this.configFile.substring(0, this.configFile.lastIndexOf('/'));
-      else 
-    	this.configDir = System.getProperty("user.dir");
+      this.configDir = this.configFile.substring(0, this.configFile.lastIndexOf('/'));
     } else if (this.configDir == null && this.configFile == null) {
       this.help(null, "No YAML file found.");
       System.exit(-1);
