@@ -65,6 +65,8 @@ public class BooCli {
     Option getIps =
         Option.builder("ip").longOpt("get_ips").argName("platform><component").numberOfArgs(2)
             .desc("Get ips from OneOps.").build();
+    
+    Option retry = Option.builder("r").longOpt("retry").desc("Retry the deployment.").build();
 
     options.addOption(help);
     options.addOption(config);
@@ -74,6 +76,7 @@ public class BooCli {
     options.addOption(list);
     options.addOption(cleanup);
     options.addOption(getIps);
+    options.addOption(retry);
   }
 
   static {
@@ -147,6 +150,8 @@ public class BooCli {
       this.cleanup();
     } else if (cmd.hasOption("ip")) {
       System.out.println(this.getIps(cmd.getOptionValues("ip")[0], cmd.getOptionValues("ip")[1]));
+    } else if (cmd.hasOption("retry")) {
+      this.retryDeployment();
     }
   }
 
@@ -165,6 +170,10 @@ public class BooCli {
       e.printStackTrace();
     }
     return null;
+  }
+
+  private boolean retryDeployment() {
+    return flow.retryDeployment();
   }
 
   private void help(String header, String footer) {

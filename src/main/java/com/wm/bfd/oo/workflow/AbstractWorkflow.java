@@ -116,7 +116,34 @@ public abstract class AbstractWorkflow {
       Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
       response = transition.cancelDeployment(envName, deploymentId, releaseId);
       if (LOG.isDebugEnabled())
-        LOG.debug("cancelDeployment: " + (response == null ? "" : response.prettyPrint()));
+        LOG.debug("Cancel deployment: " + (response == null ? "" : response.prettyPrint()));
+      isSuc = true;
+    } catch (Exception e) {
+      // Ignore
+    }
+
+    return isSuc;
+
+  }
+  
+  /**
+   * Sometimes we have to retry a few times to make the deployment done.
+   * @return
+   */
+  public boolean retryDeployment() {
+    boolean isSuc = false;
+    try {
+      JsonPath response = transition.getLatestDeployment(envName);
+      String deploymentId = response.getString("deploymentId");
+      response = transition.getLatestRelease(envName);
+      String releaseId = response.getString("releaseId");
+      if (LOG.isDebugEnabled())
+        LOG.debug("deploymentId:" + deploymentId + "; releaseId: " + releaseId);
+      response = transition.getDeploymentStatus(envName, deploymentId);
+      Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+      response = transition.retryDeployment(envName, deploymentId, releaseId);
+      if (LOG.isDebugEnabled())
+        LOG.debug("Retry deployment: " + (response == null ? "" : response.prettyPrint()));
       isSuc = true;
     } catch (Exception e) {
       // Ignore
