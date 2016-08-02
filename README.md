@@ -38,6 +38,8 @@ usage: boo [-cd <yaml>] [-cf <yaml>] [-cleanup] [-create] [-h] [-l] [-s]
  
  -h,--help                  show help.
  
+ -ip,--get_ips <platform><component>   Get ips from OneOps.
+ 
  -l,--list                  List all YAML files.
  
  -s,--status                Check deployment status.
