@@ -42,4 +42,6 @@ usage: boo [-cd <yaml>] [-cf <yaml>] [-cleanup] [-create] [-h] [-l] [-s]
  
  -l,--list                  List all YAML files.
  
+ -r,--retry                 Retry the deployment.
+ 
  -s,--status                Check deployment status.
