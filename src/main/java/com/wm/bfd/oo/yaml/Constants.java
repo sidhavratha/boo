@@ -19,6 +19,7 @@ public class Constants {
   final public static String ENV_NAME = "environment_name";
   final public static String TRUE = "true";
   final public static String PRIVATE_IP = "private_ip";
+  final public static String ACTIVE = "active";
 
   /**
    * Customize config
@@ -65,7 +66,7 @@ public class Constants {
 
   // Debug
   final public static String ENV_NOT_EXISTING = "The environment %s is not exist! %s";
-
+  
 
 
 }

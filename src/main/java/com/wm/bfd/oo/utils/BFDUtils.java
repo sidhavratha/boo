@@ -1,7 +1,10 @@
 package com.wm.bfd.oo.utils;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -9,7 +12,9 @@ import com.oo.api.exception.OneOpsClientAPIException;
 import com.wm.bfd.oo.ClientConfig;
 import com.wm.bfd.oo.exception.BFDOOException;
 import com.wm.bfd.oo.workflow.AbstractWorkflow;
+import com.wm.bfd.oo.workflow.BuildAllPlatforms;
 import com.wm.bfd.oo.yaml.Constants;
+import com.wm.bfd.oo.yaml.PlatformBean;
 import com.wm.bfd.oo.yaml.PlatformConfigBean;
 import com.wm.bfd.oo.yaml.Yaml;
 
@@ -53,8 +58,8 @@ public class BFDUtils {
    * Wait certain time.
    * @param seconds
    */
-  public static void wait(String seconds) {
-    Uninterruptibles.sleepUninterruptibly(20, TimeUnit.SECONDS);
+  public static void wait(int seconds) {
+    Uninterruptibles.sleepUninterruptibly(seconds, TimeUnit.SECONDS);
   }
 
   public String isCustomized(String val, ClientConfig config) {
@@ -120,6 +125,34 @@ public class BFDUtils {
       sb.append(Constants.SLASH);
       sb.append(template);
       return sb.toString();
+    }
+  }
+  
+  @SuppressWarnings("unchecked")
+  public boolean createPlatforms(ClientConfig config, BuildAllPlatforms workflow) throws OneOpsClientAPIException {
+    List<PlatformBean> platforms = config.getYaml().getPlatformsList();
+    Collections.sort(platforms);
+    Queue<Integer> q = new LinkedList<>();
+    int prevOrderIdx = platforms.get(0).getDeployOrder();
+    for (int i = 0; i < platforms.size(); i++) {
+      if (prevOrderIdx == platforms.get(i).getDeployOrder()) {
+        q.add(i);
+        workflow.createPlatform(platforms.get(i));
+      } else {
+        checkPlatformQ(workflow);
+        q.clear();
+        prevOrderIdx++;
+      }
+    }
+    return true;
+  }
+  
+  private void checkPlatformQ(AbstractWorkflow workFlow) {
+    while (true) {
+      if (!Constants.ACTIVE.equalsIgnoreCase(workFlow.getStatus())) {
+        break;
+      }
+      wait(30);
     }
   }
 

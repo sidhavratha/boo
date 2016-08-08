@@ -101,7 +101,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return true;
   }
 
-  private boolean createPlatform(PlatformBean platform) throws OneOpsClientAPIException {
+  public boolean createPlatform(PlatformBean platform) throws OneOpsClientAPIException {
     boolean isExist = false;
     try {
       isExist = this.isPlatformExist(platform.getName());
