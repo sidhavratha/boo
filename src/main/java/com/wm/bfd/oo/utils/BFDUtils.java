@@ -58,7 +58,7 @@ public class BFDUtils {
    * Wait certain time.
    * @param seconds
    */
-  public static void wait(int seconds) {
+  public void waitTimeout(int seconds) {
     Uninterruptibles.sleepUninterruptibly(seconds, TimeUnit.SECONDS);
   }
 
@@ -152,7 +152,7 @@ public class BFDUtils {
       if (!Constants.ACTIVE.equalsIgnoreCase(workFlow.getStatus())) {
         break;
       }
-      wait(30);
+      waitTimeout(30);
     }
   }
 

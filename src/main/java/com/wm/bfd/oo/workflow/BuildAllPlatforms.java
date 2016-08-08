@@ -61,6 +61,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       // Ignore
     }
     this.bar.update(70, 100);
+    utils.waitTimeout(3);
     this.deploy();
     this.bar.update(100, 100);
     LogUtils.info(Constants.DEPLOYMENT_RUNNING);
