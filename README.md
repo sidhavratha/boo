@@ -34,7 +34,7 @@ usage: boo [-cd <yaml>] [-cf <yaml>] [-cleanup] [-create] [-h] [-l] [-s]
  
  -cleanup                   Remove all deployment in OneOps.
  
- -create                    Create a new deployment in OneOps.
+ -create                    Create or update a new deployment in OneOps.
  
  -h,--help                  show help.
  
