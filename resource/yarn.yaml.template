@@ -57,7 +57,7 @@ platforms: # In OneOps design.
           authorized_keys: '[""]' # copy the authorized_keys into ""
       prm-admin-user:
         prm-rzhan33:
-          sername: rzhan33
+          username: rzhan33
           authorized_keys: '[""]' # copy the authorized_keys into ""
  
 scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.   
