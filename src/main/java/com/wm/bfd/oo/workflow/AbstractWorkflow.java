@@ -62,7 +62,7 @@ public abstract class AbstractWorkflow {
 
   public abstract boolean process() throws OneOpsClientAPIException;
 
-  public boolean cleanup() {
+  public boolean cleanup() throws OneOpsClientAPIException {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
       LogUtils.info(Constants.DESTROY_PLATFORM, platform.getName());
       this.cleanupInt(platform.getName());
@@ -92,15 +92,11 @@ public abstract class AbstractWorkflow {
     return true;
   }
 
-  private void deleteAssembly() {
+  private void deleteAssembly() throws OneOpsClientAPIException {
     // Don't add the following part to one try block as transition.
-    try {
       assembly.deleteAssembly(assemblyName);
       LogUtils.info(Constants.DESTROY_ASSEMBLY, assemblyName);
       assembly = null;
-    } catch (Exception e) {
-      // Ignore
-    }
   }
 
   boolean cancelDeployment() {

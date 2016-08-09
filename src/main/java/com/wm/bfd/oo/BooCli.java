@@ -65,7 +65,7 @@ public class BooCli {
     Option getIps =
         Option.builder("ip").longOpt("get_ips").argName("platform><component").numberOfArgs(2)
             .desc("Get ips from OneOps.").build();
-    
+
     Option retry = Option.builder("r").longOpt("retry").desc("Retry the deployment.").build();
 
     options.addOption(help);
@@ -270,10 +270,11 @@ public class BooCli {
       try {
         this.init(file);
         flow.cleanup();
+        this.deleteFile(this.configDir, file);
       } catch (BFDOOException e) {
         // Ignore
-      } finally {
-        this.deleteFile(this.configDir, file);
+      } catch (OneOpsClientAPIException e) {
+        // Ignore
       }
     }
     System.out.printf("Destroyed!");
