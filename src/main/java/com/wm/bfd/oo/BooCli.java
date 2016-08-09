@@ -251,7 +251,8 @@ public class BooCli {
   private void deleteFile(String dir, String file) {
     if (StringUtils.isEmpty(file))
       return;
-    LOG.warn("Deleting yaml file {}", file);
+    if (LOG.isWarnEnabled())
+      LOG.warn("Deleting yaml file {}", file);
     File f = new File(dir + "/" + file);
     if (f.exists()) {
       f.deleteOnExit();

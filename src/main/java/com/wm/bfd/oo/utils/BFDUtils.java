@@ -132,7 +132,7 @@ public class BFDUtils {
   public boolean createPlatforms(ClientConfig config, BuildAllPlatforms workflow) throws OneOpsClientAPIException {
     List<PlatformBean> platforms = config.getYaml().getPlatformsList();
     Collections.sort(platforms);
-    Queue<Integer> q = new LinkedList<>();
+    Queue<Integer> q = new LinkedList<Integer>();
     int prevOrderIdx = platforms.get(0).getDeployOrder();
     for (int i = 0; i < platforms.size(); i++) {
       if (prevOrderIdx == platforms.get(i).getDeployOrder()) {

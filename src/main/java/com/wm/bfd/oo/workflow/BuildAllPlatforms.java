@@ -95,7 +95,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
         if (value instanceof Map) {
           this.updateComponentVariables(platform.getName(), key, (Map<String, Object>) value);
         } else {
-          LOG.info("Unknow type {}.", value.getClass());
+          if (LOG.isInfoEnabled())
+            LOG.info("Unknow type {}.", value.getClass());
         }
       }
     }
