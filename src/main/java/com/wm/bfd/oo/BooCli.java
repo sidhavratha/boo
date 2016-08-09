@@ -48,7 +48,7 @@ public class BooCli {
   public BooCli(String[] args) {
     this.args = args;
     Option help = new Option("h", "help", false, "show help.");
-    Option create = Option.builder("create").desc("Create a new deployment in OneOps.").build();
+    Option create = Option.builder("create").desc("Create or update a new deployment in OneOps.").build();
     Option status = Option.builder("s").longOpt("status").desc("Check deployment status.").build();
 
     Option config =
