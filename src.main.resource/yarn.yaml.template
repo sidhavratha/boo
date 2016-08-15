@@ -21,10 +21,10 @@ variables: # Optional, global variables.
 platforms: # In OneOps design.
   yarn: # This is as your platform name as well
     deploy_order: 1
-    pack: oneops/hadoop_yarn_vrc4
+    pack: oneops/hadoop_yarn_vrc5
     pack_version: '1'
     components: # Optional
-      hadoop_yarn_attributes:
+      hadoop-yarn-config:
         additional_libraries: ''
         yarn_tarball: ''
         swift_username: ''
