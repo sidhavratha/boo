@@ -48,25 +48,28 @@ public class BooCli {
   public BooCli(String[] args) {
     this.args = args;
     Option help = new Option("h", "help", false, "show help.");
-    Option create = Option.builder("create").desc("Create or update a new deployment in OneOps.").build();
-    Option status = Option.builder("s").longOpt("status").desc("Check deployment status.").build();
-
-    Option config =
-        Option.builder("cf").longOpt("config_file").argName("yaml").hasArg()
-            .desc("Use specified template.").build();
+    Option create = Option.builder("c").longOpt("create")
+        .desc("Create a new Assembly specified by -d or -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.").build();
+    Option status = Option.builder("s").longOpt("status").desc("Get status of deployments specified by -d or -f").build();
 
     Option config_dir =
-        Option.builder("cd").longOpt("config_dir").argName("yaml").hasArg()
-            .desc("Use the config dir.").build();
+        Option.builder("d").longOpt("config-dir").argName("DIR").hasArg()
+            .desc("Use all configuration files in given directory, required if -f not used").build();
 
-    Option cleanup = Option.builder("cleanup").desc("Remove all deployment in OneOps.").build();
-    Option list = new Option("l", "list", false, "List all YAML files.");
+    Option config =
+        Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
+            .desc("Use specified configuration file, required if -d not used").build();
+
+    Option cleanup = 
+        Option.builder("r").longOpt("remove")
+            .desc("Remove all deployed configurations specified by -d or -f").build();
+    Option list = new Option("l", "list", false, "List all YAML files specified by -d or -f");
 
     Option getIps =
-        Option.builder("ip").longOpt("get_ips").argName("platform><component").numberOfArgs(2)
-            .desc("Get ips from OneOps.").build();
+        Option.builder().longOpt("get-ips").argName("platform> <component").numberOfArgs(2)
+            .desc("Get IPs of deployed nodes specified by -d or -f").build();
 
-    Option retry = Option.builder("r").longOpt("retry").desc("Retry the deployment.").build();
+    Option retry = Option.builder().longOpt("retry").desc("Retry deployments of configurations specified by -d or -f").build();
 
     options.addOption(help);
     options.addOption(config);
@@ -125,8 +128,8 @@ public class BooCli {
         this.init(this.configFile);
       }
 
-      if (cmd.hasOption("cd")) {
-        this.configDir = cmd.getOptionValue("cd");
+      if (cmd.hasOption("d")) {
+        this.configDir = cmd.getOptionValue("d");
         if (cmd.hasOption("l")) {
           this.listFiles(this.configDir);
         }
@@ -144,12 +147,12 @@ public class BooCli {
        */
       if (cmd.hasOption("s")) {
         System.out.println(this.getStatus());
-      } else if (cmd.hasOption("create")) {
+      } else if (cmd.hasOption("c")) {
         this.createPacks();
-      } else if (cmd.hasOption("cleanup")) {
+      } else if (cmd.hasOption("r")) {
         this.cleanup();
-      } else if (cmd.hasOption("ip")) {
-        System.out.println(this.getIps(cmd.getOptionValues("ip")[0], cmd.getOptionValues("ip")[1]));
+      } else if (cmd.hasOption("get-ips")) {
+        System.out.println(this.getIps(cmd.getOptionValues("get-ips")[0], cmd.getOptionValues("get-ips")[1]));
       } else if (cmd.hasOption("retry")) {
         this.retryDeployment();
       }
