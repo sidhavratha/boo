@@ -125,11 +125,13 @@ public class BooCli {
        */
       if (cmd.hasOption("f")) {
         this.configFile = cmd.getOptionValue("f");
+        System.out.println("Configuration file: " + new BFDUtils().getAbsolutePath(this.configFile));
         this.init(this.configFile);
       }
 
       if (cmd.hasOption("d")) {
         this.configDir = cmd.getOptionValue("d");
+        System.out.println("Configuration dir: " + new BFDUtils().getAbsolutePath(this.configDir));
         if (cmd.hasOption("l")) {
           this.listFiles(this.configDir);
         }
@@ -286,7 +288,7 @@ public class BooCli {
         // Ignore
       }
     }
-    System.out.printf("Destroyed!");
+    System.out.println("Destroyed!");
   }
 
   public String getStatus() throws BFDOOException {
