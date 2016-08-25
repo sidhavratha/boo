@@ -107,53 +107,58 @@ public class BooCli {
   public void parse() throws ParseException, BFDOOException {
     CommandLineParser parser = new DefaultParser();
     // CommandLineParser parser = new GnuParser();
-    CommandLine cmd = parser.parse(options, args);
-
-    /**
-     * Handle command without configuration file dependency first.
-     */
-    if (cmd.hasOption("h")) {
-      this.help(null, Constants.BFD_TOOL);
-      System.exit(0);
-    }
-
-    /**
-     * Get configuration dir or file.
-     */
-    if (cmd.hasOption("cf")) {
-      this.configFile = cmd.getOptionValue("cf");
-      this.init(this.configFile);
-    }
-
-    if (cmd.hasOption("cd")) {
-      this.configDir = cmd.getOptionValue("cd");
-      if (cmd.hasOption("l")) {
-        this.listFiles(this.configDir);
+    try {
+      CommandLine cmd = parser.parse(options, args);
+      /**
+       * Handle command without configuration file dependency first.
+       */
+      if (cmd.hasOption("h")) {
+        this.help(null, Constants.BFD_TOOL);
+        System.exit(0);
       }
-    }
 
-    if (this.configDir == null && this.configFile != null) {
-      this.configDir = this.configFile.substring(0, this.configFile.lastIndexOf('/'));
-    } else if (this.configDir == null && this.configFile == null) {
-      this.help(null, "No YAML file found.");
-      System.exit(-1);
-    }
+      /**
+       * Get configuration dir or file.
+       */
+      if (cmd.hasOption("f")) {
+        this.configFile = cmd.getOptionValue("f");
+        this.init(this.configFile);
+      }
 
-    /**
-     * Handle other commands.
-     */
-    if (cmd.hasOption("s")) {
-      System.out.println(this.getStatus());
-    } else if (cmd.hasOption("create")) {
-      this.createPacks();
-    } else if (cmd.hasOption("cleanup")) {
-      this.cleanup();
-    } else if (cmd.hasOption("ip")) {
-      System.out.println(this.getIps(cmd.getOptionValues("ip")[0], cmd.getOptionValues("ip")[1]));
-    } else if (cmd.hasOption("retry")) {
-      this.retryDeployment();
+      if (cmd.hasOption("cd")) {
+        this.configDir = cmd.getOptionValue("cd");
+        if (cmd.hasOption("l")) {
+          this.listFiles(this.configDir);
+        }
+      }
+
+      if (this.configDir == null && this.configFile != null) {
+        this.configDir = this.configFile.substring(0, this.configFile.lastIndexOf('/'));
+      } else if (this.configDir == null && this.configFile == null) {
+        this.help(null, "No YAML file found.");
+        System.exit(-1);
+      }
+
+      /**
+       * Handle other commands.
+       */
+      if (cmd.hasOption("s")) {
+        System.out.println(this.getStatus());
+      } else if (cmd.hasOption("create")) {
+        this.createPacks();
+      } else if (cmd.hasOption("cleanup")) {
+        this.cleanup();
+      } else if (cmd.hasOption("ip")) {
+        System.out.println(this.getIps(cmd.getOptionValues("ip")[0], cmd.getOptionValues("ip")[1]));
+      } else if (cmd.hasOption("retry")) {
+        this.retryDeployment();
+      }
+    } catch (ParseException e) {
+      System.err.println(e.getMessage()); 
+      this.help(null, Constants.BFD_TOOL);
     }
   }
+
 
   @SuppressWarnings("resource")
   private String userInput(String msg) {
