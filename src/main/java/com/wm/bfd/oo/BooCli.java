@@ -226,6 +226,7 @@ public class BooCli {
 
       File source = new File(src);
       File destination = new File(src + FILE_NAME_SPLIT + this.randomName());
+      System.out.println("Working file: " + destination.getPath());
       des = destination.getPath();
 
       inStream = new FileInputStream(source);
