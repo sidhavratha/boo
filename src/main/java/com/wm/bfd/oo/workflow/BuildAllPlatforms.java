@@ -26,6 +26,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   final private static String FAILED = "failed";
   final private static String NEWLINE = System.getProperty("line.separator");
   final private BFDUtils utils = new BFDUtils();
+  private int retries = 3;
 
   public BuildAllPlatforms(OOInstance instance, ClientConfig config)
       throws OneOpsClientAPIException {
@@ -61,8 +62,17 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       // Ignore
     }
     this.bar.update(70, 100);
-    utils.waitTimeout(3);
-    this.deploy();
+    // Added retry
+    boolean retry = true;
+    while (retry && retries > 0) {
+      utils.waitTimeout(2);
+      try {
+        this.deploy();
+        retry = false;
+      } catch (Exception e) {
+        retries--;
+      }
+    }
     this.bar.update(100, 100);
     LogUtils.info(Constants.DEPLOYMENT_RUNNING);
     return true;
@@ -242,7 +252,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       config.setMin(scale.getMin());
       config.setMax(scale.getMax());
       LogUtils.info(Constants.COMPUTE_SIZE, envName, scale.getPlatform());
-      transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(), config);
+      transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(),
+          config);
     }
     transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
     return true;
