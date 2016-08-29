@@ -81,7 +81,12 @@ public abstract class AbstractWorkflow {
     boolean isDisable = this.cancelDeployment();
     System.out.println("isDisable:" + isDisable);
     this.disableAllPlatforms();
-    transition.deleteEnvironment(envName);
+    try {
+      transition.deleteEnvironment(envName);
+    } catch (Exception e) {
+      // Do nothing
+    }
+    design.deletePlatform(platformName);
     op = null;
     design = null;
     return true;
