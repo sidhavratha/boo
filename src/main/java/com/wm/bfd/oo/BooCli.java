@@ -36,6 +36,7 @@ public class BooCli {
   final private static Logger LOG = LoggerFactory.getLogger(BooCli.class);
   final private static String YAML = "yaml";
   final private static String FILE_NAME_SPLIT = "-";
+  final private static String TEMPLATE_FILE = "\\.yaml" + FILE_NAME_SPLIT;
   final private static String YES_NO =
       "WARNING! There are %s instances using the yarn-cluster configuration. Do you want to destroy all of them? (y/n) ";
   private String configDir;
@@ -48,19 +49,27 @@ public class BooCli {
   public BooCli(String[] args) {
     this.args = args;
     Option help = new Option("h", "help", false, "show help.");
-    Option create = Option.builder("c").longOpt("create")
-        .desc("Create a new Assembly specified by -d or -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.").build();
-    Option status = Option.builder("s").longOpt("status").desc("Get status of deployments specified by -d or -f").build();
+    Option create =
+        Option
+            .builder("c")
+            .longOpt("create")
+            .desc(
+                "Create a new Assembly specified by -d or -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.")
+            .build();
+    Option status =
+        Option.builder("s").longOpt("status")
+            .desc("Get status of deployments specified by -d or -f").build();
 
     Option config_dir =
         Option.builder("d").longOpt("config-dir").argName("DIR").hasArg()
-            .desc("Use all configuration files in given directory, required if -f not used").build();
+            .desc("Use all configuration files in given directory, required if -f not used")
+            .build();
 
     Option config =
         Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
             .desc("Use specified configuration file, required if -d not used").build();
 
-    Option cleanup = 
+    Option cleanup =
         Option.builder("r").longOpt("remove")
             .desc("Remove all deployed configurations specified by -d or -f").build();
     Option list = new Option("l", "list", false, "List all YAML files specified by -d or -f");
@@ -69,7 +78,9 @@ public class BooCli {
         Option.builder().longOpt("get-ips").argName("platform> <component").numberOfArgs(2)
             .desc("Get IPs of deployed nodes specified by -d or -f").build();
 
-    Option retry = Option.builder().longOpt("retry").desc("Retry deployments of configurations specified by -d or -f").build();
+    Option retry =
+        Option.builder().longOpt("retry")
+            .desc("Retry deployments of configurations specified by -d or -f").build();
 
     options.addOption(help);
     options.addOption(config);
@@ -125,7 +136,8 @@ public class BooCli {
        */
       if (cmd.hasOption("f")) {
         this.configFile = cmd.getOptionValue("f");
-        System.out.println("Configuration file: " + new BFDUtils().getAbsolutePath(this.configFile));
+        System.out
+            .println("Configuration file: " + new BFDUtils().getAbsolutePath(this.configFile));
         this.init(this.configFile);
       }
 
@@ -154,12 +166,13 @@ public class BooCli {
       } else if (cmd.hasOption("r")) {
         this.cleanup();
       } else if (cmd.hasOption("get-ips")) {
-        System.out.println(this.getIps(cmd.getOptionValues("get-ips")[0], cmd.getOptionValues("get-ips")[1]));
+        System.out.println(this.getIps(cmd.getOptionValues("get-ips")[0],
+            cmd.getOptionValues("get-ips")[1]));
       } else if (cmd.hasOption("retry")) {
         this.retryDeployment();
       }
     } catch (ParseException e) {
-      System.err.println(e.getMessage()); 
+      System.err.println(e.getMessage());
       this.help(null, Constants.BFD_TOOL);
     }
   }
@@ -200,16 +213,19 @@ public class BooCli {
     }
   }
 
-  private List<String> listFilesStartWith(String dir, String file) {
+  private List<String> listConfigFiles(String dir, String file) {
     List<String> list = new ArrayList<String>();
     File dirs = new File(dir);
     File ori = new File(file);
     File[] files = dirs.listFiles();
-    // list.add(ori.getName());
-    String startWith = ori.getName() + FILE_NAME_SPLIT;
-    for (File f : files) {
-      if (StringUtils.startsWithIgnoreCase(f.getName(), startWith))
-        list.add(f.getName());
+    if (file.indexOf(TEMPLATE_FILE) > 0) {
+      list.add(ori.getName());
+    } else {
+      String startWith = ori.getName() + FILE_NAME_SPLIT;
+      for (File f : files) {
+        if (StringUtils.startsWithIgnoreCase(f.getName(), startWith))
+          list.add(f.getName());
+      }
     }
     return list;
   }
@@ -271,25 +287,35 @@ public class BooCli {
   }
 
   public void cleanup() {
-    List<String> files = this.listFilesStartWith(this.configDir, this.configFile);
+    List<String> files = this.listConfigFiles(this.configDir, this.configFile);
     String str = String.format(YES_NO, files.size());
     str = this.userInput(str);
     if (!"y".equalsIgnoreCase(str.trim()))
       return;
-
+    boolean isSuc = true;
     for (String file : files) {
       System.out.printf("Destroying OneOps instance %s", file);
       try {
         this.init(file);
-        flow.cleanup();
+        if (flow.isAssemblyExist()) {
+          boolean isDone = flow.cleanup();
+          if (!isDone && isSuc) {
+            isSuc = false;
+          }
+        }
         this.deleteFile(this.configDir, file);
       } catch (BFDOOException e) {
         // Ignore
+        isSuc = false;
       } catch (OneOpsClientAPIException e) {
         // Ignore
+        isSuc = false;
       }
     }
-    System.out.println("Destroyed!");
+    if (!isSuc) {
+      System.out.println(Constants.NEED_ANOTHER_CLEANUP);
+    }
+
   }
 
   public String getStatus() throws BFDOOException {

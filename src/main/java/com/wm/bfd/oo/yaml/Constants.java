@@ -20,7 +20,8 @@ public class Constants {
   final public static String TRUE = "true";
   final public static String PRIVATE_IP = "private_ip";
   final public static String ACTIVE = "active";
-
+  final public static String NEED_ANOTHER_CLEANUP =
+      "A deploymengt has been started to remove active nodes. Please execute this command again once the deployment is complete to finish deleting remaining elements.";
   /**
    * Customize config
    */
@@ -53,7 +54,7 @@ public class Constants {
 
   final public static String UPDATE_COMPONENTS = "Updating component %s for %s ...";
 
-  final public static String CREATING_PLATFORM_SUCCEED = "Successful creating platform %s...";
+  final public static String CREATING_PLATFORM_SUCCEED = "Created platform %s.";
   final public static String START_DEPLOYMENT = "Start the deployment now.";
   final public static String DEPLOYMENT_RUNNING = "Deployment is running ...";
   final public static String ACTIVE_DEPLOYMENT_EXISTING =
@@ -66,7 +67,7 @@ public class Constants {
 
   // Debug
   final public static String ENV_NOT_EXISTING = "The environment %s is not exist! %s";
-  
+
 
 
 }

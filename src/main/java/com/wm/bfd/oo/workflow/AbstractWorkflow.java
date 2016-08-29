@@ -75,18 +75,13 @@ public abstract class AbstractWorkflow {
     return config;
   }
 
-  private boolean cleanupInt(String platformName) {
+  private boolean cleanupInt(String platformName) throws OneOpsClientAPIException {
     if (design == null)
       return true;
     boolean isDisable = this.cancelDeployment();
     System.out.println("isDisable:" + isDisable);
     this.disableAllPlatforms();
-    try {
-      transition.deleteEnvironment(envName);
-    } catch (Exception e) {
-      // Ignore
-      // e.printStackTrace();
-    }
+    transition.deleteEnvironment(envName);
     op = null;
     design = null;
     return true;
