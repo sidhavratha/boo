@@ -36,7 +36,7 @@ public class BooCli {
   final private static Logger LOG = LoggerFactory.getLogger(BooCli.class);
   final private static String YAML = "yaml";
   final private static String FILE_NAME_SPLIT = "-";
-  final private static String TEMPLATE_FILE = "\\.yaml" + FILE_NAME_SPLIT;
+  final private static String TEMPLATE_FILE = ".yaml" + FILE_NAME_SPLIT;
   final private static String YES_NO =
       "WARNING! There are %s instances using the yarn-cluster configuration. Do you want to destroy all of them? (y/n) ";
   private String configDir;
@@ -308,7 +308,7 @@ public class BooCli {
       return;
     boolean isSuc = true;
     for (String file : files) {
-      System.out.printf("Destroying OneOps instance %s", file);
+      System.out.printf("Destroying OneOps instance %s \n", file);
       try {
         this.init(file);
         if (flow.isAssemblyExist()) {
