@@ -56,6 +56,9 @@ public class BooCli {
             .desc(
                 "Create a new Assembly specified by -d or -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.")
             .build();
+    Option update =
+        Option.builder("u").longOpt("update").desc("Update configurations specified by -d or -f.")
+            .build();
     Option status =
         Option.builder("s").longOpt("status")
             .desc("Get status of deployments specified by -d or -f").build();
@@ -86,6 +89,7 @@ public class BooCli {
     options.addOption(config);
     options.addOption(config_dir);
     options.addOption(create);
+    options.addOption(update);
     options.addOption(status);
     options.addOption(list);
     options.addOption(cleanup);
@@ -163,6 +167,12 @@ public class BooCli {
         System.out.println(this.getStatus());
       } else if (cmd.hasOption("c")) {
         this.createPacks();
+      } else if (cmd.hasOption("u")) {
+        if (flow.isAssemblyExist()) {
+          this.createPacks();
+        } else {
+          System.err.println(Constants.UPDATE_ERROR);
+        }
       } else if (cmd.hasOption("r")) {
         this.cleanup();
       } else if (cmd.hasOption("get-ips")) {

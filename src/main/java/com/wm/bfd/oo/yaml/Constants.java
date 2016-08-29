@@ -20,9 +20,7 @@ public class Constants {
   final public static String TRUE = "true";
   final public static String PRIVATE_IP = "private_ip";
   final public static String ACTIVE = "active";
-  final public static String NEED_ANOTHER_CLEANUP =
-      "A deploymengt has been started to remove active nodes. Please execute this command again once the deployment is complete to finish deleting remaining elements.";
-  /**
+   /**
    * Customize config
    */
   final public static String IPTERMINATOR1 = "[";
@@ -64,6 +62,9 @@ public class Constants {
   final public static String CREATE_ENV = "Creating the environment %s.";
   final public static String ENV_EXISTING = "Environment exist, skip create environment %s.";
   final public static String COMPUTE_SIZE = "Updating the compute size in %s - %s";
+  final public static String NEED_ANOTHER_CLEANUP =
+      "A deploymengt has been started to remove active nodes. Please execute this command again once the deployment is complete to finish deleting remaining elements.";
+  final public static String UPDATE_ERROR = "Cannot find assembly %s to update!";
 
   // Debug
   final public static String ENV_NOT_EXISTING = "The environment %s is not exist! %s";

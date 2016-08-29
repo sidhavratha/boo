@@ -62,7 +62,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       // Ignore
     }
     this.bar.update(70, 100);
-    // Added retry
+    // Added retries
     boolean retry = true;
     while (retry && retries > 0) {
       utils.waitTimeout(2);
