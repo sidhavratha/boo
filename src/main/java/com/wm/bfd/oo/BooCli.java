@@ -288,6 +288,10 @@ public class BooCli {
 
   public void cleanup() {
     List<String> files = this.listConfigFiles(this.configDir, this.configFile);
+    if (files.size() == 0) {
+      System.out.println("There is no instance to remove");
+      return;
+    }
     String str = String.format(YES_NO, files.size());
     str = this.userInput(str);
     if (!"y".equalsIgnoreCase(str.trim()))
