@@ -26,22 +26,40 @@ Run boo as a bash script:
 
 
 ## Usage:
-usage: boo [-cd <yaml>] [-cf <yaml>] [-cleanup] [-create] [-h] [-l] [-s]
-
- -cd,--config_dir <yaml>    Use the config dir.
+usage: boo [-c] [-d <DIR>] [-f <FILE>] [--get-ips <platform> <component>]
+       [-h] [-l] [--quiet] [-r] [--retry] [-s] [-u]
+       
+ -c,--create                           Create a new Assembly specified by
+                                       -d or -f. If Assembly automatic
+                                       naming is enabled, each invocation
+                                       will create a new Assembly.
+                                       
+ -d,--config-dir <DIR>                 Use all configuration files in
+                                       given directory, required if -f not
+                                       used
+                                       
+ -f,--config-file <FILE>               Use specified configuration file,
+                                       required if -d not used
+                                       
+    --get-ips <platform> <component>   Get IPs of deployed nodes specified
+                                       by -d or -f
+                                       
+ -h,--help                             show help.
  
- -cf,--config_file <yaml>   Use specified template.
- 
- -cleanup                   Remove all deployment in OneOps.
- 
- -create                    Create or update a new deployment in OneOps.
- 
- -h,--help                  show help.
- 
- -ip,--get_ips <platform><component>   Get ips from OneOps.
- 
- -l,--list                  List all YAML files.
- 
- -r,--retry                 Retry the deployment.
- 
- -s,--status                Check deployment status.
+ -l,--list                             List all YAML files specified by -d
+                                       or -f
+                                       
+    --quiet                            Silence the textual output.
+    
+ -r,--remove                           Remove all deployed configurations
+                                       specified by -d or -f
+                                       
+    --retry                            Retry deployments of configurations
+                                       specified by -d or -f
+                                       
+ -s,--status                           Get status of deployments specified
+                                       by -d or -f
+                                       
+ -u,--update                           Update configurations specified by
+                                       -d or -f.
+The tool is managed by BFD team.
