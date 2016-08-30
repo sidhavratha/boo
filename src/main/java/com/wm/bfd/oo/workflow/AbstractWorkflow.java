@@ -86,7 +86,8 @@ public abstract class AbstractWorkflow {
     } catch (Exception e) {
       // Do nothing
     }
-    design.deletePlatform(platformName);
+    if (this.isPlatformsExist())
+      design.deletePlatform(platformName);
     op = null;
     design = null;
     return true;
@@ -94,9 +95,9 @@ public abstract class AbstractWorkflow {
 
   private void deleteAssembly() throws OneOpsClientAPIException {
     // Don't add the following part to one try block as transition.
-      assembly.deleteAssembly(assemblyName);
-      LogUtils.info(Constants.DESTROY_ASSEMBLY, assemblyName);
-      assembly = null;
+    assembly.deleteAssembly(assemblyName);
+    LogUtils.info(Constants.DESTROY_ASSEMBLY, assemblyName);
+    assembly = null;
   }
 
   boolean cancelDeployment() {
@@ -121,9 +122,10 @@ public abstract class AbstractWorkflow {
     return isSuc;
 
   }
-  
+
   /**
    * Sometimes we have to retry a few times to make the deployment done.
+   * 
    * @return
    */
   public boolean retryDeployment() {
@@ -178,6 +180,18 @@ public abstract class AbstractWorkflow {
     JsonPath response = null;
     try {
       response = assembly.getAssembly(assemblyName);
+    } catch (OneOpsClientAPIException e) {
+      // String msg = String.format("The assembly %s is not exist!", assemblyName);
+      // System.err.println(msg);
+      // Ignore
+    }
+    return response == null ? false : true;
+  }
+
+  public boolean isPlatformsExist() {
+    JsonPath response = null;
+    try {
+      response = design.listPlatforms();
     } catch (OneOpsClientAPIException e) {
       // String msg = String.format("The assembly %s is not exist!", assemblyName);
       // System.err.println(msg);
