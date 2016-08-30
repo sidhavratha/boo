@@ -28,7 +28,6 @@ Run boo as a bash script:
 ## Usage:
 usage: boo [-c] [-d <DIR>] [-f <FILE>] [--get-ips <platform> <component>]
        [-h] [-l] [--quiet] [-r] [--retry] [-s] [-u]
-       
  -c,--create                           Create a new Assembly specified by
                                        -d or -f. If Assembly automatic
                                        naming is enabled, each invocation
@@ -53,13 +52,10 @@ usage: boo [-c] [-d <DIR>] [-f <FILE>] [--get-ips <platform> <component>]
     
  -r,--remove                           Remove all deployed configurations
                                        specified by -d or -f
-                                       
     --retry                            Retry deployments of configurations
                                        specified by -d or -f
-                                       
  -s,--status                           Get status of deployments specified
                                        by -d or -f
-                                       
  -u,--update                           Update configurations specified by
                                        -d or -f.
 The tool is managed by BFD team.
