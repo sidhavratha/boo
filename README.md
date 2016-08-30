@@ -26,7 +26,7 @@ Run boo as a bash script:
 
 
 ## Usage:
-```usage: boo [-c] [-d DIR] [-f FILE] [--get-ips platform component]
+usage: boo [-c] [-d DIR] [-f FILE] [--get-ips platform component]
        [-h] [-l] [--quiet] [-r] [--retry] [-s] [-u]
        
  -c,--create                           Create a new Assembly specified by
@@ -63,4 +63,4 @@ Run boo as a bash script:
  -u,--update                           Update configurations specified by
                                        -d or -f.
                                        
-The tool is managed by BFD team.```
+The tool is managed by BFD team.
