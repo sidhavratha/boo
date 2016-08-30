@@ -1,5 +1,7 @@
 package com.wm.bfd.oo.utils;
 
+import com.wm.bfd.oo.LogUtils;
+
 public class ProgressBar {
   private StringBuilder progress;
 
@@ -27,7 +29,7 @@ public class ProgressBar {
       progress.append('*');
     }
 
-    System.out.printf(format, percent, progress);
+    LogUtils.info(format, percent, progress);
 
     if (done == total) {
       System.out.flush();

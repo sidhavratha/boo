@@ -41,6 +41,7 @@ public class BooCli {
       "WARNING! There are %s instances using the yarn-cluster configuration. Do you want to destroy all of them? (y/n) ";
   private String configDir;
   private String configFile;
+  private static boolean isQuiet = false;
   private BuildAllPlatforms flow;
   private String[] args = null;
   private Options options = new Options();
@@ -84,6 +85,7 @@ public class BooCli {
     Option retry =
         Option.builder().longOpt("retry")
             .desc("Retry deployments of configurations specified by -d or -f").build();
+    Option quiet = Option.builder().longOpt("quiet").desc("Silence the textual output.").build();
 
     options.addOption(help);
     options.addOption(config);
@@ -95,6 +97,7 @@ public class BooCli {
     options.addOption(cleanup);
     options.addOption(getIps);
     options.addOption(retry);
+    options.addOption(quiet);
   }
 
   static {
@@ -135,19 +138,24 @@ public class BooCli {
         System.exit(0);
       }
 
+      if (cmd.hasOption("quiet")) {
+        BooCli.setQuiet(Boolean.TRUE);
+      }
+
       /**
        * Get configuration dir or file.
        */
       if (cmd.hasOption("f")) {
         this.configFile = cmd.getOptionValue("f");
-        System.out
-            .println("Configuration file: " + new BFDUtils().getAbsolutePath(this.configFile));
+        System.out.printf(Constants.CONFIG_FILE, new BFDUtils().getAbsolutePath(this.configFile));
+        System.out.println();
         this.init(this.configFile);
       }
 
       if (cmd.hasOption("d")) {
         this.configDir = cmd.getOptionValue("d");
-        System.out.println("Configuration dir: " + new BFDUtils().getAbsolutePath(this.configDir));
+        System.out.printf(Constants.CONFIG_DIR, new BFDUtils().getAbsolutePath(this.configDir));
+        System.out.println();
         if (cmd.hasOption("l")) {
           this.listFiles(this.configDir);
         }
@@ -252,7 +260,8 @@ public class BooCli {
 
       File source = new File(src);
       File destination = new File(src + FILE_NAME_SPLIT + this.randomName());
-      System.out.println("Working file: " + destination.getPath());
+      System.out.printf(Constants.WORKING_FILE, destination.getPath());
+      System.out.println();
       des = destination.getPath();
 
       inStream = new FileInputStream(source);
@@ -308,7 +317,7 @@ public class BooCli {
       return;
     boolean isSuc = true;
     for (String file : files) {
-      System.out.printf("Destroying OneOps instance %s \n", file);
+      LogUtils.info("Destroying OneOps instance %s \n", file);
       try {
         this.init(file);
         if (flow.isAssemblyExist()) {
@@ -327,13 +336,21 @@ public class BooCli {
       }
     }
     if (!isSuc) {
-      System.out.println(Constants.NEED_ANOTHER_CLEANUP);
+      System.err.println(Constants.NEED_ANOTHER_CLEANUP);
     }
 
   }
 
   public String getStatus() throws BFDOOException {
     return flow.getStatus();
+  }
+
+  public static boolean isQuiet() {
+    return isQuiet;
+  }
+
+  public static void setQuiet(boolean isQuiet) {
+    BooCli.isQuiet = isQuiet;
   }
 
 }

@@ -49,6 +49,9 @@ public class Constants {
   final public static String PLATFORM_EXISTING = "Platform exist, skip create platform %s.";
   final public static String CREATING_PLATFORM = "Creating platform %s ...";
   final public static String DESTROY_PLATFORM = "Destroying platform %s ...";
+  final public static String CONFIG_FILE = "Configuration file: %s";
+  final public static String CONFIG_DIR = "Configuration dir: %s";
+  final public static String WORKING_FILE = "Working file: %s";
 
   final public static String UPDATE_COMPONENTS = "Updating component %s for %s ...";
 
