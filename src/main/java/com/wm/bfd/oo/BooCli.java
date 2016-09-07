@@ -207,7 +207,6 @@ public class BooCli {
     }
   }
 
-
   @SuppressWarnings("resource")
   private String userInput(String msg) {
     System.out.println(msg);
@@ -216,15 +215,6 @@ public class BooCli {
     return input;
   }
 
-  /*private String getIps1(String platformName) {
-    try {
-      System.out.println(this.flow.getComponents("yarn").toString());
-      return flow.printIps(platformName, componentName);
-    } catch (OneOpsClientAPIException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }*/
   private void getIps0() {
     Map<String, Object> platforms =  flow.getConfig().getYaml().getPlatforms();
     List<String> computes = new BFDUtils().getComponentOfCompute(this.flow);
