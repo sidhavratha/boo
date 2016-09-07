@@ -281,7 +281,7 @@ public abstract class AbstractWorkflow {
     JsonPath response = op.listInstances(platformName, componentName);
     return response.getList("ciAttributes");
   }
-
+  
   public String getCloudId(String cloudName) throws OneOpsClientAPIException {
     JsonPath response = cloud.getCloud(cloudName);
     return response.getString("ciId");

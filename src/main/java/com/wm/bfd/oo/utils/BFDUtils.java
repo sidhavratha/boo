@@ -1,5 +1,6 @@
 package com.wm.bfd.oo.utils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.wm.bfd.oo.ClientConfig;
+import com.wm.bfd.oo.LogUtils;
 import com.wm.bfd.oo.exception.BFDOOException;
 import com.wm.bfd.oo.workflow.AbstractWorkflow;
 import com.wm.bfd.oo.workflow.BuildAllPlatforms;
@@ -156,4 +158,19 @@ public class BFDUtils {
     }
   }
 
+  public List<String> getComponentOfCompute(BuildAllPlatforms flow) {
+    List<String> comp = new ArrayList<String>();
+    for (PlatformBean platform : flow.getConfig().getYaml().getPlatformsList()) {
+      for (Map.Entry<String, Object> entry : platform.getComponents().entrySet()) {
+        Object value = entry.getValue();
+        if (value instanceof Map) {
+          Map<String, Object> target = (Map<String, Object>) value;
+          if (target.containsKey(Constants.SIZE)) {
+            comp.add(entry.getKey());
+          }
+        }
+      }
+     }
+    return comp;
+  }
 }
