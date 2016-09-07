@@ -58,7 +58,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     LogUtils.info(Constants.START_DEPLOYMENT);
     try {
       this.pullDesign();
-    } catch (OneOpsClientAPIException e) {
+    } catch (Exception e) {
       // Ignore
     }
     this.bar.update(70, 100);
@@ -176,6 +176,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     try {
       design.updatePlatformVariable(platformName, variables, isSecure);
     } catch (OneOpsClientAPIException e) {
+      e.printStackTrace();
       design.addPlatformVariable(platformName, variables, isSecure);
     }
   }
