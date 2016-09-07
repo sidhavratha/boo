@@ -176,7 +176,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     try {
       design.updatePlatformVariable(platformName, variables, isSecure);
     } catch (OneOpsClientAPIException e) {
-      e.printStackTrace();
       design.addPlatformVariable(platformName, variables, isSecure);
     }
   }
