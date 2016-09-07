@@ -479,7 +479,7 @@ public class Design extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath addPlatformVariable(String platformName, Map<String, String> variables,
+  public boolean addPlatformVariable(String platformName, Map<String, String> variables,
       boolean isSecure) throws OneOpsClientAPIException {
     if (platformName == null || platformName.length() == 0) {
       String msg = String.format("Missing platform name to add variables");
@@ -489,7 +489,7 @@ public class Design extends APIClient {
       String msg = String.format("Missing variables list to be added");
       throw new OneOpsClientAPIException(msg);
     }
-
+    Boolean success = false;
     RequestSpecification request = createRequest();
     for (Entry<String, String> entry : variables.entrySet()) {
 
@@ -532,7 +532,7 @@ public class Design extends APIClient {
               DESIGN_URI + "platforms/" + platformName + "/variables");
       if (response != null) {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
-          return response.getBody().jsonPath();
+          //return response.getBody().jsonPath();
         } else {
           String msg =
               String.format("Failed to add platform variable %s due to %s", entry.getKey(),
@@ -541,9 +541,8 @@ public class Design extends APIClient {
         }
       }
     }
-
-    String msg = String.format("Failed to add new variables %s due to null response", variables);
-    throw new OneOpsClientAPIException(msg);
+    success = true;
+    return success;
   }
 
   /**
@@ -568,7 +567,6 @@ public class Design extends APIClient {
     Boolean success = false;
     RequestSpecification request = createRequest();
     for (Entry<String, String> entry : variables.entrySet()) {
-
       Response variable =
           request.get(DESIGN_URI + "platforms/" + platformName + "/variables/" + entry.getKey());
       if (variable == null || variable.getBody() == null) {
