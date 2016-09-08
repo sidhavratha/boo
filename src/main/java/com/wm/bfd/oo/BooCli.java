@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -31,6 +32,7 @@ import com.wm.bfd.oo.exception.BFDOOException;
 import com.wm.bfd.oo.utils.BFDUtils;
 import com.wm.bfd.oo.workflow.BuildAllPlatforms;
 import com.wm.bfd.oo.yaml.Constants;
+import com.wm.bfd.oo.yaml.PlatformBean;
 
 public class BooCli {
   final private static Logger LOG = LoggerFactory.getLogger(BooCli.class);
@@ -79,8 +81,10 @@ public class BooCli {
     Option list = new Option("l", "list", false, "List all YAML files specified by -d or -f");
 
     Option getIps =
-        Option.builder().longOpt("get-ips").argName("platform> <component").numberOfArgs(2)
-            .desc("Get IPs of deployed nodes specified by -d or -f").build();
+        Option.builder().longOpt("get-ips").argName("environment> <compute-class")
+            .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
+    getIps.setOptionalArg(true);
+    getIps.setArgs(Option.UNLIMITED_VALUES);
 
     Option retry =
         Option.builder().longOpt("retry")
@@ -184,8 +188,16 @@ public class BooCli {
       } else if (cmd.hasOption("r")) {
         this.cleanup();
       } else if (cmd.hasOption("get-ips")) {
-        System.out.println(this.getIps(cmd.getOptionValues("get-ips")[0],
-            cmd.getOptionValues("get-ips")[1]));
+        if (cmd.getOptionValues("get-ips") == null) {
+          // if there is no args for get-ips
+          getIps0();
+        } else if (cmd.getOptionValues("get-ips").length == 1) {
+          // if there is one arg for get-ips
+          getIps1(cmd.getOptionValues("get-ips")[0]);
+        } else if (cmd.getOptionValues("get-ips").length == 2) {
+          // if there are two args for get-ips
+          getIps2(cmd.getOptionValues("get-ips")[0], cmd.getOptionValues("get-ips")[1]);
+        }
       } else if (cmd.hasOption("retry")) {
         this.retryDeployment();
       }
@@ -195,7 +207,6 @@ public class BooCli {
     }
   }
 
-
   @SuppressWarnings("resource")
   private String userInput(String msg) {
     System.out.println(msg);
@@ -204,6 +215,50 @@ public class BooCli {
     return input;
   }
 
+  private void getIps0() {
+    Map<String, Object> platforms =  flow.getConfig().getYaml().getPlatforms();
+    List<String> computes = new BFDUtils().getComponentOfCompute(this.flow);
+    System.out.println("Environment name: " + flow.getConfig().getYaml().getBoo().getEnvName());     
+    for (String pname : platforms.keySet()) {
+      System.out.println("Platform name: " + pname);
+      for (String cname : computes) {
+        System.out.println("Compute name: " + cname);
+        System.out.printf(getIps(pname, cname));
+      }
+    }
+  }
+  
+  private void getIps1(String inputEnv) {
+    String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
+    if (yamlEnv.equals(inputEnv)) {
+      getIps0();
+    } else {
+      System.out.println("No such environment");
+    }
+  }
+  
+  private void getIps2(String inputEnv, String componentName) {
+    String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
+    if (yamlEnv.equals(inputEnv)) {
+      Map<String, Object> platforms =  flow.getConfig().getYaml().getPlatforms();
+      List<String> computes = new BFDUtils().getComponentOfCompute(this.flow);
+      for (String s : computes) {
+        if (s.equals(componentName)) {
+          System.out.println("Environment name: " + flow.getConfig().getYaml().getBoo().getEnvName());     
+          for (String pname : platforms.keySet()) {
+            System.out.println("Platform name: " + pname);
+            System.out.println("Compute name: " + componentName);
+            System.out.printf(getIps(pname, componentName));
+          }
+          return;
+        }
+      }
+      System.out.println("No such component: " + componentName);
+    } else {
+      System.out.println("No such environment: " + inputEnv);
+    }
+  }
+  
   private String getIps(String platformName, String componentName) {
     try {
       return flow.printIps(platformName, componentName);

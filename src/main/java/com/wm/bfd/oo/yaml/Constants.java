@@ -20,6 +20,7 @@ public class Constants {
   final public static String TRUE = "true";
   final public static String PRIVATE_IP = "private_ip";
   final public static String ACTIVE = "active";
+  final public static String SIZE = "size"; 
    /**
    * Customize config
    */
