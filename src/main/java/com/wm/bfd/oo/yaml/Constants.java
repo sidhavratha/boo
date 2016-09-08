@@ -56,7 +56,7 @@ public class Constants {
   final public static String UPDATE_COMPONENTS = "Updating component %s for %s ...";
 
   final public static String CREATING_PLATFORM_SUCCEED = "Created platform %s.";
-  final public static String START_DEPLOYMENT = "Start the deployment now.";
+  final public static String START_DEPLOYMENT = "Starting the deployment now.";
   final public static String DEPLOYMENT_RUNNING = "Deployment is running ...";
   final public static String ACTIVE_DEPLOYMENT_EXISTING =
       "An active deployment has been running in the same environment, quit!";
@@ -66,7 +66,7 @@ public class Constants {
   final public static String ENV_EXISTING = "Environment exist, skip create environment %s.";
   final public static String COMPUTE_SIZE = "Updating the compute size in %s - %s";
   final public static String NEED_ANOTHER_CLEANUP =
-      "A deploymengt has been started to remove active nodes. Please execute this command again once the deployment is complete to finish deleting remaining elements.";
+      "A deployment has been started to remove active nodes. Please execute this command again once the deployment is complete to finish deleting remaining elements.";
   final public static String UPDATE_ERROR = "Cannot find assembly %s to update!";
 
   // Debug
