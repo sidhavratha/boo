@@ -26,41 +26,41 @@ Run boo as a bash script:
 
 
 ## Usage:
-usage: boo [-c] [-d DIR] [-f FILE] [--get-ips platform component]
+usage: boo [-c] [-d DIR] [-f FILE] [--get-ips environment compute-class]
        [-h] [-l] [--quiet] [-r] [--retry] [-s] [-u]
        
- -c,--create                           Create a new Assembly specified by
-                                       -d or -f. If Assembly automatic
-                                       naming is enabled, each invocation
-                                       will create a new Assembly.
+ -c,--create                                  Create a new Assembly specified by
+                                              -d or -f. If Assembly automatic
+                                              naming is enabled, each invocation
+                                              will create a new Assembly.
                                        
- -d,--config-dir <DIR>                 Use all configuration files in
-                                       given directory, required if -f not
-                                       used
+ -d,--config-dir <DIR>                        Use all configuration files in
+                                              given directory, required if -f not
+                                              used
                                        
- -f,--config-file <FILE>               Use specified configuration file,
-                                       required if -d not used
+ -f,--config-file <FILE>                      Use specified configuration file,
+                                              required if -d not used
                                        
-    --get-ips <platform> <component>   Get IPs of deployed nodes specified
-                                       by -d or -f
+    --get-ips <environment> <compute-class>   Get IPs of deployed nodes specified
+                                              by -d or -f
                                        
- -h,--help                             show help.
+ -h,--help                                    show help.
  
- -l,--list                             List all YAML files specified by -d
-                                       or -f
+ -l,--list                                    List all YAML files specified by -d
+                                              or -f
                                        
-    --quiet                            Silence the textual output.
+    --quiet                                   Silence the textual output.
     
- -r,--remove                           Remove all deployed configurations
-                                       specified by -d or -f
+ -r,--remove                                  Remove all deployed configurations
+                                              specified by -d or -f
                                        
-    --retry                            Retry deployments of configurations
-                                       specified by -d or -f
+    --retry                                   Retry deployments of configurations
+                                              specified by -d or -f
                                        
- -s,--status                           Get status of deployments specified
-                                       by -d or -f
+ -s,--status                                  Get status of deployments specified
+                                              by -d or -f
                                        
- -u,--update                           Update configurations specified by
-                                       -d or -f.
+ -u,--update                                  Update configurations specified by
+                                              -d or -f.
                                        
 The tool is managed by BFD team.
