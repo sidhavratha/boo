@@ -81,8 +81,8 @@ public class BooCli {
     Option list = new Option("l", "list", false, "List all YAML files specified by -d or -f");
 
     Option getIps =
-        Option.builder().longOpt("get-ips")
-            .desc("Get IPs of deployed nodes specified by -d or -f").build();
+        Option.builder().longOpt("get-ips").argName("environment> <compute-class")
+            .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
     getIps.setOptionalArg(true);
     getIps.setArgs(Option.UNLIMITED_VALUES);
 
