@@ -42,7 +42,8 @@ usage: boo [-c] [-d DIR] [-f FILE] [--get-ips environment compute-class]
                                               required if -d not used
                                        
     --get-ips <environment> <compute-class>   Get IPs of deployed nodes specified
-                                              by -d or -f
+    --get-ips <environment>                   by -d or -f
+    --get-ips
                                        
  -h,--help                                    show help.
  
