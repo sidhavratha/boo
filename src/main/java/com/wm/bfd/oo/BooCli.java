@@ -239,7 +239,7 @@ public class BooCli {
   
   private void getIps2(String inputEnv, String componentName) {
     String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
-    if (yamlEnv.equals(inputEnv)) {
+    if (inputEnv.equals("*") || yamlEnv.equals(inputEnv)) {
       Map<String, Object> platforms =  flow.getConfig().getYaml().getPlatforms();
       List<String> computes = new BFDUtils().getComponentOfCompute(this.flow);
       for (String s : computes) {
