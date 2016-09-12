@@ -63,7 +63,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.updateScaling();
     this.bar.update(50, 100);
     utils.waitTimeout(1);
-    LogUtils.info(Constants.START_DEPLOYMENT);
     if (isUpdate) {
       try {
         this.pullDesign();
@@ -78,6 +77,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     String deployError = null;
     if (isUpdate)
       this.commitEnv();
+    LogUtils.info(Constants.START_DEPLOYMENT);
     while (retry && retries > 0) {
       utils.waitTimeout(2);
       try {
@@ -124,8 +124,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
         String key = entry.getKey();
         Object value = entry.getValue();
         if (value instanceof Map) {
-          if (isUpdate)
-            this.updateComponentVariables(platform.getName(), key, (Map<String, Object>) value);
+          this.updateComponentVariables(platform.getName(), key, (Map<String, Object>) value);
         } else {
           if (LOG.isInfoEnabled())
             LOG.info("Unknow type {}.", value.getClass());
