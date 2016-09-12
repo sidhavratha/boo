@@ -29,7 +29,7 @@ public class TestBuildAllPlatforms extends BFDOOTest {
 
   @Test
   public void testBCreatePlatform() throws OneOpsClientAPIException {
-    boolean isSuc = build.createPlatforms();
+    boolean isSuc = build.createPlatforms(false);
     assertEquals(isSuc, true);
   }
 

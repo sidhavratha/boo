@@ -44,9 +44,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     this.createAssemblyIfNotExist();
     this.bar.update(5, 100);
-    this.createPlatforms();
+    this.createPlatforms(isUpdate);
     this.bar.update(15, 100);
-    this.updatePlatformVariables();
+    this.updatePlatformVariables(isUpdate);
     this.bar.update(20, 100);
     this.createEnv();
     this.bar.update(30, 100);
@@ -112,7 +112,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
   @SuppressWarnings("unchecked")
-  public boolean createPlatforms() throws OneOpsClientAPIException {
+  public boolean createPlatforms(boolean isUpdate) throws OneOpsClientAPIException {
     List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
     Collections.sort(platforms);
     for (PlatformBean platform : platforms) {
@@ -124,7 +124,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
         String key = entry.getKey();
         Object value = entry.getValue();
         if (value instanceof Map) {
-          this.updateComponentVariables(platform.getName(), key, (Map<String, Object>) value);
+          if (isUpdate)
+            this.updateComponentVariables(platform.getName(), key, (Map<String, Object>) value);
         } else {
           if (LOG.isInfoEnabled())
             LOG.info("Unknow type {}.", value.getClass());
@@ -169,15 +170,15 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
 
-  private boolean updatePlatformVariables() throws OneOpsClientAPIException {
+  private boolean updatePlatformVariables(boolean isUpdate) throws OneOpsClientAPIException {
     List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
     for (PlatformBean platform : platforms) {
       Map<String, String> secureVariables = platform.getSecureVariables();
       if (secureVariables != null && secureVariables.size() > 0)
-        this.updateOrAddPlatformVariables(platform.getName(), secureVariables, true);
+        this.updateOrAddPlatformVariables(platform.getName(), secureVariables, true, isUpdate);
       Map<String, String> variables = platform.getVariables();
       if (variables != null && variables.size() > 0)
-        this.updateOrAddPlatformVariables(platform.getName(), variables, false);
+        this.updateOrAddPlatformVariables(platform.getName(), variables, false, isUpdate);
     }
     if (platforms.size() > 0)
       design.commitDesign();
@@ -193,11 +194,15 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @throws OneOpsClientAPIException
    */
   private void updateOrAddPlatformVariables(String platformName, Map<String, String> variables,
-      boolean isSecure) throws OneOpsClientAPIException {
-    try {
-      design.updatePlatformVariable(platformName, variables, isSecure);
-    } catch (OneOpsClientAPIException e) {
+      boolean isSecure, boolean isUpdate) throws OneOpsClientAPIException {
+    if (!isUpdate) {
       design.addPlatformVariable(platformName, variables, isSecure);
+    } else {
+      try {
+        design.updatePlatformVariable(platformName, variables, isSecure);
+      } catch (OneOpsClientAPIException e) {
+        design.addPlatformVariable(platformName, variables, isSecure);
+      }
     }
   }
 
@@ -246,7 +251,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     } else {
       design.addPlatformComponent(platformName, componentName, uniqueName, attributes);
     }
-    design.commitDesign();
+    // design.commitDesign();
     return true;
   }
 

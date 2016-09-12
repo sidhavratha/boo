@@ -54,6 +54,7 @@ public class Constants {
   final public static String CONFIG_DIR = "Configuration dir: %s";
   final public static String WORKING_FILE = "Working file: %s";
 
+  final public static String CREATE_COMPONENTS = "Creating component %s for %s ...";
   final public static String UPDATE_COMPONENTS = "Updating component %s for %s ...";
 
   final public static String CREATING_PLATFORM_SUCCEED = "Created platform %s.";

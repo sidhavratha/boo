@@ -123,7 +123,7 @@ public class BooCli {
   }
 
   /**
-   * Paser user's input
+   * Parse user's input
    * 
    * @throws ParseException
    * @throws BFDOOException

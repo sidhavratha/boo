@@ -1,11 +1,7 @@
 package com.wm.bfd.oo;
 
-import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-import com.oo.api.exception.OneOpsClientAPIException;
-import com.wm.bfd.oo.exception.BFDOOException;
 
 public class Main {
 
@@ -17,7 +13,8 @@ public class Main {
     BooCli cli = new BooCli(args);
     try {
       cli.parse();
-    } catch (ParseException | BFDOOException | OneOpsClientAPIException e) {
+    } catch (Exception e) {
+      e.printStackTrace();
       System.err.println(e.getMessage());
     }
   }
