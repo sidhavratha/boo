@@ -26,15 +26,22 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   final private static String FAILED = "failed";
   final private static String NEWLINE = System.getProperty("line.separator");
   final private BFDUtils utils = new BFDUtils();
-  private int retries = 3;
+  private int retries = 6;
 
   public BuildAllPlatforms(OOInstance instance, ClientConfig config)
       throws OneOpsClientAPIException {
     super(instance, config);
   }
 
-  public boolean process() throws OneOpsClientAPIException {
+  public boolean process(boolean isUpdate) throws OneOpsClientAPIException {
     this.bar.update(1, 100);
+    boolean isAssemblyExist = this.isAssemblyExist();
+    if (isUpdate && !isAssemblyExist) {
+      throw new OneOpsClientAPIException(this.assemblyName + " not exists!");
+    }
+    if (!isUpdate && isAssemblyExist) {
+      throw new OneOpsClientAPIException(this.assemblyName + " already exists!");
+    }
     this.createAssemblyIfNotExist();
     this.bar.update(5, 100);
     this.createPlatforms();
@@ -55,26 +62,40 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     this.updateScaling();
     this.bar.update(50, 100);
+    utils.waitTimeout(1);
     LogUtils.info(Constants.START_DEPLOYMENT);
-    try {
-      this.pullDesign();
-    } catch (Exception e) {
-      // Ignore
+    if (isUpdate) {
+      try {
+        this.pullDesign();
+      } catch (Exception e) {
+        // Ignore
+        e.printStackTrace();
+      }
     }
     this.bar.update(70, 100);
     // Added retries
     boolean retry = true;
+    String deployError = null;
+    if (isUpdate)
+      this.commitEnv();
     while (retry && retries > 0) {
       utils.waitTimeout(2);
       try {
         this.deploy();
         retry = false;
       } catch (Exception e) {
+        deployError = e.getMessage();
         retries--;
       }
     }
     this.bar.update(100, 100);
-    LogUtils.info(Constants.DEPLOYMENT_RUNNING);
+    if (!retry) { // If no error for deployment.
+      LogUtils.info(Constants.DEPLOYMENT_RUNNING);
+    } else {
+      System.out.println();
+      System.err.printf(Constants.DEPLOYMENT_FAILED, deployError);
+      System.out.println();
+    }
     return true;
   }
 

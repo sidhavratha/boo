@@ -59,6 +59,7 @@ public class Constants {
   final public static String CREATING_PLATFORM_SUCCEED = "Created platform %s.";
   final public static String START_DEPLOYMENT = "Starting the deployment now.";
   final public static String DEPLOYMENT_RUNNING = "Deployment is running ...";
+  final public static String DEPLOYMENT_FAILED = "Deploy failed! %s";
   final public static String ACTIVE_DEPLOYMENT_EXISTING =
       "An active deployment has been running in the same environment, quit!";
   final public static String FAIL_DEPLOYMENT_EXISTING =

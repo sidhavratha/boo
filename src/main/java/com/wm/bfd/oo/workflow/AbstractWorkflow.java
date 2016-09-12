@@ -60,7 +60,7 @@ public abstract class AbstractWorkflow {
     this.bar = new ProgressBar();
   }
 
-  public abstract boolean process() throws OneOpsClientAPIException;
+  public abstract boolean process(boolean isUpdate) throws OneOpsClientAPIException;
 
   public boolean cleanup() throws OneOpsClientAPIException {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
@@ -259,6 +259,11 @@ public abstract class AbstractWorkflow {
 
   public void pullDesign() throws OneOpsClientAPIException {
     transition.pullDesin(envName);
+  }
+
+  public boolean commitEnv() throws OneOpsClientAPIException {
+    JsonPath response = transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    return response == null ? false : true;
   }
 
   public boolean deploy() throws OneOpsClientAPIException {

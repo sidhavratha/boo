@@ -13,9 +13,12 @@ public class Main {
     Logger.getRootLogger().setLevel(Level.OFF);
   }
 
-  public static void main(String[] args) throws BFDOOException, OneOpsClientAPIException,
-      ParseException {
+  public static void main(String[] args) {
     BooCli cli = new BooCli(args);
-    cli.parse();
+    try {
+      cli.parse();
+    } catch (ParseException | BFDOOException | OneOpsClientAPIException e) {
+      System.err.println(e.getMessage());
+    }
   }
 }

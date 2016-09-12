@@ -32,7 +32,6 @@ import com.wm.bfd.oo.exception.BFDOOException;
 import com.wm.bfd.oo.utils.BFDUtils;
 import com.wm.bfd.oo.workflow.BuildAllPlatforms;
 import com.wm.bfd.oo.yaml.Constants;
-import com.wm.bfd.oo.yaml.PlatformBean;
 
 public class BooCli {
   final private static Logger LOG = LoggerFactory.getLogger(BooCli.class);
@@ -128,8 +127,9 @@ public class BooCli {
    * 
    * @throws ParseException
    * @throws BFDOOException
+   * @throws OneOpsClientAPIException
    */
-  public void parse() throws ParseException, BFDOOException {
+  public void parse() throws ParseException, BFDOOException, OneOpsClientAPIException {
     CommandLineParser parser = new DefaultParser();
     // CommandLineParser parser = new GnuParser();
     try {
@@ -178,10 +178,10 @@ public class BooCli {
       if (cmd.hasOption("s")) {
         System.out.println(this.getStatus());
       } else if (cmd.hasOption("c")) {
-        this.createPacks();
+        this.createPacks(Boolean.FALSE);
       } else if (cmd.hasOption("u")) {
         if (flow.isAssemblyExist()) {
-          this.createPacks();
+          this.createPacks(Boolean.TRUE);
         } else {
           System.err.println(Constants.UPDATE_ERROR);
         }
@@ -339,14 +339,9 @@ public class BooCli {
     return des;
   }
 
-  public void createPacks() throws BFDOOException {
+  public void createPacks(boolean isUpdate) throws BFDOOException, OneOpsClientAPIException {
     this.copyFile(this.configFile);
-    try {
-      flow.process();
-    } catch (OneOpsClientAPIException e) {
-      // Ignore
-      e.printStackTrace();
-    }
+    flow.process(isUpdate);
   }
 
   private void deleteFile(String dir, String file) {
