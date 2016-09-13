@@ -43,6 +43,7 @@ public class BooCli {
   private String configDir;
   private String configFile;
   private static boolean isQuiet = false;
+  private static boolean isForced = false;
   private BuildAllPlatforms flow;
   private String[] args = null;
   private Options options = new Options();
@@ -79,6 +80,8 @@ public class BooCli {
             .desc("Remove all deployed configurations specified by -d or -f").build();
     Option list = new Option("l", "list", false, "List all YAML files specified by -d or -f");
 
+    Option force = Option.builder().longOpt("force").desc("Do not prompt for --remove").build();
+    
     Option getIps =
         Option.builder().longOpt("get-ips").argName("environment> <compute-class")
             .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
@@ -101,6 +104,7 @@ public class BooCli {
     options.addOption(getIps);
     options.addOption(retry);
     options.addOption(quiet);
+    options.addOption(force);
   }
 
   static {
@@ -146,6 +150,9 @@ public class BooCli {
         BooCli.setQuiet(Boolean.TRUE);
       }
 
+      if (cmd.hasOption("force")) {
+        BooCli.setForced(Boolean.TRUE);
+      }
       /**
        * Get configuration dir or file.
        */
@@ -361,10 +368,12 @@ public class BooCli {
       System.out.println("There is no instance to remove");
       return;
     }
-    String str = String.format(YES_NO, files.size());
-    str = this.userInput(str);
-    if (!"y".equalsIgnoreCase(str.trim()))
-      return;
+    if (isForced == false) {
+      String str = String.format(YES_NO, files.size());
+      str = this.userInput(str);
+      if (!"y".equalsIgnoreCase(str.trim()))
+        return;
+    }
     boolean isSuc = true;
     for (String file : files) {
       LogUtils.info("Destroying OneOps instance %s \n", file);
@@ -401,6 +410,10 @@ public class BooCli {
 
   public static void setQuiet(boolean isQuiet) {
     BooCli.isQuiet = isQuiet;
+  }
+  
+  public static void setForced(boolean isForced) {
+    BooCli.isForced = isForced;
   }
 
 }

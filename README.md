@@ -41,6 +41,7 @@ usage: boo [-c] [-d DIR] [-f FILE] [--get-ips environment compute-class]
  -f,--config-file <FILE>                      Use specified configuration file,
                                               required if -d not used
                                        
+    --force                                   Do not prompt for --remove
     --get-ips <environment> <compute-class>   Get IPs of deployed nodes specified
     --get-ips <environment>                   by -d or -f
     --get-ips
