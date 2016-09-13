@@ -1,6 +1,7 @@
 package com.wm.bfd.oo.workflow;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -184,6 +185,15 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return true;
   }
 
+  @SuppressWarnings("serial")
+  private void updateOrAddPlatformVariables(String platformName, Map<String, String> variables,
+      boolean isSecure, boolean isUpdate) throws OneOpsClientAPIException {
+    if (variables == null || variables.size() == 0) return;
+    for (Map.Entry<String, String> entry : variables.entrySet()) {
+      this.updateOrAddPlatformVariablesIntl(platformName, new HashMap<String, String>(){{put(entry.getKey(),entry.getValue());}}, isSecure, isUpdate);
+    }
+  }
+
   /**
    * Have to add isExist method later
    * 
@@ -192,7 +202,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @param isSecure
    * @throws OneOpsClientAPIException
    */
-  private void updateOrAddPlatformVariables(String platformName, Map<String, String> variables,
+  private void updateOrAddPlatformVariablesIntl(String platformName, Map<String, String> variables,
       boolean isSecure, boolean isUpdate) throws OneOpsClientAPIException {
     if (!isUpdate) {
       design.addPlatformVariable(platformName, variables, isSecure);
