@@ -189,7 +189,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   private void updateOrAddPlatformVariables(String platformName, Map<String, String> variables,
       boolean isSecure, boolean isUpdate) throws OneOpsClientAPIException {
     if (variables == null || variables.size() == 0) return;
-    for (Map.Entry<String, String> entry : variables.entrySet()) {
+    for (final Map.Entry<String, String> entry : variables.entrySet()) {
       this.updateOrAddPlatformVariablesIntl(platformName, new HashMap<String, String>(){{put(entry.getKey(),entry.getValue());}}, isSecure, isUpdate);
     }
   }
