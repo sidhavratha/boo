@@ -81,7 +81,7 @@ public class BooCli {
     Option list = new Option("l", "list", false, "List all YAML files specified by -d or -f");
 
     Option force = Option.builder().longOpt("force").desc("Do not prompt for --remove").build();
-    
+
     Option getIps =
         Option.builder().longOpt("get-ips").argName("environment> <compute-class")
             .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
@@ -223,9 +223,9 @@ public class BooCli {
   }
 
   private void getIps0() {
-    Map<String, Object> platforms =  flow.getConfig().getYaml().getPlatforms();
+    Map<String, Object> platforms = flow.getConfig().getYaml().getPlatforms();
     List<String> computes = new BFDUtils().getComponentOfCompute(this.flow);
-    System.out.println("Environment name: " + flow.getConfig().getYaml().getBoo().getEnvName());     
+    System.out.println("Environment name: " + flow.getConfig().getYaml().getBoo().getEnvName());
     for (String pname : platforms.keySet()) {
       System.out.println("Platform name: " + pname);
       for (String cname : computes) {
@@ -234,7 +234,7 @@ public class BooCli {
       }
     }
   }
-  
+
   private void getIps1(String inputEnv) {
     String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
     if (yamlEnv.equals(inputEnv)) {
@@ -243,15 +243,16 @@ public class BooCli {
       System.out.println("No such environment");
     }
   }
-  
+
   private void getIps2(String inputEnv, String componentName) {
     String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
     if (inputEnv.equals("*") || yamlEnv.equals(inputEnv)) {
-      Map<String, Object> platforms =  flow.getConfig().getYaml().getPlatforms();
+      Map<String, Object> platforms = flow.getConfig().getYaml().getPlatforms();
       List<String> computes = new BFDUtils().getComponentOfCompute(this.flow);
       for (String s : computes) {
         if (s.equals(componentName)) {
-          System.out.println("Environment name: " + flow.getConfig().getYaml().getBoo().getEnvName());     
+          System.out.println("Environment name: "
+              + flow.getConfig().getYaml().getBoo().getEnvName());
           for (String pname : platforms.keySet()) {
             System.out.println("Platform name: " + pname);
             System.out.println("Compute name: " + componentName);
@@ -265,7 +266,7 @@ public class BooCli {
       System.out.println("No such environment: " + inputEnv);
     }
   }
-  
+
   private String getIps(String platformName, String componentName) {
     try {
       return flow.printIps(platformName, componentName);
@@ -362,6 +363,12 @@ public class BooCli {
     }
   }
 
+  private String trimFileName(String file) {
+    String name = new File(file).getName();
+    return (name == null || name.lastIndexOf('.') < 0) ? "" : name.substring(0,
+        name.lastIndexOf('.'));
+  }
+
   public void cleanup() {
     List<String> files = this.listConfigFiles(this.configDir, this.configFile);
     if (files.size() == 0) {
@@ -369,7 +376,7 @@ public class BooCli {
       return;
     }
     if (isForced == false) {
-      String str = String.format(YES_NO, this.configFile, files.size());
+      String str = String.format(YES_NO, files.size(), trimFileName(this.configFile));
       str = this.userInput(str);
       if (!"y".equalsIgnoreCase(str.trim()))
         return;
@@ -411,7 +418,7 @@ public class BooCli {
   public static void setQuiet(boolean isQuiet) {
     BooCli.isQuiet = isQuiet;
   }
-  
+
   public static void setForced(boolean isForced) {
     BooCli.isForced = isForced;
   }
