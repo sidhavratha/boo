@@ -32,6 +32,9 @@ public final class EnvironmentBeanHelper {
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   public static List<ScalBean> getScales(Map<String, Object> scaleMap) {
+    if (scaleMap == null) {
+      return null;
+    }
     List<ScalBean> scales = new ArrayList<ScalBean>();
     for (Map.Entry<String, Object> entry : scaleMap.entrySet()) {
       String platform = entry.getKey();
