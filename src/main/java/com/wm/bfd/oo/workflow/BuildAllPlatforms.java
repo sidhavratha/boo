@@ -51,6 +51,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.bar.update(20, 100);
     this.createEnv();
     this.bar.update(30, 100);
+    this.updateEnv();
+    this.bar.update(40, 100);
     String status = this.getStatus();
     if (ACTIVE.equalsIgnoreCase(status)) {
       LogUtils.info(Constants.ACTIVE_DEPLOYMENT_EXISTING);

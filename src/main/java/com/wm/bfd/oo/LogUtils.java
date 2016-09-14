@@ -9,4 +9,11 @@ public class LogUtils {
     }
   }
 
+  public static void error(String msg, Object... arg) {
+    if (!BooCli.isQuiet()) {
+      System.err.printf(msg, arg);
+      System.err.println();
+    }
+  }
+
 }

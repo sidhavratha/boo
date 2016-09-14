@@ -21,7 +21,8 @@ public class PlatformBean implements Comparable {
     this.secureVariables = builder.secureVariables;
     this.components = builder.components;
     this.deployOrder = builder.deployOrder;
-    this.packs = pack.split("[\\W]");
+    if (packs != null)
+      this.packs = pack.split("[\\W]");
   }
 
   public Map<String, String> getSecureVariables() {

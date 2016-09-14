@@ -39,7 +39,7 @@ public class BooCli {
   final private static String FILE_NAME_SPLIT = "-";
   final private static String TEMPLATE_FILE = ".yaml" + FILE_NAME_SPLIT;
   final private static String YES_NO =
-      "WARNING! There are %s instances using the configuration. Do you want to destroy all of them? (y/n) ";
+      "WARNING! There are %s instances using the %s configuration. Do you want to destroy all of them? (y/n) ";
   private String configDir;
   private String configFile;
   private static boolean isQuiet = false;
@@ -369,7 +369,7 @@ public class BooCli {
       return;
     }
     if (isForced == false) {
-      String str = String.format(YES_NO, files.size());
+      String str = String.format(YES_NO, this.configFile, files.size());
       str = this.userInput(str);
       if (!"y".equalsIgnoreCase(str.trim()))
         return;
@@ -395,7 +395,7 @@ public class BooCli {
       }
     }
     if (!isSuc) {
-      System.err.println(Constants.NEED_ANOTHER_CLEANUP);
+      LogUtils.error(Constants.NEED_ANOTHER_CLEANUP);
     }
 
   }

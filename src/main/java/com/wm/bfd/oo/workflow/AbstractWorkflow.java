@@ -256,6 +256,23 @@ public abstract class AbstractWorkflow {
     return response == null ? false : true;
   }
 
+  @SuppressWarnings("unchecked")
+  public boolean updateEnv() throws OneOpsClientAPIException {
+    List<PlatformBean> platforms = config.getYaml().getEnvironmentBean().getPlatformsList();
+    if (platforms == null)
+      return false;
+    for (PlatformBean platform : platforms) {
+      Map<String, Object> map = platform.getComponents();
+      if (map != null) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+          transition.updatePlatformComponent(envName, platform.getName(), entry.getKey(),
+              (Map<String, String>) entry.getValue());
+        }
+      }
+    }
+    return true;
+  }
+
   public void pullDesign() throws OneOpsClientAPIException {
     transition.pullDesin(envName);
   }
@@ -285,7 +302,7 @@ public abstract class AbstractWorkflow {
     JsonPath response = op.listInstances(platformName, componentName);
     return response.getList("ciAttributes");
   }
-  
+
   public String getCloudId(String cloudName) throws OneOpsClientAPIException {
     JsonPath response = cloud.getCloud(cloudName);
     return response.getString("ciId");

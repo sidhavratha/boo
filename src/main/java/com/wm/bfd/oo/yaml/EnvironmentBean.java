@@ -5,10 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class EnvironmentBean {
 
   private Map<String, String> others = new HashMap<String, String>();
   private List<CloudBean> clouds = new ArrayList<CloudBean>();
+
+  @JsonIgnore
+  private List<PlatformBean> platformsList;
 
   public List<CloudBean> getClouds() {
     return clouds;
@@ -24,5 +29,13 @@ public class EnvironmentBean {
 
   public void setOthers(Map<String, String> others) {
     this.others = others;
+  }
+
+  public List<PlatformBean> getPlatformsList() {
+    return platformsList;
+  }
+
+  public void setPlatformsList(List<PlatformBean> platformsList) {
+    this.platformsList = platformsList;
   }
 }

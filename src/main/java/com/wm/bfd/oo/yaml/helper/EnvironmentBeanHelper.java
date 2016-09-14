@@ -26,6 +26,9 @@ public final class EnvironmentBeanHelper {
   final private static String STEP_DOWN = "step_down";
   final private static String PERCENT_DEPLOY = "percent_deploy";
 
+  final private static String CLOUDS = "clouds";
+  final private static String PLATFORMS = "platforms";
+
   final public static String PRIORITY = "priority";
   final public static String DPMT_ORDER = "dpmt_order";
   final public static String PCT_SCALE = "pct_scale";
@@ -61,11 +64,10 @@ public final class EnvironmentBeanHelper {
   public static EnvironmentBean getEnvironment(Map<String, Object> environmentsMap) {
     Map<String, String> attris = new HashMap<String, String>();
     EnvironmentBean env = new EnvironmentBean();
-
     for (Map.Entry<String, Object> entry : environmentsMap.entrySet()) {
       String key = entry.getKey();
       Object value = entry.getValue();
-      if (value instanceof Map) {
+      if (CLOUDS.equalsIgnoreCase(key)) {
         Map<String, Object> map = (Map<String, Object>) value;
         for (Map.Entry<String, Object> entry1 : map.entrySet()) {
           Map<String, String> m = (Map<String, String>) entry1.getValue();
@@ -74,10 +76,13 @@ public final class EnvironmentBeanHelper {
           env.addClouds(cloud);
         }
 
+      } else if (PLATFORMS.equalsIgnoreCase(key)) {
+        env.setPlatformsList(PlatformBeanHelper.getPlatforms((Map<String, Object>) value));
       } else if (value instanceof String) {
         attris.put(key, (String) value);
       }
     }
+
     env.setOthers(attris);
     return env;
   }
