@@ -35,7 +35,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
   public boolean process(boolean isUpdate) throws OneOpsClientAPIException {
-    this.bar.update(1, 100);
     boolean isAssemblyExist = this.isAssemblyExist();
     if (isUpdate && !isAssemblyExist) {
       throw new OneOpsClientAPIException(this.assemblyName + " not exists!");
@@ -43,6 +42,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     if (!isUpdate && isAssemblyExist) {
       throw new OneOpsClientAPIException(this.assemblyName + " already exists!");
     }
+    this.bar.update(1, 100);
     this.createAssemblyIfNotExist();
     this.bar.update(5, 100);
     this.createPlatforms(isUpdate);

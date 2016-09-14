@@ -14,7 +14,6 @@ public class Main {
     try {
       cli.parse();
     } catch (Exception e) {
-      e.printStackTrace();
       System.err.println(e.getMessage());
       System.exit(2);
     }
