@@ -21,7 +21,7 @@ public class PlatformBean implements Comparable {
     this.secureVariables = builder.secureVariables;
     this.components = builder.components;
     this.deployOrder = builder.deployOrder;
-    if (packs != null)
+    if (pack != null)
       this.packs = pack.split("[\\W]");
   }
 

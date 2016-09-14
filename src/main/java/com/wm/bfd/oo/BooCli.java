@@ -48,6 +48,7 @@ public class BooCli {
   private String[] args = null;
   private Options options = new Options();
   private static int BUFFER = 1024;
+  private String assembly;
 
   public BooCli(String[] args) {
     this.args = args;
@@ -121,6 +122,7 @@ public class BooCli {
     OOInstance oo = injector.getInstance(OOInstance.class);
     try {
       flow = new BuildAllPlatforms(oo, config);
+      assembly = config.getYaml().getAssembly().getName();
     } catch (OneOpsClientAPIException e) {
       System.err.println("Init failed! Quit!");
     }
@@ -190,7 +192,7 @@ public class BooCli {
         if (flow.isAssemblyExist()) {
           this.createPacks(Boolean.TRUE);
         } else {
-          System.err.println(Constants.UPDATE_ERROR);
+          System.err.printf(Constants.UPDATE_ERROR, assembly);
         }
       } else if (cmd.hasOption("r")) {
         this.cleanup();
