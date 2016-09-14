@@ -39,7 +39,7 @@ public class BooCli {
   final private static String FILE_NAME_SPLIT = "-";
   final private static String TEMPLATE_FILE = ".yaml" + FILE_NAME_SPLIT;
   final private static String YES_NO =
-      "WARNING! There are %s instances using the yarn-cluster configuration. Do you want to destroy all of them? (y/n) ";
+      "WARNING! There are %s instances using the configuration. Do you want to destroy all of them? (y/n) ";
   private String configDir;
   private String configFile;
   private static boolean isQuiet = false;
