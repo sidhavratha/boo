@@ -64,8 +64,10 @@ public abstract class AbstractWorkflow {
 
   public boolean cleanup() throws OneOpsClientAPIException {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
-      LogUtils.info(Constants.DESTROY_PLATFORM, platform.getName());
-      this.cleanupInt(platform.getName());
+      if (this.platformExist(platform.getName())) {
+        LogUtils.info(Constants.DESTROY_PLATFORM, platform.getName());
+        this.cleanupInt(platform.getName());
+      }
     }
     this.deleteAssembly();
     return true;
@@ -194,6 +196,16 @@ public abstract class AbstractWorkflow {
     } catch (OneOpsClientAPIException e) {
       // String msg = String.format("The assembly %s is not exist!", assemblyName);
       // System.err.println(msg);
+      // Ignore
+    }
+    return response == null ? false : true;
+  }
+
+  public boolean platformExist(String platformName) {
+    JsonPath response = null;
+    try {
+      response = design.getPlatform(platformName);
+    } catch (OneOpsClientAPIException e) {
       // Ignore
     }
     return response == null ? false : true;
