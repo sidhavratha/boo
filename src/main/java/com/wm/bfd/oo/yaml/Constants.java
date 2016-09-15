@@ -61,6 +61,7 @@ public class Constants {
   final public static String START_DEPLOYMENT = "Starting the deployment now.";
   final public static String DEPLOYMENT_RUNNING = "Deployment is running ...";
   final public static String DEPLOYMENT_FAILED = "Deploy failed! %s";
+  final public static String NO_NEED_DEPLOY = "NO deployment needed!";
   final public static String ACTIVE_DEPLOYMENT_EXISTING =
       "An active deployment has been running in the same environment, quit!";
   final public static String FAIL_DEPLOYMENT_EXISTING =
@@ -71,6 +72,7 @@ public class Constants {
   final public static String NEED_ANOTHER_CLEANUP =
       "A deployment has been started to remove active nodes. Please execute this command again once the deployment is complete to finish deleting remaining elements.";
   final public static String UPDATE_ERROR = "Cannot find assembly %s to update!";
+  final public static String NO_DEPLOYMENT = "404 Not Found";
 
   // Debug
   final public static String ENV_NOT_EXISTING = "The environment %s is not exist! %s";
