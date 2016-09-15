@@ -93,7 +93,8 @@ public class BooCli {
         Option.builder().longOpt("retry")
             .desc("Retry deployments of configurations specified by -d or -f").build();
     Option quiet = Option.builder().longOpt("quiet").desc("Silence the textual output.").build();
-
+    Option assembly =
+        Option.builder("a").longOpt("assembly").desc("Override the assembly name.").build();
     options.addOption(help);
     options.addOption(config);
     options.addOption(config_dir);
@@ -106,13 +107,14 @@ public class BooCli {
     options.addOption(retry);
     options.addOption(quiet);
     options.addOption(force);
+    options.addOption(assembly);
   }
 
   static {
     RestAssured.useRelaxedHTTPSValidation();
   }
 
-  public void init(String template) throws BFDOOException {
+  public void init(String template, String assembly) throws BFDOOException {
     if (LOG.isDebugEnabled())
       LOG.debug("Loading {}", template);
     this.configFile = new BFDUtils().getAbsolutePath(template);
@@ -122,7 +124,10 @@ public class BooCli {
     OOInstance oo = injector.getInstance(OOInstance.class);
     try {
       flow = new BuildAllPlatforms(oo, config);
-      assembly = config.getYaml().getAssembly().getName();
+      if (assembly != null) {
+        config.getYaml().getAssembly().setName(assembly);
+      }
+      this.assembly = config.getYaml().getAssembly().getName();
     } catch (OneOpsClientAPIException e) {
       System.err.println("Init failed! Quit!");
     }
@@ -155,6 +160,10 @@ public class BooCli {
       if (cmd.hasOption("force")) {
         BooCli.setForced(Boolean.TRUE);
       }
+
+      if (cmd.hasOption("a")) {
+        this.assembly = cmd.getOptionValue("a");
+      }
       /**
        * Get configuration dir or file.
        */
@@ -162,7 +171,7 @@ public class BooCli {
         this.configFile = cmd.getOptionValue("f");
         System.out.printf(Constants.CONFIG_FILE, new BFDUtils().getAbsolutePath(this.configFile));
         System.out.println();
-        this.init(this.configFile);
+        this.init(this.configFile, this.assembly);
       }
 
       if (cmd.hasOption("d")) {
@@ -173,6 +182,8 @@ public class BooCli {
           this.listFiles(this.configDir);
         }
       }
+
+
 
       if (this.configDir == null && this.configFile != null) {
         this.configDir = this.configFile.substring(0, this.configFile.lastIndexOf('/'));
@@ -387,7 +398,7 @@ public class BooCli {
     for (String file : files) {
       LogUtils.info("Destroying OneOps instance %s \n", file);
       try {
-        this.init(file);
+        this.init(file, null);
         if (flow.isAssemblyExist()) {
           boolean isDone = flow.cleanup();
           if (!isDone && isSuc) {

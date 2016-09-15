@@ -78,8 +78,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     // Added retries
     boolean retry = true;
     String deployError = null;
+    boolean commit = false;
     if (isUpdate)
-      this.commitEnv();
+      commit = this.commitEnv();
     LogUtils.info(Constants.START_DEPLOYMENT);
     while (retry && retries > 0) {
       utils.waitTimeout(2);
@@ -94,7 +95,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.bar.update(100, 100);
     if (!retry) { // If no error for deployment.
       LogUtils.info(Constants.DEPLOYMENT_RUNNING);
-    } else {
+    } else if (!commit) {
       System.out.println();
       System.err.printf(Constants.DEPLOYMENT_FAILED, deployError);
       System.out.println();
@@ -190,9 +191,14 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   @SuppressWarnings("serial")
   private void updateOrAddPlatformVariables(String platformName, Map<String, String> variables,
       boolean isSecure, boolean isUpdate) throws OneOpsClientAPIException {
-    if (variables == null || variables.size() == 0) return;
+    if (variables == null || variables.size() == 0)
+      return;
     for (final Map.Entry<String, String> entry : variables.entrySet()) {
-      this.updateOrAddPlatformVariablesIntl(platformName, new HashMap<String, String>(){{put(entry.getKey(),entry.getValue());}}, isSecure, isUpdate);
+      this.updateOrAddPlatformVariablesIntl(platformName, new HashMap<String, String>() {
+        {
+          put(entry.getKey(), entry.getValue());
+        }
+      }, isSecure, isUpdate);
     }
   }
 
