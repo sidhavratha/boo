@@ -245,7 +245,10 @@ public class BooCli {
           assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());
         } else {
           assemblies = new ArrayList<String>();
-          assemblies.add(this.config.getYaml().getAssembly().getName());
+          String asb = this.config.getYaml().getAssembly().getName();
+          if (this.flow.isAssemblyExist(asb)) {
+            assemblies.add(asb);
+          }
         }
         this.cleanup(assemblies);
       } else if (cmd.hasOption("get-ips")) {
@@ -460,17 +463,6 @@ public class BooCli {
 
   public void cleanup(List<String> assemblies) {
     if (assemblies.size() == 0) {
-      System.out.println("There is no instance to remove");
-      return;
-    }
-    boolean hasAssembly = false;
-    for (String asb : assemblies) {
-      if (this.flow.isAssemblyExist(asb)) {
-        hasAssembly = true;
-        break;
-      }
-    }
-    if (hasAssembly == false) {
       System.out.println("There is no instance to remove");
       return;
     }
