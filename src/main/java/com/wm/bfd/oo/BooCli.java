@@ -50,6 +50,7 @@ public class BooCli {
   private static int BUFFER = 1024;
   private ClientConfig config;
   private Injector injector;
+  private BFDUtils bfdUtils = new BFDUtils();
 
   public BooCli(String[] args) {
     this.args = args;
@@ -121,10 +122,9 @@ public class BooCli {
   public void init(String template, String assembly) throws BFDOOException {
     if (LOG.isDebugEnabled())
       LOG.debug("Loading {}", template);
-    this.configFile = new BFDUtils().getAbsolutePath(template);
     injector = Guice.createInjector(new JaywayHttpModule(this.configFile));
     config = injector.getInstance(ClientConfig.class);
-    new BFDUtils().verifyTemplate(config);
+    bfdUtils.verifyTemplate(config);
     if (assembly != null) {
       config.getYaml().getAssembly().setName(assembly);
     }
@@ -153,6 +153,7 @@ public class BooCli {
     CommandLineParser parser = new DefaultParser();
     // CommandLineParser parser = new GnuParser();
     try {
+
       String assembly = null;
       CommandLine cmd = parser.parse(options, args);
       /**
@@ -179,13 +180,15 @@ public class BooCli {
        */
       if (cmd.hasOption("f")) {
         this.configFile = cmd.getOptionValue("f");
-        System.out.printf(Constants.CONFIG_FILE, new BFDUtils().getAbsolutePath(this.configFile));
+        this.configFile = bfdUtils.getAbsolutePath(configFile);
+        System.out.printf(Constants.CONFIG_FILE, this.configFile);
         System.out.println();
       }
 
       if (cmd.hasOption("d")) {
         this.configDir = cmd.getOptionValue("d");
-        System.out.printf(Constants.CONFIG_DIR, new BFDUtils().getAbsolutePath(this.configDir));
+        this.configDir = bfdUtils.getAbsolutePath(configDir);
+        System.out.printf(Constants.CONFIG_DIR, this.configDir);
         System.out.println();
       }
 
@@ -214,10 +217,13 @@ public class BooCli {
       if (cmd.hasOption("s")) {
         System.out.println(this.getStatus());
       } else if (cmd.hasOption("c")) {
-        this.initOO(
-            this.config,
-            this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(), config.getYaml()
-                .getAssembly().getName()));
+        if (config.getYaml().getAssembly().getAutoGen()) {
+          this.initOO(
+              this.config,
+              this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(), config
+                  .getYaml().getAssembly().getName()));
+          LogUtils.info(Constants.CREATING_ASSEMBLY, config.getYaml().getAssembly().getName());
+        }
         this.createPacks(Boolean.FALSE);
       } else if (cmd.hasOption("u")) {
         if (!config.getYaml().getAssembly().getAutoGen()) {
@@ -256,9 +262,11 @@ public class BooCli {
       } else if (cmd.hasOption("retry")) {
         this.retryDeployment();
       }
-    } catch (Exception e) {
+    } catch (ParseException e) {
       System.err.println(e.getMessage());
       this.help(null, Constants.BFD_TOOL);
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
     }
   }
 
@@ -272,7 +280,7 @@ public class BooCli {
 
   private void getIps0() {
     Map<String, Object> platforms = flow.getConfig().getYaml().getPlatforms();
-    List<String> computes = new BFDUtils().getComponentOfCompute(this.flow);
+    List<String> computes = bfdUtils.getComponentOfCompute(this.flow);
     System.out.println("Environment name: " + flow.getConfig().getYaml().getBoo().getEnvName());
     for (String pname : platforms.keySet()) {
       System.out.println("Platform name: " + pname);
@@ -296,7 +304,7 @@ public class BooCli {
     String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
     if (inputEnv.equals("*") || yamlEnv.equals(inputEnv)) {
       Map<String, Object> platforms = flow.getConfig().getYaml().getPlatforms();
-      List<String> computes = new BFDUtils().getComponentOfCompute(this.flow);
+      List<String> computes = bfdUtils.getComponentOfCompute(this.flow);
       for (String s : computes) {
         if (s.equals(componentName)) {
           System.out.println("Environment name: "

@@ -288,7 +288,6 @@ public abstract class AbstractWorkflow {
   public boolean createAssemblyIfNotExist() throws OneOpsClientAPIException {
     boolean isExist = this.isAssemblyExist();
     if (!isExist) {
-      LogUtils.info(Constants.CREATING_ASSEMBLY, this.assemblyName);
       this.checkAssemblyName();
       assembly.createAssembly(assemblyName, config.getYaml().getBoo().getEmail(), "", "");
     }
