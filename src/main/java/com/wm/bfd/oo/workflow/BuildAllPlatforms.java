@@ -39,8 +39,10 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     if (isUpdate && !isAssemblyExist) {
       throw new OneOpsClientAPIException(this.assemblyName + " not exists!");
     }
-    if (!isUpdate && isAssemblyExist) {
-      throw new OneOpsClientAPIException(this.assemblyName + " already exists!");
+    if (!config.getYaml().getAssembly().getAutoGen()) {
+      if (!isUpdate && isAssemblyExist) {
+        throw new OneOpsClientAPIException(this.assemblyName + " already exists!");
+      }
     }
     this.bar.update(1, 100);
     this.createAssemblyIfNotExist();
@@ -78,9 +80,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     // Added retries
     boolean retry = true;
     String deployError = null;
-    boolean commit = false;
     if (isUpdate)
-      commit = this.commitEnv();
+      this.commitEnv();
     LogUtils.info(Constants.START_DEPLOYMENT);
     while (retry && retries > 0) {
       utils.waitTimeout(2);

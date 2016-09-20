@@ -1,8 +1,10 @@
 package com.wm.bfd.oo.workflow;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -73,11 +75,47 @@ public abstract class AbstractWorkflow {
     return true;
   }
 
+  public boolean removeAllEnvs() throws OneOpsClientAPIException {
+    if (design == null)
+      return true;
+    for (String env : this.listEnvs()) {
+      this.cancelDeployment(env);
+      this.disableAllPlatforms(env);
+      try {
+        transition.deleteEnvironment(env);
+      } catch (Exception e) {
+        // Do nothing
+      }
+    }
+    return true;
+  }
+
+  public boolean removeAllPlatforms() throws OneOpsClientAPIException {
+    if (design == null)
+      return true;
+    boolean isSuc = true;
+    for (String platformName : this.listPlatforms()) {
+      try {
+        design.deletePlatform(platformName);
+      } catch (Exception e) {
+        // Do nothing
+        isSuc = false;
+      }
+    }
+    if (isSuc)
+      isSuc = this.deleteAssembly();
+    return isSuc;
+  }
+
   public ClientConfig getConfig() {
     return config;
   }
 
   private boolean cleanupInt(String platformName) throws OneOpsClientAPIException {
+    return this.cleanupInt(this.envName, platformName);
+  }
+
+  private boolean cleanupInt(String envName, String platformName) throws OneOpsClientAPIException {
     if (design == null)
       return true;
     this.cancelDeployment();
@@ -94,14 +132,42 @@ public abstract class AbstractWorkflow {
     return true;
   }
 
-  private void deleteAssembly() throws OneOpsClientAPIException {
+  public List<String> listEnvs() throws OneOpsClientAPIException {
+    JsonPath response = transition.listEnvironments();
+    return response.getList(Constants.CINAME);
+  }
+
+  public List<String> listPlatforms() throws OneOpsClientAPIException {
+    JsonPath response = design.listPlatforms();
+    return response.getList(Constants.CINAME);
+  }
+
+  private boolean deleteAssembly() throws OneOpsClientAPIException {
+    return this.deleteAssembly(this.assemblyName);
+  }
+
+  private boolean deleteAssembly(String assemblyName) throws OneOpsClientAPIException {
     // Don't add the following part to one try block as transition.
     assembly.deleteAssembly(assemblyName);
     LogUtils.info(Constants.DESTROY_ASSEMBLY, assemblyName);
     assembly = null;
+    return true;
+  }
+
+  /**
+   * 
+   * @throws OneOpsClientAPIException
+   */
+  public List<String> getAssemblies() throws OneOpsClientAPIException {
+    JsonPath response = assembly.listAssemblies();
+    return response.getList(Constants.CINAME);
   }
 
   boolean cancelDeployment() {
+    return this.cancelDeployment(this.envName);
+  }
+
+  boolean cancelDeployment(String envName) {
     boolean isSuc = false;
     try {
       JsonPath response = transition.getLatestDeployment(envName);
@@ -153,6 +219,10 @@ public abstract class AbstractWorkflow {
   }
 
   void disableAllPlatforms() {
+    this.disableAllPlatforms(this.envName);
+  }
+
+  void disableAllPlatforms(String envName) {
     try {
       transition.disableAllPlatforms(envName);
       transition.commitEnvironment(envName, null, "Clean up " + envName);
@@ -178,6 +248,10 @@ public abstract class AbstractWorkflow {
   }
 
   public boolean isAssemblyExist() {
+    return this.isAssemblyExist(this.assemblyName);
+  }
+
+  public boolean isAssemblyExist(String assemblyName) {
     JsonPath response = null;
     try {
       response = assembly.getAssembly(assemblyName);
@@ -214,9 +288,39 @@ public abstract class AbstractWorkflow {
   public boolean createAssemblyIfNotExist() throws OneOpsClientAPIException {
     boolean isExist = this.isAssemblyExist();
     if (!isExist) {
+      LogUtils.info(Constants.CREATING_ASSEMBLY, this.assemblyName);
+      this.checkAssemblyName();
       assembly.createAssembly(assemblyName, config.getYaml().getBoo().getEmail(), "", "");
     }
     return true;
+  }
+
+  void checkAssemblyName() {
+    if (this.assemblyName.length() > 32) {
+      System.err.println();
+      System.err.println(Constants.ASSEMBLY_NAME_TOO_LONG);
+      System.exit(3);
+    }
+  }
+
+  public List<String> getAllAutoGenAssemblies(String prefix) {
+    if (config.getYaml().getAssembly().getAutoGen()) {
+      try {
+        List<String> assemblies = this.getAssemblies();
+        if (assemblies != null && assemblies.size() > 0) {
+          List<String> matches = new ArrayList<String>();
+          for (String assembly : assemblies) {
+            if (assembly.contains(prefix)) {
+              matches.add(assembly);
+            }
+          }
+          return matches;
+        }
+      } catch (OneOpsClientAPIException e) {
+        System.err.println(e.getMessage());
+      }
+    }
+    return null;
   }
 
   public boolean isEnvExist(String platformName) {

@@ -48,7 +48,8 @@ public class BooCli {
   private String[] args = null;
   private Options options = new Options();
   private static int BUFFER = 1024;
-  private String assembly;
+  private ClientConfig config;
+  private Injector injector;
 
   public BooCli(String[] args) {
     this.args = args;
@@ -79,7 +80,9 @@ public class BooCli {
     Option cleanup =
         Option.builder("r").longOpt("remove")
             .desc("Remove all deployed configurations specified by -d or -f").build();
-    Option list = new Option("l", "list", false, "List all YAML files specified by -d or -f");
+    Option list =
+        Option.builder("l").longOpt("list").numberOfArgs(1).optionalArg(Boolean.TRUE)
+            .desc("Return a list of instances applicable to the identifier provided..").build();
 
     Option force = Option.builder().longOpt("force").desc("Do not prompt for --remove").build();
 
@@ -94,7 +97,8 @@ public class BooCli {
             .desc("Retry deployments of configurations specified by -d or -f").build();
     Option quiet = Option.builder().longOpt("quiet").desc("Silence the textual output.").build();
     Option assembly =
-        Option.builder("a").longOpt("assembly").desc("Override the assembly name.").build();
+        Option.builder("a").longOpt("assembly").hasArg().desc("Override the assembly name.")
+            .build();
     options.addOption(help);
     options.addOption(config);
     options.addOption(config_dir);
@@ -118,16 +122,21 @@ public class BooCli {
     if (LOG.isDebugEnabled())
       LOG.debug("Loading {}", template);
     this.configFile = new BFDUtils().getAbsolutePath(template);
-    Injector injector = Guice.createInjector(new JaywayHttpModule(this.configFile));
-    ClientConfig config = injector.getInstance(ClientConfig.class);
+    injector = Guice.createInjector(new JaywayHttpModule(this.configFile));
+    config = injector.getInstance(ClientConfig.class);
     new BFDUtils().verifyTemplate(config);
+    if (assembly != null) {
+      config.getYaml().getAssembly().setName(assembly);
+    }
+  }
+
+  public void initOO(ClientConfig config, String assembly) {
     OOInstance oo = injector.getInstance(OOInstance.class);
     try {
-      flow = new BuildAllPlatforms(oo, config);
       if (assembly != null) {
         config.getYaml().getAssembly().setName(assembly);
       }
-      this.assembly = config.getYaml().getAssembly().getName();
+      flow = new BuildAllPlatforms(oo, config);
     } catch (OneOpsClientAPIException e) {
       System.err.println("Init failed! Quit!");
     }
@@ -144,6 +153,7 @@ public class BooCli {
     CommandLineParser parser = new DefaultParser();
     // CommandLineParser parser = new GnuParser();
     try {
+      String assembly = null;
       CommandLine cmd = parser.parse(options, args);
       /**
        * Handle command without configuration file dependency first.
@@ -162,7 +172,7 @@ public class BooCli {
       }
 
       if (cmd.hasOption("a")) {
-        this.assembly = cmd.getOptionValue("a");
+        assembly = cmd.getOptionValue("a");
       }
       /**
        * Get configuration dir or file.
@@ -171,18 +181,13 @@ public class BooCli {
         this.configFile = cmd.getOptionValue("f");
         System.out.printf(Constants.CONFIG_FILE, new BFDUtils().getAbsolutePath(this.configFile));
         System.out.println();
-        this.init(this.configFile, this.assembly);
       }
 
       if (cmd.hasOption("d")) {
         this.configDir = cmd.getOptionValue("d");
         System.out.printf(Constants.CONFIG_DIR, new BFDUtils().getAbsolutePath(this.configDir));
         System.out.println();
-        if (cmd.hasOption("l")) {
-          this.listFiles(this.configDir);
-        }
       }
-
 
 
       if (this.configDir == null && this.configFile != null) {
@@ -192,21 +197,51 @@ public class BooCli {
         System.exit(-1);
       }
 
+      this.init(this.configFile, assembly);
+      this.initOO(config, null);
+      if (cmd.hasOption("l")) {
+        String prefix = cmd.getOptionValue("l");
+        if (prefix == null) {
+          this.listFiles(config.getYaml().getAssembly().getName());
+        } else {
+          this.listFiles(prefix.trim());
+        }
+        System.exit(0);
+      }
       /**
        * Handle other commands.
        */
       if (cmd.hasOption("s")) {
         System.out.println(this.getStatus());
       } else if (cmd.hasOption("c")) {
+        this.initOO(
+            this.config,
+            this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(), config.getYaml()
+                .getAssembly().getName()));
         this.createPacks(Boolean.FALSE);
       } else if (cmd.hasOption("u")) {
-        if (flow.isAssemblyExist()) {
-          this.createPacks(Boolean.TRUE);
+        if (!config.getYaml().getAssembly().getAutoGen()) {
+          if (flow.isAssemblyExist()) {
+            this.createPacks(Boolean.TRUE);
+          } else {
+            System.err.printf(Constants.UPDATE_ERROR, assembly);
+          }
         } else {
-          System.err.printf(Constants.UPDATE_ERROR, assembly);
+          List<String> assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());
+          for (String asm : assemblies) {
+            this.initOO(config, asm);
+            this.createPacks(Boolean.TRUE);
+          }
         }
       } else if (cmd.hasOption("r")) {
-        this.cleanup();
+        List<String> assemblies;
+        if (config.getYaml().getAssembly().getAutoGen()) {
+          assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());
+        } else {
+          assemblies = new ArrayList<String>();
+          assemblies.add(this.config.getYaml().getAssembly().getName());
+        }
+        this.cleanup(assemblies);
       } else if (cmd.hasOption("get-ips")) {
         if (cmd.getOptionValues("get-ips") == null) {
           // if there is no args for get-ips
@@ -221,7 +256,7 @@ public class BooCli {
       } else if (cmd.hasOption("retry")) {
         this.retryDeployment();
       }
-    } catch (ParseException e) {
+    } catch (Exception e) {
       System.err.println(e.getMessage());
       this.help(null, Constants.BFD_TOOL);
     }
@@ -298,7 +333,18 @@ public class BooCli {
     formatter.printHelp("boo", header, options, footer, true);
   }
 
-  private void listFiles(String dir) {
+  private List<String> listFiles(String prefix) {
+    prefix =
+        (prefix == null ? Constants.ASSEMBLY_PREFIX
+            : (prefix + Constants.DASH + Constants.ASSEMBLY_PREFIX));
+    List<String> assemblies = flow.getAllAutoGenAssemblies(prefix);
+    for (String assembly : assemblies) {
+      System.out.println(assembly);
+    }
+    return assemblies;
+  }
+
+  private void listFilesOld(String dir) {
     File dirs = new File(dir);
     File[] files = dirs.listFiles();
     for (File file : files) {
@@ -361,8 +407,30 @@ public class BooCli {
   }
 
   public void createPacks(boolean isUpdate) throws BFDOOException, OneOpsClientAPIException {
-    this.copyFile(this.configFile);
     flow.process(isUpdate);
+  }
+
+  /**
+   * Limit to 32 characters long
+   * 
+   * @return
+   */
+  private String autoGenAssemblyName(boolean isAutoGen, String assemblyName) {
+    if (isAutoGen) {
+      assemblyName =
+          (assemblyName == null ? this.randomString("") : (assemblyName + Constants.DASH + this
+              .randomString(assemblyName)));
+    }
+    return assemblyName;
+  }
+
+  private String randomString(String assemblyName) {
+    StringBuilder name = new StringBuilder();
+    name.append(Constants.ASSEMBLY_PREFIX);
+    int rand = 32 - assemblyName.length() - 1;
+    rand = rand > 8 ? 8 : rand;
+    name.append(UUID.randomUUID().toString().substring(0, rand));
+    return name.toString();
   }
 
   private void deleteFile(String dir, String file) {
@@ -382,7 +450,41 @@ public class BooCli {
         name.lastIndexOf('.'));
   }
 
-  public void cleanup() {
+  public void cleanup(List<String> assemblies) {
+    if (assemblies.size() == 0) {
+      System.out.println("There is no instance to remove");
+      return;
+    }
+    if (isForced == false) {
+      String str =
+          String.format(YES_NO, assemblies.size(), this.config.getYaml().getAssembly().getName());
+      str = this.userInput(str);
+      if (!"y".equalsIgnoreCase(str.trim()))
+        return;
+    }
+    boolean isSuc = true;
+    for (String assembly : assemblies) {
+      LogUtils.info("Destroying OneOps assembly %s \n", assembly);
+      this.initOO(config, assembly);
+      if (flow.isAssemblyExist(assembly)) {
+        boolean isDone;
+        try {
+          isDone = flow.removeAllEnvs();
+          isDone = flow.removeAllPlatforms();
+          if (!isDone && isSuc) {
+            isSuc = false;
+          }
+        } catch (OneOpsClientAPIException e) {
+          isSuc = false;
+        }
+      }
+    }
+    if (!isSuc) {
+      LogUtils.error(Constants.NEED_ANOTHER_CLEANUP);
+    }
+  }
+
+  public void cleanupOld() {
     List<String> files = this.listConfigFiles(this.configDir, this.configFile);
     if (files.size() == 0) {
       System.out.println("There is no instance to remove");
@@ -405,7 +507,7 @@ public class BooCli {
             isSuc = false;
           }
         }
-        this.deleteFile(this.configDir, file);
+        // this.deleteFile(this.configDir, file);
       } catch (BFDOOException e) {
         // Ignore
         isSuc = false;

@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.wm.bfd.oo.ClientConfig;
-import com.wm.bfd.oo.LogUtils;
 import com.wm.bfd.oo.exception.BFDOOException;
 import com.wm.bfd.oo.workflow.AbstractWorkflow;
 import com.wm.bfd.oo.workflow.BuildAllPlatforms;
@@ -58,6 +57,7 @@ public class BFDUtils {
 
   /**
    * Wait certain time.
+   * 
    * @param seconds
    */
   public void waitTimeout(int seconds) {
@@ -115,11 +115,12 @@ public class BFDUtils {
       return "";
     return customFormat.substring(l + 1, r);
   }
-  
+
   public String getAbsolutePath(String template) {
     if (template == null || template.length() == 0 || template.charAt(0) == Constants.SLASH) {
       return template;
-    } else if (template.charAt(0) == Constants.DOT && template.length() > 1 && template.charAt(1) == Constants.DOT) {
+    } else if (template.charAt(0) == Constants.DOT && template.length() > 1
+        && template.charAt(1) == Constants.DOT) {
       return getAbsolutePath(template.substring(2));
     } else {
       StringBuilder sb = new StringBuilder();
@@ -129,9 +130,10 @@ public class BFDUtils {
       return sb.toString();
     }
   }
-  
+
   @SuppressWarnings("unchecked")
-  public boolean createPlatforms(ClientConfig config, BuildAllPlatforms workflow) throws OneOpsClientAPIException {
+  public boolean createPlatforms(ClientConfig config, BuildAllPlatforms workflow)
+      throws OneOpsClientAPIException {
     List<PlatformBean> platforms = config.getYaml().getPlatformsList();
     Collections.sort(platforms);
     Queue<Integer> q = new LinkedList<Integer>();
@@ -148,7 +150,7 @@ public class BFDUtils {
     }
     return true;
   }
-  
+
   private void checkPlatformQ(AbstractWorkflow workFlow) {
     while (true) {
       if (!Constants.ACTIVE.equalsIgnoreCase(workFlow.getStatus())) {
@@ -170,7 +172,30 @@ public class BFDUtils {
           }
         }
       }
-     }
+    }
     return comp;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void printMap(Map<String, Object> map, int depth) {
+    String log = "Parent";
+    if (depth > 0)
+      log = "Children";
+    StringBuilder str = new StringBuilder();
+    int loop = depth;
+    while (loop > 0) {
+      str.append('\t');
+      loop--;
+    }
+    for (Map.Entry<String, Object> entry : map.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      System.out.printf("%s %s: key: %s; value:%s: \n", str.toString(), log, key,
+          value == null ? "" : value.getClass());
+      if (value instanceof Map) {
+        printMap((Map<String, Object>) value, ++depth);
+      }
+
+    }
   }
 }

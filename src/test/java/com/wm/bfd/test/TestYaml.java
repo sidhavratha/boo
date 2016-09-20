@@ -1,6 +1,5 @@
 package com.wm.bfd.test;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -71,29 +70,6 @@ public class TestYaml extends BFDOOTest {
     Yaml yaml = config.getYaml();
     assertNotNull(yaml.getOthers());
     // this.printMap(yaml.getOthers(), 0);
-  }
-
-  @SuppressWarnings("unchecked")
-  void printMap(Map<String, Object> map, int depth) {
-    String log = "Parent";
-    if (depth > 0)
-      log = "Children";
-    StringBuilder str = new StringBuilder();
-    int loop = depth;
-    while (loop > 0) {
-      str.append('\t');
-      loop--;
-    }
-    for (Map.Entry<String, Object> entry : map.entrySet()) {
-      String key = entry.getKey();
-      Object value = entry.getValue();
-      System.out.printf("%s %s: key: %s; value:%s: \n", str.toString(), log, key,
-          value == null ? "" : value.getClass());
-      if (value instanceof Map) {
-        this.printMap((Map<String, Object>) value, ++depth);
-      }
-
-    }
   }
 
 }

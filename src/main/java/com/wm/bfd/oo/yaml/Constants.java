@@ -21,6 +21,9 @@ public class Constants {
   final public static String PRIVATE_IP = "private_ip";
   final public static String ACTIVE = "active";
   final public static String SIZE = "size"; 
+  final public static String CINAME = "ciName";
+  final public static String ASSEMBLY_PREFIX = "CUBEBOO-"; // Magic string.
+  final public static String ASSEMBLY_NAME_TOO_LONG = "Assembly name cannot be more than 32 characters long. Please fix your assembly name in YAML.";
    /**
    * Customize config
    */
@@ -32,7 +35,7 @@ public class Constants {
   final public static char DOLLAR = '$';
   final public static char SLASH = '/';
   final public static char DOT = '.';
-
+  final public static char DASH = '-';
 
   final public static String BFD_TOOL = "The tool is managed by BFD team.";
   final public static String NO_AVAILABILITY =
@@ -48,6 +51,7 @@ public class Constants {
   // Output during deployment
   final public static String DESTROY_ASSEMBLY = "Destroyed assembly %s!";
   final public static String PLATFORM_EXISTING = "Platform exist, skip create platform %s.";
+  final public static String CREATING_ASSEMBLY = "Auto generate assembly name turned on. Creating assembly %s ...";
   final public static String CREATING_PLATFORM = "Creating platform %s ...";
   final public static String DESTROY_PLATFORM = "Destroying platform %s ...";
   final public static String CONFIG_FILE = "Configuration file: %s";

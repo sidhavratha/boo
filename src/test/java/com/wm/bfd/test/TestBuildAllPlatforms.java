@@ -1,5 +1,7 @@
 package com.wm.bfd.test;
 
+import java.util.List;
+
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -8,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.wm.bfd.oo.workflow.BuildAllPlatforms;
+import com.wm.bfd.oo.yaml.Constants;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBuildAllPlatforms extends BFDOOTest {
@@ -25,6 +28,29 @@ public class TestBuildAllPlatforms extends BFDOOTest {
   public void testACreateAssemblyIfNotExist() throws OneOpsClientAPIException {
     boolean isSuc = build.createAssemblyIfNotExist();
     assertEquals(isSuc, true);
+  }
+
+  @Test
+  public void testGetAllAutoGenAssemblies() throws OneOpsClientAPIException {
+    List<String> assemblies = build.getAllAutoGenAssemblies(Constants.ASSEMBLY_PREFIX);
+    // System.out.println(assemblies);
+  }
+
+  @Test
+  public void testGetAssemblies() throws OneOpsClientAPIException {
+    build.getAssemblies();
+  }
+
+  @Test
+  public void testListEnvs() throws OneOpsClientAPIException {
+    List<String> envs = build.listEnvs();
+    // System.out.println(envs);
+  }
+
+  @Test
+  public void testListPlatformss() throws OneOpsClientAPIException {
+    List<String> platforms = build.listPlatforms();
+    // System.out.println(platforms);
   }
 
   @Test
@@ -56,14 +82,14 @@ public class TestBuildAllPlatforms extends BFDOOTest {
     String status = build.getStatus();
     LOG.info("The {} deploy {}", this.envName, status);
   }
-  
+
   @Test
   public void testEGetCloud() throws OneOpsClientAPIException {
     String testCloud = "dev-cdc003";
     String id = build.getCloudId(testCloud);
     LOG.info("The {} id {}", testCloud, id);
   }
-  
+
   @Test
   public void testGetIpsInternal() throws OneOpsClientAPIException {
     System.out.println(build.getIpsInternal("yarn", "compute"));
