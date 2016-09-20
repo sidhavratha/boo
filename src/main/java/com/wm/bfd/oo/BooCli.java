@@ -463,6 +463,17 @@ public class BooCli {
       System.out.println("There is no instance to remove");
       return;
     }
+    boolean hasAssembly = false;
+    for (String asb : assemblies) {
+      if (this.flow.isAssemblyExist(asb)) {
+        hasAssembly = true;
+        break;
+      }
+    }
+    if (hasAssembly == false) {
+      System.out.println("There is no instance to remove");
+      return;
+    }
     if (isForced == false) {
       String str =
           String.format(YES_NO, assemblies.size(), this.config.getYaml().getAssembly().getName());
