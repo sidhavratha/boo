@@ -215,7 +215,11 @@ public class BooCli {
        * Handle other commands.
        */
       if (cmd.hasOption("s")) {
-        System.out.println(this.getStatus());
+        if (!flow.isAssemblyExist()) {
+          System.err.printf(Constants.NOTFOUND_ERROR, config.getYaml().getAssembly().getName());
+        } else {
+          System.out.println(this.getStatus());
+        }
       } else if (cmd.hasOption("c")) {
         if (config.getYaml().getAssembly().getAutoGen()) {
           this.initOO(
@@ -230,7 +234,7 @@ public class BooCli {
           if (flow.isAssemblyExist()) {
             this.createPacks(Boolean.TRUE);
           } else {
-            System.err.printf(Constants.UPDATE_ERROR, config.getYaml().getAssembly().getName());
+            System.err.printf(Constants.NOTFOUND_ERROR, config.getYaml().getAssembly().getName());
           }
         } else {
           List<String> assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());
@@ -252,7 +256,9 @@ public class BooCli {
         }
         this.cleanup(assemblies);
       } else if (cmd.hasOption("get-ips")) {
-        if (cmd.getOptionValues("get-ips") == null) {
+        if (!flow.isAssemblyExist()) {
+          System.err.printf(Constants.NOTFOUND_ERROR, config.getYaml().getAssembly().getName());
+        } else if (cmd.getOptionValues("get-ips") == null) {
           // if there is no args for get-ips
           getIps0();
         } else if (cmd.getOptionValues("get-ips").length == 1) {
