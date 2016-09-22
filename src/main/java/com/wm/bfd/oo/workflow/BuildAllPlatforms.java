@@ -73,13 +73,14 @@ public class BuildAllPlatforms extends AbstractWorkflow {
         this.pullDesign();
       } catch (Exception e) {
         // Ignore
-        e.printStackTrace();
+        // e.printStackTrace();
       }
     }
     this.bar.update(70, 100);
     // Added retries
     boolean retry = true;
     String deployError = null;
+    this.relayEnableDelivery(config.getYaml().getBoo().isEnable());
     if (isUpdate)
       this.commitEnv();
     LogUtils.info(Constants.START_DEPLOYMENT);
@@ -109,8 +110,18 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return true;
   }
 
-  public boolean isPlatformExist(String platformName) throws OneOpsClientAPIException,
-      OneOpsComponentExistException {
+  public boolean relayEnableDelivery(boolean enable) {
+    try {
+      transition.updateRelay(this.envName, "default", null, null, null, null, null, false, enable);
+      return Boolean.TRUE;
+    } catch (OneOpsClientAPIException e) {
+      System.err.println("Cannot update relay!");
+    }
+    return Boolean.FALSE;
+  }
+
+  public boolean isPlatformExist(String platformName)
+      throws OneOpsClientAPIException, OneOpsComponentExistException {
     JsonPath response = null;
     try {
       response = design.getPlatform(platformName);
@@ -283,7 +294,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return utils.getIps(platformName, componentName, this);
   }
 
-  public String printIps(String platformName, String componentName) throws OneOpsClientAPIException {
+  public String printIps(String platformName, String componentName)
+      throws OneOpsClientAPIException {
     List<Map<String, String>> ips = this.getIpsInternal(platformName, componentName);
     StringBuilder str = new StringBuilder();
     for (Map<String, String> ip : ips) {
