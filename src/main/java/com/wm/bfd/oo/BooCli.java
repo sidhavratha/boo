@@ -230,7 +230,7 @@ public class BooCli {
           if (flow.isAssemblyExist()) {
             this.createPacks(Boolean.TRUE);
           } else {
-            System.err.printf(Constants.UPDATE_ERROR, assembly);
+            System.err.printf(Constants.UPDATE_ERROR, config.getYaml().getAssembly().getName());
           }
         } else {
           List<String> assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());

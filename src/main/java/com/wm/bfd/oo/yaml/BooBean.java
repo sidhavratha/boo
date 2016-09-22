@@ -16,7 +16,7 @@ public class BooBean {
   private String email;
   @JsonProperty("cloud")
   private Map<String, Object> cloud;
-  
+
   @JsonProperty("ip_output")
   private String ipOutput;
 
@@ -25,7 +25,18 @@ public class BooBean {
 
   @JsonProperty("description")
   private String description;
-  
+
+  public boolean isEnable() {
+    return enable;
+  }
+
+  public void setEnable(boolean enable) {
+    this.enable = enable;
+  }
+
+  @JsonProperty("enable_delivery")
+  private boolean enable;
+
   @JsonProperty("custom")
   private Map<String, String> custom;
 
