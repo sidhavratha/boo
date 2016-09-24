@@ -36,6 +36,7 @@ public class Constants {
   final public static char SLASH = '/';
   final public static char DOT = '.';
   final public static char DASH = '-';
+  final public static String ATTACHMENTS = "attachments";
 
   final public static String BFD_TOOL = "The tool is managed by BFD team.";
   final public static String NO_AVAILABILITY =

@@ -1,6 +1,8 @@
 package com.wm.bfd.test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -39,6 +41,32 @@ public class TestBuildAllPlatforms extends BFDOOTest {
   @Test
   public void testGetAssemblies() throws OneOpsClientAPIException {
     build.getAssemblies();
+  }
+
+  @Test
+  public void testListAttachements() throws OneOpsClientAPIException {
+    List<String> attachements = build.listAttachements("yarn", "hadoop-yarn-config");
+  }
+
+  @Test
+  public void testAddAttachement() throws OneOpsClientAPIException {
+    boolean isSuc = build.addAttachement("yarn", "hadoop-yarn-config", "testa2", null);
+  }
+
+  @Test
+  public void testIsAttachementExist() throws OneOpsClientAPIException {
+    boolean isSuc = build.isAttachmentExists("yarn", "hadoop-yarn-config", "test");
+  }
+
+  @Test
+  public void testUpdateAttachement() throws OneOpsClientAPIException {
+    // Map<String, String> attributes = new HashMap<String, String>();
+    // attributes.put("path", "/opt/datameer/etc/das-env.sh");
+    // attributes.put("priority", "2");
+    // attributes.put("exec_cmd", "chmod +x /opt/datameer/etc/das-env.sh");
+    // attributes.put("run_on", "{ \"after-add\":true }");
+    // attributes.put("content", "content");
+    boolean isSuc = build.updateAttachement("yarn", "hadoop-yarn-config", "testa2", null);
   }
 
   @Test
