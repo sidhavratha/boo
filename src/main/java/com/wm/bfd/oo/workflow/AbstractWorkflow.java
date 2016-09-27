@@ -62,7 +62,7 @@ public abstract class AbstractWorkflow {
     this.bar = new ProgressBar();
   }
 
-  public abstract boolean process(boolean isUpdate) throws OneOpsClientAPIException;
+  public abstract boolean process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException;
 
   public boolean cleanup() throws OneOpsClientAPIException {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
