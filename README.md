@@ -47,7 +47,7 @@ usage: boo [-c] [-d DIR] [-f FILE] [--get-ips environment compute-class]
  --get-ips <environment>                      by -d or -f
  --get-ips
  
- --nodeploy                                   Create assembly without
+ --no-deploy                                  Create assembly without
                                               deployments
                                       
  -h,--help                                    show help.
