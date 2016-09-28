@@ -58,9 +58,8 @@ public class Design extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to get platform with name %s due to %s", platformName,
-                response.getStatusLine());
+        String msg = String.format("Failed to get platform with name %s due to %s", platformName,
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -157,9 +156,8 @@ public class Design extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to create platform with name %s due to %s", platformName,
-                response.getBody().asString());
+        String msg = String.format("Failed to create platform with name %s due to %s", platformName,
+            response.getBody().asString());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -201,9 +199,8 @@ public class Design extends APIClient {
 
 
       } else {
-        String msg =
-            String.format("Failed to get latest release details due to %s",
-                response.getStatusLine());
+        String msg = String.format("Failed to get latest release details due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -230,8 +227,7 @@ public class Design extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to delete platform with name %s", platformName);
+        String msg = String.format("Failed to delete platform with name %s", platformName);
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -259,13 +255,178 @@ public class Design extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to get list of platforms components due to %s",
-                response.getStatusLine());
+        String msg = String.format("Failed to get list of platforms components due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
     String msg = String.format("Failed to get list of platforms components due to null response");
+    throw new OneOpsClientAPIException(msg);
+  }
+
+  public JsonPath listPlatformComponentAttachments(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    if (platformName == null || platformName.length() == 0) {
+      String msg = String.format("Missing platform name to update component attributes");
+      throw new OneOpsClientAPIException(msg);
+    }
+    if (componentName == null || componentName.length() == 0) {
+      String msg = String.format("Missing component name to update component attributes");
+      throw new OneOpsClientAPIException(msg);
+    }
+
+    JsonPath componentDetails = getPlatformComponent(platformName, componentName);
+    if (componentDetails != null) {
+
+      String ciId = componentDetails.getString("ciId");
+      RequestSpecification request = createRequest();
+      Response response = request.get(
+          DESIGN_URI + "platforms/" + platformName + "/components/" + ciId + "/attachments.json");
+      if (response != null) {
+        if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
+          return response.getBody().jsonPath();
+        } else {
+          String msg = String.format("Failed to get update component %s due to %s", componentName,
+              response.getStatusLine());
+          throw new OneOpsClientAPIException(msg);
+        }
+      }
+    }
+    String msg =
+        String.format("Failed to get update component %s due to null response", componentName);
+    throw new OneOpsClientAPIException(msg);
+  }
+
+  public JsonPath addPlatformComponentAttachment(String platformName, String componentName,
+      String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
+    if (platformName == null || platformName.length() == 0) {
+      String msg = String.format("Missing platform name to add component");
+      throw new OneOpsClientAPIException(msg);
+    }
+    if (componentName == null || componentName.length() == 0) {
+      String msg = String.format("Missing component name to add component");
+      throw new OneOpsClientAPIException(msg);
+    }
+
+    RequestSpecification request = createRequest();
+    JsonPath componentDetails = getPlatformComponent(platformName, componentName);
+    if (componentDetails == null) {
+      String msg = new String("Cannot find component");
+      throw new OneOpsClientAPIException(msg);
+    }
+    String ciId = componentDetails.getString("ciId");
+    Response newComponentResponse = request.queryParam("template_name", componentName).get(
+        DESIGN_URI + "platforms/" + platformName + "/components/" + ciId + "/attachments/new.json");
+    if (newComponentResponse != null) {
+      ResourceObject ro = new ResourceObject();
+      Map<String, String> properties = Maps.newHashMap();
+      properties.put("ciName", uniqueName);
+      properties.put("rfcAction", "add");
+
+      componentDetails = newComponentResponse.getBody().jsonPath();
+      Map<String, String> attr = componentDetails.getMap("ciAttributes");
+      if (attr == null) {
+        attr = Maps.newHashMap();
+      }
+      if (attributes != null && attributes.size() > 0) {
+        attr.putAll(attributes);
+        Map<String, String> ownerProps = componentDetails.getMap("ciAttrProps.owner");
+        if (ownerProps == null) {
+          ownerProps = Maps.newHashMap();
+        }
+        for (Entry<String, String> entry : attributes.entrySet()) {
+          ownerProps.put(entry.getKey(), "");
+        }
+        ro.setOwnerProps(ownerProps);
+      }
+      ro.setAttributes(attr);
+      ro.setProperties(properties);
+      JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_dj_ci");
+      jsonObject.put("template_name", componentName);
+      LOG.debug("Json in addPlatformComponent {}", jsonObject.toString());
+      Response response = request.body(jsonObject.toString())
+          .post(DESIGN_URI + "platforms/" + platformName + "/components/" + ciId + "/attachments");
+      if (response != null) {
+        if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
+          return response.getBody().jsonPath();
+        } else {
+          String msg = String.format("Failed to get update component %s due to %s", componentName,
+              response.getStatusLine());
+          throw new OneOpsClientAPIException(msg);
+        }
+      }
+    }
+
+    String msg =
+        String.format("Failed to get update component %s due to null response", componentName);
+    throw new OneOpsClientAPIException(msg);
+  }
+
+  public JsonPath updatePlatformComponentAttachment(String platformName, String componentName,
+      String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
+    if (platformName == null || platformName.length() == 0) {
+      String msg = String.format("Missing platform name to add component");
+      throw new OneOpsClientAPIException(msg);
+    }
+    if (componentName == null || componentName.length() == 0) {
+      String msg = String.format("Missing component name to add component");
+      throw new OneOpsClientAPIException(msg);
+    }
+
+    RequestSpecification request = createRequest();
+    JsonPath componentDetails = getPlatformComponent(platformName, componentName);
+    if (componentDetails == null) {
+      String msg = new String("Cannot find component");
+      throw new OneOpsClientAPIException(msg);
+    }
+    String ciId = componentDetails.getString("ciId");
+    Response newComponentResponse =
+        request.queryParam("template_name", componentName).get(DESIGN_URI + "platforms/"
+            + platformName + "/components/" + ciId + "/attachments/" + uniqueName + ".json");
+    if (newComponentResponse != null) {
+      ResourceObject ro = new ResourceObject();
+      Map<String, String> properties = Maps.newHashMap();
+      properties.put("ciName", uniqueName);
+      properties.put("rfcAction", "add");
+
+      componentDetails = newComponentResponse.getBody().jsonPath();
+      String ciId2 = componentDetails.getString("ciId");
+      Map<String, String> attr = componentDetails.getMap("ciAttributes");
+      if (attr == null) {
+        attr = Maps.newHashMap();
+      }
+      if (attributes != null && attributes.size() > 0) {
+        attr.putAll(attributes);
+
+        Map<String, String> ownerProps = componentDetails.getMap("ciAttrProps.owner");
+        if (ownerProps == null) {
+          ownerProps = Maps.newHashMap();
+        }
+        for (Entry<String, String> entry : attributes.entrySet()) {
+          ownerProps.put(entry.getKey(), "");
+        }
+        ro.setOwnerProps(ownerProps);
+      }
+      ro.setAttributes(attr);
+      ro.setProperties(properties);
+      JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_dj_ci");
+      jsonObject.put("template_name", componentName);
+      LOG.debug("Json in addPlatformComponent {}", jsonObject.toString());
+      Response response = request.body(jsonObject.toString()).put(DESIGN_URI + "platforms/"
+          + platformName + "/components/" + ciId + "/attachments/" + ciId2);
+      if (response != null) {
+        if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
+          return response.getBody().jsonPath();
+        } else {
+          String msg = String.format("Failed to get update attachment %s due to %s", uniqueName,
+              response.getStatusLine());
+          throw new OneOpsClientAPIException(msg);
+        }
+      }
+    }
+
+    String msg =
+        String.format("Failed to get update component %s due to null response", uniqueName);
     throw new OneOpsClientAPIException(msg);
   }
 
@@ -294,13 +455,45 @@ public class Design extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to get platform component details due to %s", response
-                .getStatusLine());
+        String msg = String.format("Failed to get platform component details due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
     String msg = String.format("Failed to get platform component details due to null response");
+    throw new OneOpsClientAPIException(msg);
+  }
+
+  public JsonPath getPlatformComponentAttachment(String platformName, String componentName, String attachmentName)
+      throws OneOpsClientAPIException {
+    if (platformName == null || platformName.length() == 0) {
+      String msg = String.format("Missing platform name to update component attributes");
+      throw new OneOpsClientAPIException(msg);
+    }
+    if (componentName == null || componentName.length() == 0) {
+      String msg = String.format("Missing component name to update component attributes");
+      throw new OneOpsClientAPIException(msg);
+    }
+
+    JsonPath componentDetails = getPlatformComponent(platformName, componentName);
+    if (componentDetails != null) {
+
+      String ciId = componentDetails.getString("ciId");
+      RequestSpecification request = createRequest();
+      Response response = request.get(
+          DESIGN_URI + "platforms/" + platformName + "/components/" + ciId + "/attachments/" + attachmentName + ".json");
+      if (response != null) {
+        if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
+          return response.getBody().jsonPath();
+        } else {
+          String msg = String.format("Failed to get update component %s due to %s", componentName,
+              response.getStatusLine());
+          throw new OneOpsClientAPIException(msg);
+        }
+      }
+    }
+    String msg =
+        String.format("Failed to get update component %s due to null response", componentName);
     throw new OneOpsClientAPIException(msg);
   }
 
@@ -313,8 +506,8 @@ public class Design extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath addPlatformComponent(String platformName, String componentName,
-      String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
+  public JsonPath addPlatformComponent(String platformName, String componentName, String uniqueName,
+      Map<String, String> attributes) throws OneOpsClientAPIException {
     if (platformName == null || platformName.length() == 0) {
       String msg = String.format("Missing platform name to add component");
       throw new OneOpsClientAPIException(msg);
@@ -326,9 +519,8 @@ public class Design extends APIClient {
 
     RequestSpecification request = createRequest();
 
-    Response newComponentResponse =
-        request.queryParam("template_name", componentName).get(
-            DESIGN_URI + "platforms/" + platformName + "/components/new.json");
+    Response newComponentResponse = request.queryParam("template_name", componentName)
+        .get(DESIGN_URI + "platforms/" + platformName + "/components/new.json");
     if (newComponentResponse != null) {
       ResourceObject ro = new ResourceObject();
       Map<String, String> properties = Maps.newHashMap();
@@ -357,16 +549,14 @@ public class Design extends APIClient {
       JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_dj_ci");
       jsonObject.put("template_name", componentName);
       LOG.debug("Json in addPlatformComponent {}", jsonObject.toString());
-      Response response =
-          request.body(jsonObject.toString()).post(
-              DESIGN_URI + "platforms/" + platformName + "/components/");
+      Response response = request.body(jsonObject.toString())
+          .post(DESIGN_URI + "platforms/" + platformName + "/components/");
       if (response != null) {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
           return response.getBody().jsonPath();
         } else {
-          String msg =
-              String.format("Failed to get update component %s due to %s", componentName, response
-                  .getStatusLine());
+          String msg = String.format("Failed to get update component %s due to %s", componentName,
+              response.getStatusLine());
           throw new OneOpsClientAPIException(msg);
         }
       }
@@ -423,16 +613,14 @@ public class Design extends APIClient {
       ro.setOwnerProps(ownerProps);
       ro.setAttributes(attr);
       JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_dj_ci");
-      Response response =
-          request.body(jsonObject.toString()).put(
-              DESIGN_URI + "platforms/" + platformName + "/components/" + ciId);
+      Response response = request.body(jsonObject.toString())
+          .put(DESIGN_URI + "platforms/" + platformName + "/components/" + ciId);
       if (response != null) {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
           return response.getBody().jsonPath();
         } else {
-          String msg =
-              String.format("Failed to get update component %s due to %s", componentName, response
-                  .getStatusLine());
+          String msg = String.format("Failed to get update component %s due to %s", componentName,
+              response.getStatusLine());
           throw new OneOpsClientAPIException(msg);
         }
       }
@@ -460,9 +648,8 @@ public class Design extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to get list of design platforms variables due to %s",
-                response.getStatusLine());
+        String msg = String.format("Failed to get list of design platforms variables due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -527,16 +714,14 @@ public class Design extends APIClient {
 
       JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_dj_ci");
 
-      Response response =
-          request.body(jsonObject.toString()).post(
-              DESIGN_URI + "platforms/" + platformName + "/variables");
+      Response response = request.body(jsonObject.toString())
+          .post(DESIGN_URI + "platforms/" + platformName + "/variables");
       if (response != null) {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
-          //return response.getBody().jsonPath();
+          // return response.getBody().jsonPath();
         } else {
-          String msg =
-              String.format("Failed to add platform variable %s due to %s", entry.getKey(),
-                  response.getStatusLine());
+          String msg = String.format("Failed to add platform variable %s due to %s", entry.getKey(),
+              response.getStatusLine());
           throw new OneOpsClientAPIException(msg);
         }
       }
@@ -570,9 +755,8 @@ public class Design extends APIClient {
       Response variable =
           request.get(DESIGN_URI + "platforms/" + platformName + "/variables/" + entry.getKey());
       if (variable == null || variable.getBody() == null) {
-        String msg =
-            String.format("Failed to find local variables %s for platform %s", entry.getKey(),
-                platformName);
+        String msg = String.format("Failed to find local variables %s for platform %s",
+            entry.getKey(), platformName);
         throw new OneOpsClientAPIException(msg);
       }
 
@@ -596,17 +780,15 @@ public class Design extends APIClient {
 
       JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_dj_ci");
 
-      Response response =
-          request.body(jsonObject.toString()).put(
-              DESIGN_URI + "platforms/" + platformName + "/variables/" + ciId);
+      Response response = request.body(jsonObject.toString())
+          .put(DESIGN_URI + "platforms/" + platformName + "/variables/" + ciId);
       if (response != null) {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
           // return response.getBody().jsonPath();
           success = true;
         } else {
-          String msg =
-              String.format("Failed to get update variables %s due to %s", entry.getKey(),
-                  response.getStatusLine());
+          String msg = String.format("Failed to get update variables %s due to %s", entry.getKey(),
+              response.getStatusLine());
           throw new OneOpsClientAPIException(msg);
         }
       }
@@ -630,9 +812,8 @@ public class Design extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to get list of design variables due to %s",
-                response.getStatusLine());
+        String msg = String.format("Failed to get list of design variables due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -695,9 +876,8 @@ public class Design extends APIClient {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
           return response.getBody().jsonPath();
         } else {
-          String msg =
-              String.format("Failed to get new global variable %s due to %s", entry.getKey(),
-                  response.getStatusLine());
+          String msg = String.format("Failed to get new global variable %s due to %s",
+              entry.getKey(), response.getStatusLine());
           throw new OneOpsClientAPIException(msg);
         }
       }
@@ -754,9 +934,8 @@ public class Design extends APIClient {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
           success = true;
         } else {
-          String msg =
-              String.format("Failed to get update global variable %s due to %s", entry.getKey(),
-                  response.getStatusLine());
+          String msg = String.format("Failed to get update global variable %s due to %s",
+              entry.getKey(), response.getStatusLine());
           throw new OneOpsClientAPIException(msg);
         }
       }

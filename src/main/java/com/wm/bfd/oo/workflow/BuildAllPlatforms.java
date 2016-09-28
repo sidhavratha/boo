@@ -142,10 +142,12 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       if (platform.getComponents() == null)
         continue;
       for (Map.Entry<String, Object> entry : platform.getComponents().entrySet()) {
-        String key = entry.getKey();
+        String componentName = entry.getKey();
         Object value = entry.getValue();
         if (value instanceof Map) {
-          this.updateComponentVariables(platform.getName(), key, (Map<String, Object>) value);
+          Map<String, Object> components = (Map<String, Object>) value;
+          this.handleAttachments(components, platform.getName(), componentName);
+          this.updateComponentVariables(platform.getName(), componentName, components);
         } else {
           if (LOG.isInfoEnabled())
             LOG.info("Unknow type {}.", value.getClass());
@@ -153,6 +155,43 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       }
     }
     return true;
+  }
+
+  /**
+   * We tolerate that if update attachment failed, won't stop the whole process.
+   * 
+   * @param components
+   * @param platformName
+   * @param componentName
+   */
+  private void handleAttachments(Map<String, Object> components, String platformName,
+      String componentName) {
+    try {
+      this.handleAttachmentsIntl(components, platformName, componentName);
+    } catch (Exception e) {
+      // Ignore
+    } finally {
+      if (components.get(Constants.ATTACHMENTS) != null) {
+        components.remove(Constants.ATTACHMENTS);
+      }
+    }
+  }
+
+  private void handleAttachmentsIntl(Map<String, Object> components, String platformName,
+      String componentName) throws OneOpsClientAPIException {
+    if (components.get(Constants.ATTACHMENTS) != null) {
+      Map<String, Object> attachments = (Map<String, Object>) components.get(Constants.ATTACHMENTS);
+      for (Map.Entry<String, Object> entry : attachments.entrySet()) {
+        String attachment = entry.getKey();
+        Map<String, String> attributes = (Map<String, String>) entry.getValue();
+        if (this.isAttachmentExists(platformName, componentName, attachment)) {
+          this.updateAttachement(platformName, componentName, attachment, attributes);
+        } else {
+          this.addAttachement(platformName, componentName, attachment, attributes);
+        }
+      }
+    }
+
   }
 
   public boolean createPlatform(PlatformBean platform) throws OneOpsClientAPIException {

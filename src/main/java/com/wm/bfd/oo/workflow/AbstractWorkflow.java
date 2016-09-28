@@ -45,7 +45,8 @@ public abstract class AbstractWorkflow {
 
   ProgressBar bar;
 
-  public AbstractWorkflow(OOInstance instance, ClientConfig config) throws OneOpsClientAPIException {
+  public AbstractWorkflow(OOInstance instance, ClientConfig config)
+      throws OneOpsClientAPIException {
 
     this.instance = instance;
     this.config = config;
@@ -161,6 +162,36 @@ public abstract class AbstractWorkflow {
   public List<String> getAssemblies() throws OneOpsClientAPIException {
     JsonPath response = assembly.listAssemblies();
     return response.getList(Constants.CINAME);
+  }
+
+  public List<String> listAttachements(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    JsonPath response = design.listPlatformComponentAttachments(platformName, componentName);
+    return response.getList(Constants.CINAME);
+  }
+
+  public boolean addAttachement(String platformName, String componentName, String uniqueName,
+      Map<String, String> attributes) throws OneOpsClientAPIException {
+    design.addPlatformComponentAttachment(platformName, componentName, uniqueName, attributes);
+    return true;
+  }
+
+  public boolean updateAttachement(String platformName, String componentName, String uniqueName,
+      Map<String, String> attributes) throws OneOpsClientAPIException {
+    design.updatePlatformComponentAttachment(platformName, componentName, uniqueName, attributes);
+    return true;
+  }
+
+  public boolean isAttachmentExists(String platformName, String componentName,
+      String attachmentName) {
+    boolean isExist = true;
+    JsonPath response = null;
+    try {
+      response = design.getPlatformComponentAttachment(platformName, componentName, attachmentName);
+    } catch (Exception e) {
+      isExist = false;
+    }
+    return (response == null || !isExist) ? false : true;
   }
 
   boolean cancelDeployment() {
@@ -358,10 +389,10 @@ public abstract class AbstractWorkflow {
       // String availability = cloudMap.get(Constants.AVAILABILITY);
       // if (StringUtils.isEmpty(availability))
       // throw new OneOpsClientAPIException(Constants.NO_AVAILABILITY);
-      response =
-          transition.createEnvironment(envName, config.getYaml().getEnvironmentBean().getOthers()
-              .get(Constants.AVAILABILITY), config.getYaml().getEnvironmentBean().getOthers(),
-              null, cloudMaps, Constants.DESCRIPTION);
+      response = transition.createEnvironment(envName,
+          config.getYaml().getEnvironmentBean().getOthers().get(Constants.AVAILABILITY),
+          config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps,
+          Constants.DESCRIPTION);
       response = transition.getEnvironment(envName);
 
       transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
