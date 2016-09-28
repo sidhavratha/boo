@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,7 @@ import com.wm.bfd.oo.yaml.helper.EnvironmentBeanHelper;
 
 public abstract class AbstractWorkflow {
   private static Logger LOG = LoggerFactory.getLogger(AbstractWorkflow.class);
+  private static Pattern pattern = Pattern.compile("^-[0-9a-zA-Z]{2,9}$");
   String assemblyName;
   String envName;
 
@@ -62,7 +65,8 @@ public abstract class AbstractWorkflow {
     this.bar = new ProgressBar();
   }
 
-  public abstract boolean process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException;
+  public abstract boolean process(boolean isUpdate, boolean isAssemblyOnly)
+      throws OneOpsClientAPIException;
 
   public boolean cleanup() throws OneOpsClientAPIException {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
@@ -332,22 +336,39 @@ public abstract class AbstractWorkflow {
     }
   }
 
+  private boolean isMatch(String str, String prefix) {
+    if (str.startsWith(prefix)) {
+      Matcher matcher = pattern.matcher(str.substring(prefix.length()));
+      if (matcher.matches()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public List<String> getAllAutoGenAssemblies(String prefix) {
+
     if (config.getYaml().getAssembly().getAutoGen()) {
       try {
         List<String> assemblies = this.getAssemblies();
         if (assemblies != null && assemblies.size() > 0) {
           List<String> matches = new ArrayList<String>();
           for (String assembly : assemblies) {
-            if (assembly.contains(prefix)) {
+            // Only match auto generated string.
+            if (this.isMatch(assembly, prefix)) {
               matches.add(assembly);
             }
           }
           return matches;
         }
-      } catch (OneOpsClientAPIException e) {
+      } catch (Exception e) {
         System.err.println(e.getMessage());
       }
+    } else {
+      List<String> matches = new ArrayList<String>();
+      if (this.isAssemblyExist(prefix))
+        matches.add(prefix);
+      return matches;
     }
     return null;
   }
@@ -400,6 +421,7 @@ public abstract class AbstractWorkflow {
     }
     return response == null ? false : true;
   }
+
 
   @SuppressWarnings("unchecked")
   public boolean updateEnv() throws OneOpsClientAPIException {

@@ -22,7 +22,7 @@ public class Constants {
   final public static String ACTIVE = "active";
   final public static String SIZE = "size";
   final public static String CINAME = "ciName";
-  final public static String ASSEMBLY_PREFIX = "CUBEBOO-"; // Magic string.
+  //final public static String ASSEMBLY_PREFIX = "CUBEBOO-"; // Magic string.
   final public static String ASSEMBLY_NAME_TOO_LONG =
       "Assembly name cannot be more than 32 characters long. Please fix your assembly name in YAML.";
   /**
@@ -42,7 +42,7 @@ public class Constants {
   final public static String BFD_TOOL = "The tool is managed by BFD team.";
   final public static String NO_AVAILABILITY =
       "You don't set the availability, please check your yaml config.";
-
+  final public static String ASSEMBLY_PREFIX_ERROR = "The prefix of assembly cannot be empty!";
   // Components
   final public static String USER = "user";
 
@@ -76,6 +76,7 @@ public class Constants {
   final public static String FAIL_DEPLOYMENT_EXISTING =
       "A failed deployment has been running in the same environment, quit!";
   final public static String CREATE_ENV = "Creating the environment %s.";
+  final public static String UPDATE_ENV = "Updating the environment %s.";
   final public static String ENV_EXISTING = "Environment exist, skip create environment %s.";
   final public static String COMPUTE_SIZE = "Updating the compute size in %s - %s";
   final public static String NEED_ANOTHER_CLEANUP =

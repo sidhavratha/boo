@@ -345,11 +345,14 @@ public class BooCli {
   }
 
   private List<String> listFiles(String prefix) {
-    prefix = (prefix == null ? Constants.ASSEMBLY_PREFIX
-        : (prefix + Constants.DASH + Constants.ASSEMBLY_PREFIX));
+    if (prefix == null || prefix.trim().length() == 0) {
+      System.err.println(Constants.ASSEMBLY_PREFIX_ERROR);
+      System.exit(1);
+    }
     List<String> assemblies = flow.getAllAutoGenAssemblies(prefix);
     for (String assembly : assemblies) {
-      System.out.println(assembly);
+      if (assembly != null)
+        System.out.println(assembly);
     }
     return assemblies;
   }
@@ -436,7 +439,6 @@ public class BooCli {
 
   private String randomString(String assemblyName) {
     StringBuilder name = new StringBuilder();
-    name.append(Constants.ASSEMBLY_PREFIX);
     int rand = 32 - assemblyName.length() - 1;
     rand = rand > 8 ? 8 : rand;
     name.append(UUID.randomUUID().toString().substring(0, rand));

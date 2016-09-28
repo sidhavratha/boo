@@ -34,8 +34,9 @@ public class TestBuildAllPlatforms extends BFDOOTest {
 
   @Test
   public void testGetAllAutoGenAssemblies() throws OneOpsClientAPIException {
-    List<String> assemblies = build.getAllAutoGenAssemblies(Constants.ASSEMBLY_PREFIX);
-    // System.out.println(assemblies);
+    assertNotNull(config.getYaml().getAssembly().getName());
+    List<String> assemblies =
+        build.getAllAutoGenAssemblies(config.getYaml().getAssembly().getName());
   }
 
   @Test

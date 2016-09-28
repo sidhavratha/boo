@@ -360,6 +360,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       config.setCurrent(scale.getCurrent());
       config.setMin(scale.getMin());
       config.setMax(scale.getMax());
+      config.setPercentDeploy(scale.getPercentDeploy());
       LogUtils.info(Constants.COMPUTE_SIZE, envName, scale.getPlatform());
       transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(),
           config);
