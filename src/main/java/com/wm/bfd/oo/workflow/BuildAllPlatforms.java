@@ -13,6 +13,7 @@ import com.oo.api.OOInstance;
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.oo.api.exception.OneOpsComponentExistException;
 import com.oo.api.resource.model.RedundancyConfig;
+import com.wm.bfd.oo.BooCli;
 import com.wm.bfd.oo.ClientConfig;
 import com.wm.bfd.oo.LogUtils;
 import com.wm.bfd.oo.utils.BFDUtils;
@@ -83,7 +84,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.relayEnableDelivery(config.getYaml().getBoo().isEnable());
     if (isUpdate)
       this.commitEnv();
-    if (isAssemblyOnly) {
+    if (BooCli.isNoDeploy()) {
       this.bar.update(100, 100);
       LogUtils.info(Constants.CREATE_WITHOUT_DEPLOYMENT);
       return true;

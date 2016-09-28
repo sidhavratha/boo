@@ -20,11 +20,12 @@ public class Constants {
   final public static String TRUE = "true";
   final public static String PRIVATE_IP = "private_ip";
   final public static String ACTIVE = "active";
-  final public static String SIZE = "size"; 
+  final public static String SIZE = "size";
   final public static String CINAME = "ciName";
   final public static String ASSEMBLY_PREFIX = "CUBEBOO-"; // Magic string.
-  final public static String ASSEMBLY_NAME_TOO_LONG = "Assembly name cannot be more than 32 characters long. Please fix your assembly name in YAML.";
-   /**
+  final public static String ASSEMBLY_NAME_TOO_LONG =
+      "Assembly name cannot be more than 32 characters long. Please fix your assembly name in YAML.";
+  /**
    * Customize config
    */
   final public static String IPTERMINATOR1 = "[";
@@ -52,7 +53,8 @@ public class Constants {
   // Output during deployment
   final public static String DESTROY_ASSEMBLY = "Destroyed assembly %s!";
   final public static String PLATFORM_EXISTING = "Platform exist, skip create platform %s.";
-  final public static String CREATING_ASSEMBLY = "Auto generate assembly name turned on. Creating assembly %s ...";
+  final public static String CREATING_ASSEMBLY =
+      "Auto generate assembly name turned on. Creating assembly %s ...";
   final public static String CREATING_PLATFORM = "Creating platform %s ...";
   final public static String DESTROY_PLATFORM = "Destroying platform %s ...";
   final public static String CONFIG_FILE = "Configuration file: %s";
@@ -64,7 +66,8 @@ public class Constants {
 
   final public static String CREATING_PLATFORM_SUCCEED = "Created platform %s.";
   final public static String START_DEPLOYMENT = "Starting the deployment now.";
-  final public static String CREATE_WITHOUT_DEPLOYMENT = "Created/updated assembly without deployments.";
+  final public static String CREATE_WITHOUT_DEPLOYMENT =
+      "Created/updated assembly without deployments.";
   final public static String DEPLOYMENT_RUNNING = "Deployment is running ...";
   final public static String DEPLOYMENT_FAILED = "Deploy failed! %s";
   final public static String NO_NEED_DEPLOY = "NO deployment needed!";
