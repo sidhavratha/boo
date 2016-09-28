@@ -34,7 +34,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     super(instance, config);
   }
 
-  public boolean process(boolean isUpdate) throws OneOpsClientAPIException {
+  public boolean process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
     boolean isAssemblyExist = this.isAssemblyExist();
     if (isUpdate && !isAssemblyExist) {
       throw new OneOpsClientAPIException(this.assemblyName + " not exists!");
@@ -83,6 +83,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.relayEnableDelivery(config.getYaml().getBoo().isEnable());
     if (isUpdate)
       this.commitEnv();
+    if (isAssemblyOnly) {
+      this.bar.update(100, 100);
+      LogUtils.info(Constants.CREATE_WITHOUT_DEPLOYMENT);
+      return true;
+    }
     LogUtils.info(Constants.START_DEPLOYMENT);
     while (retry && retries > 0) {
       utils.waitTimeout(2);

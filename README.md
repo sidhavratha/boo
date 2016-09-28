@@ -41,22 +41,26 @@ usage: boo [-c] [-d DIR] [-f FILE] [--get-ips environment compute-class]
  -f,--config-file <FILE>                      Use specified configuration file,
                                               required if -d not used
                                        
-    --force                                   Do not prompt for --remove
-    --get-ips <environment> <compute-class>   Get IPs of deployed nodes specified
-    --get-ips <environment>                   by -d or -f
-    --get-ips
-                                       
+ --force                                      Do not prompt for --remove
+ 
+ --get-ips <environment> <compute-class>      Get IPs of deployed nodes specified
+ --get-ips <environment>                      by -d or -f
+ --get-ips
+ 
+ --no-deploy                                  Create assembly without
+                                              deployments
+                                      
  -h,--help                                    show help.
  
  -l,--list                                    List all YAML files specified by -d
                                               or -f
                                        
-    --quiet                                   Silence the textual output.
+ --quiet                                       Silence the textual output.
     
  -r,--remove                                  Remove all deployed configurations
                                               specified by -d or -f
                                        
-    --retry                                   Retry deployments of configurations
+ --retry                                       Retry deployments of configurations
                                               specified by -d or -f
                                        
  -s,--status                                  Get status of deployments specified

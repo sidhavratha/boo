@@ -44,6 +44,7 @@ public class BooCli {
   private String configFile;
   private static boolean isQuiet = false;
   private static boolean isForced = false;
+  private static boolean isAssemblyOnly = false;
   private BuildAllPlatforms flow;
   private String[] args = null;
   private Options options = new Options();
@@ -87,6 +88,8 @@ public class BooCli {
 
     Option force = Option.builder().longOpt("force").desc("Do not prompt for --remove").build();
 
+    Option nodeploy = Option.builder().longOpt("no-deploy").desc("Create assembly without deployments").build();
+
     Option getIps =
         Option.builder().longOpt("get-ips").argName("environment> <compute-class")
             .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
@@ -112,6 +115,7 @@ public class BooCli {
     options.addOption(retry);
     options.addOption(quiet);
     options.addOption(force);
+    options.addOption(nodeploy);
     options.addOption(assembly);
   }
 
@@ -167,9 +171,12 @@ public class BooCli {
       if (cmd.hasOption("quiet")) {
         BooCli.setQuiet(Boolean.TRUE);
       }
-
+      
       if (cmd.hasOption("force")) {
         BooCli.setForced(Boolean.TRUE);
+      }
+      if (cmd.hasOption("no-deploy")) {
+        BooCli.setNoDeploy(Boolean.TRUE);
       }
 
       if (cmd.hasOption("a")) {
@@ -228,11 +235,11 @@ public class BooCli {
                   .getYaml().getAssembly().getName()));
           LogUtils.info(Constants.CREATING_ASSEMBLY, config.getYaml().getAssembly().getName());
         }
-        this.createPacks(Boolean.FALSE);
+        this.createPacks(Boolean.FALSE, isAssemblyOnly);
       } else if (cmd.hasOption("u")) {
         if (!config.getYaml().getAssembly().getAutoGen()) {
           if (flow.isAssemblyExist()) {
-            this.createPacks(Boolean.TRUE);
+            this.createPacks(Boolean.TRUE, isAssemblyOnly);
           } else {
             System.err.printf(Constants.NOTFOUND_ERROR, config.getYaml().getAssembly().getName());
           }
@@ -240,7 +247,7 @@ public class BooCli {
           List<String> assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());
           for (String asm : assemblies) {
             this.initOO(config, asm);
-            this.createPacks(Boolean.TRUE);
+            this.createPacks(Boolean.TRUE, isAssemblyOnly);
           }
         }
       } else if (cmd.hasOption("r")) {
@@ -423,8 +430,8 @@ public class BooCli {
     return des;
   }
 
-  public void createPacks(boolean isUpdate) throws BFDOOException, OneOpsClientAPIException {
-    flow.process(isUpdate);
+  public void createPacks(boolean isUpdate, boolean isAssemblyOnly) throws BFDOOException, OneOpsClientAPIException {
+    flow.process(isUpdate, isAssemblyOnly);
   }
 
   /**
@@ -554,5 +561,8 @@ public class BooCli {
   public static void setForced(boolean isForced) {
     BooCli.isForced = isForced;
   }
-
+  
+  public static void setNoDeploy(boolean isAssemblyOnly) {
+    BooCli.isAssemblyOnly = isAssemblyOnly;
+  }
 }
