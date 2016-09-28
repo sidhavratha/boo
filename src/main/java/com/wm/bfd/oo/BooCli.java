@@ -88,7 +88,7 @@ public class BooCli {
 
     Option force = Option.builder().longOpt("force").desc("Do not prompt for --remove").build();
 
-    Option nodeploy = Option.builder().longOpt("nodeploy").desc("Create assembly without deployments").build();
+    Option nodeploy = Option.builder().longOpt("no-deploy").desc("Create assembly without deployments").build();
 
     Option getIps =
         Option.builder().longOpt("get-ips").argName("environment> <compute-class")
@@ -175,7 +175,7 @@ public class BooCli {
       if (cmd.hasOption("force")) {
         BooCli.setForced(Boolean.TRUE);
       }
-      if (cmd.hasOption("nodeploy")) {
+      if (cmd.hasOption("no-deploy")) {
         BooCli.setNoDeploy(Boolean.TRUE);
       }
 
