@@ -63,7 +63,7 @@ public class Constants {
 
   final public static String CREATING_PLATFORM_SUCCEED = "Created platform %s.";
   final public static String START_DEPLOYMENT = "Starting the deployment now.";
-  final public static String CREATE_WITHOUT_DEPLOYMENT = "Created assembly without deployments.";
+  final public static String CREATE_WITHOUT_DEPLOYMENT = "Created/updated assembly without deployments.";
   final public static String DEPLOYMENT_RUNNING = "Deployment is running ...";
   final public static String DEPLOYMENT_FAILED = "Deploy failed! %s";
   final public static String NO_NEED_DEPLOY = "NO deployment needed!";
