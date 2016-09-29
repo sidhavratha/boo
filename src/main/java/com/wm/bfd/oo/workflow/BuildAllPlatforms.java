@@ -54,6 +54,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.bar.update(20, 100);
     this.createEnv();
     this.bar.update(30, 100);
+    this.updatePlatformCloudScale();
     this.updateEnv();
     this.bar.update(40, 100);
     String status = this.getStatus();
@@ -360,7 +361,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       config.setCurrent(scale.getCurrent());
       config.setMin(scale.getMin());
       config.setMax(scale.getMax());
-      config.setPercentDeploy(scale.getPercentDeploy());
       LogUtils.info(Constants.COMPUTE_SIZE, envName, scale.getPlatform());
       transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(),
           config);
