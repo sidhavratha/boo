@@ -120,6 +120,12 @@ public class TestBuildAllPlatforms extends BFDOOTest {
   }
 
   @Test
+  public void testUpdatePlatformCloudScale() throws OneOpsClientAPIException {
+    boolean isSuc = build.updatePlatformCloudScale();
+    assertEquals(isSuc, true);
+  }
+
+  @Test
   public void testGetIpsInternal() throws OneOpsClientAPIException {
     System.out.println(build.getIpsInternal("yarn", "compute"));
   }
