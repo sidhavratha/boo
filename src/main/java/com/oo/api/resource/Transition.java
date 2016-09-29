@@ -1463,4 +1463,52 @@ public class Transition extends APIClient {
         String.format("Failed to update relay with name %s due to null response", relayName);
     throw new OneOpsClientAPIException(msg);
   }
+
+
+  /*
+   * 
+   */
+  public JsonPath updatePlatformCloudScale(String environmentName, String platformName,
+      String cloudId, Map<String, String> cloudMap) throws OneOpsClientAPIException {
+
+    if (environmentName == null || environmentName.length() == 0) {
+      String msg = String.format("Missing environment name to be updated");
+      throw new OneOpsClientAPIException(msg);
+    }
+
+    if (platformName == null || platformName.length() == 0) {
+      String msg = String.format("Missing platform name to be updated");
+      throw new OneOpsClientAPIException(msg);
+    }
+
+    if (cloudId == null || cloudId.length() == 0) {
+      String msg = String.format("Missing cloud ID to be updated");
+      throw new OneOpsClientAPIException(msg);
+    }
+
+    if (cloudMap == null || cloudMap.size() == 0) {
+      String msg = String.format("Missing cloud info to be updated");
+      throw new OneOpsClientAPIException(msg);
+    }
+
+    RequestSpecification request = createRequest();
+    JSONObject jo = new JSONObject();
+    jo.put("cloud_id", cloudId);
+    jo.put("attributes", cloudMap);
+    Response response = request.body(jo.toString()).put(TRANSITION_ENV_URI + environmentName
+        + "/platforms/" + platformName + "/cloud_configuration");
+    if (response != null) {
+      if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
+        return response.getBody().jsonPath();
+      } else {
+        String msg = String.format("Failed to update platforms cloud scale with name %s due to %s",
+            environmentName, response.getStatusLine());
+        throw new OneOpsClientAPIException(msg);
+      }
+    }
+    String msg =
+        String.format("Failed to update platforms cloud scale with name %s due to null response",
+            environmentName);
+    throw new OneOpsClientAPIException(msg);
+  }
 }
