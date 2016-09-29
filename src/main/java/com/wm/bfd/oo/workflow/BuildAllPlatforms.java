@@ -54,6 +54,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.bar.update(20, 100);
     this.createEnv();
     this.bar.update(30, 100);
+    if (isUpdate) {
+      this.updatePlatformCloudScale();
+    }
     this.updateEnv();
     this.bar.update(40, 100);
     String status = this.getStatus();

@@ -440,6 +440,23 @@ public abstract class AbstractWorkflow {
     return true;
   }
 
+  public boolean updatePlatformCloudScale() throws OneOpsClientAPIException {
+    for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
+      if (this.platformExist(platform.getName())) {
+        List<CloudBean> clouds = config.getYaml().getEnvironmentBean().getClouds();
+        for (CloudBean cloud : clouds) {
+          Map<String, String> cloudMap = new HashMap<String, String>();
+          cloudMap.put(EnvironmentBeanHelper.PRIORITY, cloud.getPriority());
+          cloudMap.put(EnvironmentBeanHelper.DPMT_ORDER, cloud.getDpmtOrder());
+          cloudMap.put(EnvironmentBeanHelper.PCT_SCALE, cloud.getPctScale());
+          transition.updatePlatformCloudScale(envName, platform.getName(),
+              this.getCloudId(cloud.getCloudName()), cloudMap);
+        }
+      }
+    }
+    return true;
+  }
+
   public void pullDesign() throws OneOpsClientAPIException {
     transition.pullDesin(envName);
   }
