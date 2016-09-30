@@ -59,7 +59,7 @@ public class TestBuildAllPlatforms extends BFDOOTest {
 
   @Test
   public void testExecuteAction() throws OneOpsClientAPIException {
-    build.executeAction("web", "apache", "status", "", null);
+    build.executeAction("web", "apache", "status", "", null, 100);
   }
 
   @Test

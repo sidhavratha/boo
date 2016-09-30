@@ -327,7 +327,7 @@ public abstract class AbstractWorkflow {
   }
 
   public boolean executeAction(String platformName, String componentName, String actionName,
-      String arglist, List<String> instanceList) throws OneOpsClientAPIException {
+      String arglist, List<String> instanceList, int rollAt) throws OneOpsClientAPIException {
     List<String> list = new ArrayList<String>();
     if (instanceList == null || instanceList.size() == 0) {
 
@@ -338,7 +338,7 @@ public abstract class AbstractWorkflow {
         list.add(String.valueOf(map.get(name)));
       }
     }
-    JsonPath response = op.executeAction(platformName, componentName, actionName, list, arglist);
+    JsonPath response = op.executeAction(platformName, componentName, actionName, list, arglist, rollAt);
     return response == null ? false : true;
   }
 

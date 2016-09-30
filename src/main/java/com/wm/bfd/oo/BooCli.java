@@ -108,8 +108,7 @@ public class BooCli {
     Option action =
         Option.builder().longOpt("procedure").numberOfArgs(3).optionalArg(Boolean.TRUE)
             .argName("platform> <component> <action")
-            .desc("Execute actions. 'list' is for all actions that available to use.")
-            .build();
+            .desc("Execute actions. 'list' is for all actions that available to use.").build();
     Option procedureArguments =
         Option
             .builder()
@@ -120,9 +119,18 @@ public class BooCli {
                 "Arguments to pass to the procedure call. Example: '{\"backup_type\":\"incremental\"}'")
             .build();
     Option instanceList =
-        Option.builder().longOpt("procedure-instances").argName("instanceList").hasArg()
-            .desc("Comma-separated list of component instance names. 'list' to show all available component instances.")
+        Option
+            .builder()
+            .longOpt("procedure-instances")
+            .argName("instanceList")
+            .hasArg()
+            .desc(
+                "Comma-separated list of component instance names. 'list' to show all available component instances.")
             .build();
+
+    Option stepSize =
+        Option.builder().longOpt("procedure-step-size").argName("size").hasArg()
+            .desc("Percent of nodes to preform procuedure on, default is 100.").build();
     options.addOption(help);
     options.addOption(config);
     options.addOption(config_dir);
@@ -140,6 +148,7 @@ public class BooCli {
     options.addOption(action);
     options.addOption(procedureArguments);
     options.addOption(instanceList);
+    options.addOption(stepSize);
   }
 
   static {
@@ -308,8 +317,12 @@ public class BooCli {
         } else {
           String[] args = cmd.getOptionValues("procedure");
           String arglist = "";
+          int rollAt = 100;
           if (cmd.hasOption("procedure-arguments")) {
             arglist = cmd.getOptionValue("procedure-arguments");
+          }
+          if (cmd.hasOption("procedure-step-size")) {
+            rollAt = Integer.valueOf(cmd.getOptionValue("procedure-step-size"));
           }
           List<String> instances = null;
           if (cmd.hasOption("procedure-instances")) {
@@ -333,7 +346,7 @@ public class BooCli {
                 System.out.println(instance);
               }
           } else {
-            this.executeAction(args[0], args[1], args[2], arglist, instances);
+            this.executeAction(args[0], args[1], args[2], arglist, instances, rollAt);
           }
 
         }
@@ -347,9 +360,9 @@ public class BooCli {
   }
 
   private void executeAction(String platformName, String componentName, String actionName,
-      String arglist, List<String> instanceList) {
+      String arglist, List<String> instanceList, int rollAt) {
     try {
-      flow.executeAction(platformName, componentName, actionName, arglist, instanceList);
+      flow.executeAction(platformName, componentName, actionName, arglist, instanceList, rollAt);
     } catch (OneOpsClientAPIException e) {
       System.err.println(e.getMessage());
     }
