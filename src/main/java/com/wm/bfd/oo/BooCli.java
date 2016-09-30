@@ -121,7 +121,7 @@ public class BooCli {
             .build();
     Option instanceList =
         Option.builder().longOpt("procedure-instances").argName("instanceList").hasArg()
-            .desc("Comma-separated list of component instance names, for use with procedures.")
+            .desc("Comma-separated list of component instance names, for use with procedures.'list' to show all available component instances.")
             .build();
     options.addOption(help);
     options.addOption(config);
