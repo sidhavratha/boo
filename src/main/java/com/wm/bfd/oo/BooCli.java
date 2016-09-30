@@ -106,9 +106,9 @@ public class BooCli {
         Option.builder("a").longOpt("assembly").hasArg().desc("Override the assembly name.")
             .build();
     Option action =
-        Option.builder("pc").longOpt("procedure").numberOfArgs(3).optionalArg(Boolean.TRUE)
-            .argName("platformName> <componentName> <actionName")
-            .desc("Execute actions. Action name: 'list' is for all actions that available to use.")
+        Option.builder().longOpt("procedure").numberOfArgs(3).optionalArg(Boolean.TRUE)
+            .argName("platform> <component> <action")
+            .desc("Execute actions. 'list' is for all actions that available to use.")
             .build();
     Option procedureArguments =
         Option
@@ -117,11 +117,11 @@ public class BooCli {
             .argName("arglist")
             .hasArg()
             .desc(
-                "Arguments to pass to the procedure call.  Example: '{\"backup_type\":\"incremental\"}'")
+                "Arguments to pass to the procedure call. Example: '{\"backup_type\":\"incremental\"}'")
             .build();
     Option instanceList =
         Option.builder().longOpt("procedure-instances").argName("instanceList").hasArg()
-            .desc("Comma-separated list of component instance names, for use with procedures.'list' to show all available component instances.")
+            .desc("Comma-separated list of component instance names. 'list' to show all available component instances.")
             .build();
     options.addOption(help);
     options.addOption(config);
