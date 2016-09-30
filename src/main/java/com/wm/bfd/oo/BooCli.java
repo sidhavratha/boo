@@ -363,6 +363,7 @@ public class BooCli {
       String arglist, List<String> instanceList, int rollAt) {
     try {
       flow.executeAction(platformName, componentName, actionName, arglist, instanceList, rollAt);
+      System.out.println(Constants.SUCCEED);
     } catch (OneOpsClientAPIException e) {
       System.err.println(e.getMessage());
     }

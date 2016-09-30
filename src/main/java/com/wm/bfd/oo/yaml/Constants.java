@@ -83,6 +83,7 @@ public class Constants {
       "A deployment has been started to remove active nodes. Please execute this command again once the deployment is complete to finish deleting remaining elements.";
   final public static String NOTFOUND_ERROR = "Cannot find assembly %s!\n";
   final public static String NO_DEPLOYMENT = "404 Not Found";
+  final public static String SUCCEED = "Succeed!";
 
   // Debug
   final public static String ENV_NOT_EXISTING = "The environment %s is not exist! %s";
