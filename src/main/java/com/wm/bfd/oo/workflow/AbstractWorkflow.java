@@ -47,8 +47,7 @@ public abstract class AbstractWorkflow {
 
   ProgressBar bar;
 
-  public AbstractWorkflow(OOInstance instance, ClientConfig config)
-      throws OneOpsClientAPIException {
+  public AbstractWorkflow(OOInstance instance, ClientConfig config) throws OneOpsClientAPIException {
 
     this.instance = instance;
     this.config = config;
@@ -185,8 +184,7 @@ public abstract class AbstractWorkflow {
     return true;
   }
 
-  public boolean isAttachmentExists(String platformName, String componentName,
-      String attachmentName) {
+  public boolean isAttachmentExists(String platformName, String componentName, String attachmentName) {
     boolean isExist = true;
     JsonPath response = null;
     try {
@@ -294,6 +292,53 @@ public abstract class AbstractWorkflow {
       // System.err.println(msg);
       // Ignore
     }
+    return response == null ? false : true;
+  }
+
+  public List<String> listActions(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    JsonPath response = op.listActions(platformName, componentName);
+    return response.getList("actionName");
+  }
+
+  public Map<String, Integer> listInstancesMap(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    JsonPath response = op.listInstances(platformName, componentName);
+    List<String> names = response.getList("ciName");
+    List<Integer> ids = response.getList("ciId");
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    int i = 0;
+    for (String name : names) {
+      map.put(name, ids.get(i++));
+    }
+    return map;
+  }
+
+  public List<String> listInstances(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    JsonPath response = op.listInstances(platformName, componentName);
+    return response.getList("ciName");
+  }
+
+  private List<String> listInstanceIds(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    JsonPath response = op.listInstances(platformName, componentName);
+    return response.getList("ciId");
+  }
+
+  public boolean executeAction(String platformName, String componentName, String actionName,
+      String arglist, List<String> instanceList, int rollAt) throws OneOpsClientAPIException {
+    List<String> list = new ArrayList<String>();
+    if (instanceList == null || instanceList.size() == 0) {
+
+      list = this.listInstanceIds(platformName, componentName);
+    } else {
+      Map<String, Integer> map = this.listInstancesMap(platformName, componentName);
+      for (String name : instanceList) {
+        list.add(String.valueOf(map.get(name)));
+      }
+    }
+    JsonPath response = op.executeAction(platformName, componentName, actionName, list, arglist, rollAt);
     return response == null ? false : true;
   }
 
@@ -409,10 +454,10 @@ public abstract class AbstractWorkflow {
       // String availability = cloudMap.get(Constants.AVAILABILITY);
       // if (StringUtils.isEmpty(availability))
       // throw new OneOpsClientAPIException(Constants.NO_AVAILABILITY);
-      response = transition.createEnvironment(envName,
-          config.getYaml().getEnvironmentBean().getOthers().get(Constants.AVAILABILITY),
-          config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps,
-          Constants.DESCRIPTION);
+      response =
+          transition.createEnvironment(envName, config.getYaml().getEnvironmentBean().getOthers()
+              .get(Constants.AVAILABILITY), config.getYaml().getEnvironmentBean().getOthers(),
+              null, cloudMaps, Constants.DESCRIPTION);
       response = transition.getEnvironment(envName);
 
       transition.commitEnvironment(envName, null, Constants.DESCRIPTION);

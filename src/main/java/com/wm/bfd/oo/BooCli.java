@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -56,41 +57,80 @@ public class BooCli {
   public BooCli(String[] args) {
     this.args = args;
     Option help = new Option("h", "help", false, "show help.");
-    Option create = Option.builder("c").longOpt("create")
-        .desc(
-            "Create a new Assembly specified by -d or -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.")
-        .build();
-    Option update = Option.builder("u").longOpt("update")
-        .desc("Update configurations specified by -d or -f.").build();
-    Option status = Option.builder("s").longOpt("status")
-        .desc("Get status of deployments specified by -d or -f").build();
+    Option create =
+        Option
+            .builder("c")
+            .longOpt("create")
+            .desc(
+                "Create a new Assembly specified by -d or -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.")
+            .build();
+    Option update =
+        Option.builder("u").longOpt("update").desc("Update configurations specified by -d or -f.")
+            .build();
+    Option status =
+        Option.builder("s").longOpt("status")
+            .desc("Get status of deployments specified by -d or -f").build();
 
-    Option config_dir = Option.builder("d").longOpt("config-dir").argName("DIR").hasArg()
-        .desc("Use all configuration files in given directory, required if -f not used").build();
+    Option config_dir =
+        Option.builder("d").longOpt("config-dir").argName("DIR").hasArg()
+            .desc("Use all configuration files in given directory, required if -f not used")
+            .build();
 
-    Option config = Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
-        .desc("Use specified configuration file, required if -d not used").build();
+    Option config =
+        Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
+            .desc("Use specified configuration file, required if -d not used").build();
 
-    Option cleanup = Option.builder("r").longOpt("remove")
-        .desc("Remove all deployed configurations specified by -d or -f").build();
-    Option list = Option.builder("l").longOpt("list").numberOfArgs(1).optionalArg(Boolean.TRUE)
-        .desc("Return a list of instances applicable to the identifier provided..").build();
+    Option cleanup =
+        Option.builder("r").longOpt("remove")
+            .desc("Remove all deployed configurations specified by -d or -f").build();
+    Option list =
+        Option.builder("l").longOpt("list").numberOfArgs(1).optionalArg(Boolean.TRUE)
+            .desc("Return a list of instances applicable to the identifier provided..").build();
 
     Option force = Option.builder().longOpt("force").desc("Do not prompt for --remove").build();
 
     Option nodeploy =
         Option.builder().longOpt("no-deploy").desc("Create assembly without deployments").build();
 
-    Option getIps = Option.builder().longOpt("get-ips").argName("environment> <compute-class")
-        .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
+    Option getIps =
+        Option.builder().longOpt("get-ips").argName("environment> <compute-class")
+            .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
     getIps.setOptionalArg(true);
     getIps.setArgs(Option.UNLIMITED_VALUES);
 
-    Option retry = Option.builder().longOpt("retry")
-        .desc("Retry deployments of configurations specified by -d or -f").build();
+    Option retry =
+        Option.builder().longOpt("retry")
+            .desc("Retry deployments of configurations specified by -d or -f").build();
     Option quiet = Option.builder().longOpt("quiet").desc("Silence the textual output.").build();
-    Option assembly = Option.builder("a").longOpt("assembly").hasArg()
-        .desc("Override the assembly name.").build();
+    Option assembly =
+        Option.builder("a").longOpt("assembly").hasArg().desc("Override the assembly name.")
+            .build();
+    Option action =
+        Option.builder().longOpt("procedure").numberOfArgs(3).optionalArg(Boolean.TRUE)
+            .argName("platform> <component> <action")
+            .desc("Execute actions. 'list' is for all actions that available to use.").build();
+    Option procedureArguments =
+        Option
+            .builder()
+            .longOpt("procedure-arguments")
+            .argName("arglist")
+            .hasArg()
+            .desc(
+                "Arguments to pass to the procedure call. Example: '{\"backup_type\":\"incremental\"}'")
+            .build();
+    Option instanceList =
+        Option
+            .builder()
+            .longOpt("procedure-instances")
+            .argName("instanceList")
+            .hasArg()
+            .desc(
+                "Comma-separated list of component instance names. 'list' to show all available component instances.")
+            .build();
+
+    Option stepSize =
+        Option.builder().longOpt("procedure-step-size").argName("size").hasArg()
+            .desc("Percent of nodes to preform procuedure on, default is 100.").build();
     options.addOption(help);
     options.addOption(config);
     options.addOption(config_dir);
@@ -105,6 +145,10 @@ public class BooCli {
     options.addOption(force);
     options.addOption(nodeploy);
     options.addOption(assembly);
+    options.addOption(action);
+    options.addOption(procedureArguments);
+    options.addOption(instanceList);
+    options.addOption(stepSize);
   }
 
   static {
@@ -217,9 +261,10 @@ public class BooCli {
         }
       } else if (cmd.hasOption("c")) {
         if (config.getYaml().getAssembly().getAutoGen()) {
-          this.initOO(this.config,
-              this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(),
-                  config.getYaml().getAssembly().getName()));
+          this.initOO(
+              this.config,
+              this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(), config
+                  .getYaml().getAssembly().getName()));
           LogUtils.info(Constants.CREATING_ASSEMBLY, config.getYaml().getAssembly().getName());
         }
         this.createPacks(Boolean.FALSE, isNoDeploy);
@@ -264,11 +309,62 @@ public class BooCli {
         }
       } else if (cmd.hasOption("retry")) {
         this.retryDeployment();
+      } else if (cmd.hasOption("procedure")) {
+        if (cmd.getOptionValues("procedure").length != 3) {
+          System.err
+              .println("Wrong prameters! --prodedure <platformName> <componentName> <actionName>");
+          System.exit(1);
+        } else {
+          String[] args = cmd.getOptionValues("procedure");
+          String arglist = "";
+          int rollAt = 100;
+          if (cmd.hasOption("procedure-arguments")) {
+            arglist = cmd.getOptionValue("procedure-arguments");
+          }
+          if (cmd.hasOption("procedure-step-size")) {
+            rollAt = Integer.valueOf(cmd.getOptionValue("procedure-step-size"));
+          }
+          List<String> instances = null;
+          if (cmd.hasOption("procedure-instances")) {
+            String ins = cmd.getOptionValue("procedure-instances");
+            if (ins != null && ins.trim().length() > 0) {
+              if (ins.equalsIgnoreCase("list")) {
+                List<String> list = flow.listInstances(args[0], args[1]);
+                if (list != null)
+                  for (String instance : list) {
+                    System.out.println(instance);
+                  }
+                System.exit(0);
+              }
+              instances = Arrays.asList(ins.split(","));
+            }
+          }
+          if ("list".equalsIgnoreCase(args[2])) {
+            List<String> list = flow.listActions(args[0], args[1]);
+            if (list != null)
+              for (String instance : list) {
+                System.out.println(instance);
+              }
+          } else {
+            this.executeAction(args[0], args[1], args[2], arglist, instances, rollAt);
+          }
+
+        }
       }
     } catch (ParseException e) {
       System.err.println(e.getMessage());
       this.help(null, Constants.BFD_TOOL);
     } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
+  }
+
+  private void executeAction(String platformName, String componentName, String actionName,
+      String arglist, List<String> instanceList, int rollAt) {
+    try {
+      flow.executeAction(platformName, componentName, actionName, arglist, instanceList, rollAt);
+      System.out.println(Constants.SUCCEED);
+    } catch (OneOpsClientAPIException e) {
       System.err.println(e.getMessage());
     }
   }
@@ -310,8 +406,8 @@ public class BooCli {
       List<String> computes = bfdUtils.getComponentOfCompute(this.flow);
       for (String s : computes) {
         if (s.equals(componentName)) {
-          System.out
-              .println("Environment name: " + flow.getConfig().getYaml().getBoo().getEnvName());
+          System.out.println("Environment name: "
+              + flow.getConfig().getYaml().getBoo().getEnvName());
           for (String pname : platforms.keySet()) {
             System.out.println("Platform name: " + pname);
             System.out.println("Compute name: " + componentName);
@@ -419,8 +515,8 @@ public class BooCli {
     return des;
   }
 
-  public void createPacks(boolean isUpdate, boolean isAssemblyOnly)
-      throws BFDOOException, OneOpsClientAPIException {
+  public void createPacks(boolean isUpdate, boolean isAssemblyOnly) throws BFDOOException,
+      OneOpsClientAPIException {
     flow.process(isUpdate, isAssemblyOnly);
   }
 
@@ -431,8 +527,9 @@ public class BooCli {
    */
   private String autoGenAssemblyName(boolean isAutoGen, String assemblyName) {
     if (isAutoGen) {
-      assemblyName = (assemblyName == null ? this.randomString("")
-          : (assemblyName + Constants.DASH + this.randomString(assemblyName)));
+      assemblyName =
+          (assemblyName == null ? this.randomString("") : (assemblyName + Constants.DASH + this
+              .randomString(assemblyName)));
     }
     return assemblyName;
   }
@@ -458,8 +555,8 @@ public class BooCli {
 
   private String trimFileName(String file) {
     String name = new File(file).getName();
-    return (name == null || name.lastIndexOf('.') < 0) ? ""
-        : name.substring(0, name.lastIndexOf('.'));
+    return (name == null || name.lastIndexOf('.') < 0) ? "" : name.substring(0,
+        name.lastIndexOf('.'));
   }
 
   public void cleanup(List<String> assemblies) {

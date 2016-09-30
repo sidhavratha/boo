@@ -1,6 +1,5 @@
 package com.wm.bfd.test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.wm.bfd.oo.workflow.BuildAllPlatforms;
-import com.wm.bfd.oo.yaml.Constants;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBuildAllPlatforms extends BFDOOTest {
@@ -42,6 +40,26 @@ public class TestBuildAllPlatforms extends BFDOOTest {
   @Test
   public void testGetAssemblies() throws OneOpsClientAPIException {
     build.getAssemblies();
+  }
+
+  @Test
+  public void testListActions() throws OneOpsClientAPIException {
+    List<String> actions = build.listActions("web", "apache");
+  }
+
+  @Test
+  public void testListInstances() throws OneOpsClientAPIException {
+    List<String> actions = build.listInstances("web", "apache");
+  }
+
+  @Test
+  public void testListInstancesMap() throws OneOpsClientAPIException {
+    Map<String, Integer> actions = build.listInstancesMap("web", "apache");
+  }
+
+  @Test
+  public void testExecuteAction() throws OneOpsClientAPIException {
+    build.executeAction("web", "apache", "status", "", null, 100);
   }
 
   @Test
