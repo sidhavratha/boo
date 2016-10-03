@@ -84,6 +84,7 @@ public class Constants {
   final public static String NOTFOUND_ERROR = "Cannot find assembly %s!\n";
   final public static String NO_DEPLOYMENT = "404 Not Found";
   final public static String SUCCEED = "Succeed!";
+  final public static String PROCEDURE_NOT_COMPLETE = "Procedure did not complete";
 
   // Debug
   final public static String ENV_NOT_EXISTING = "The environment %s is not exist! %s";

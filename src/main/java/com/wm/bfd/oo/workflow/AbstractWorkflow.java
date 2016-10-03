@@ -320,13 +320,18 @@ public abstract class AbstractWorkflow {
     return response.getList("ciName");
   }
 
+  public List<String> getProcedureStatus(String procedureId) throws OneOpsClientAPIException {
+    JsonPath response = op.getProcedureStatus(procedureId);
+    return response.getList("ciName");
+  }
+
   private List<String> listInstanceIds(String platformName, String componentName)
       throws OneOpsClientAPIException {
     JsonPath response = op.listInstances(platformName, componentName);
     return response.getList("ciId");
   }
 
-  public boolean executeAction(String platformName, String componentName, String actionName,
+  public String executeAction(String platformName, String componentName, String actionName,
       String arglist, List<String> instanceList, int rollAt) throws OneOpsClientAPIException {
     List<String> list = new ArrayList<String>();
     if (instanceList == null || instanceList.size() == 0) {
@@ -338,8 +343,13 @@ public abstract class AbstractWorkflow {
         list.add(String.valueOf(map.get(name)));
       }
     }
-    JsonPath response = op.executeAction(platformName, componentName, actionName, list, arglist, rollAt);
-    return response == null ? false : true;
+    JsonPath response =
+        op.executeAction(platformName, componentName, actionName, list, arglist, rollAt);
+    return response == null ? null : response.getString("procedureId");
+  }
+
+  public String getProcedureStatusForAction(String procedureId) throws OneOpsClientAPIException {
+    return op.getProcedureStatus(procedureId).getString("procedureState");
   }
 
   public boolean isPlatformsExist() {
