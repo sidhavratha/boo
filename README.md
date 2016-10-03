@@ -26,60 +26,63 @@ Run boo as a bash script:
 
 
 ## Usage:
-usage: boo [-a <arg>] [-c] [-d <DIR>] [-f <FILE>] [--force] [--get-ips <environment> <compute-class>] [-h] [-l <arg>] [--no-deploy] [--procedure <platform> <component> <action>] [--procedure-arguments <arglist>] [--procedure-instances <instanceList>] [--procedure-step-size <size>] [--quiet] [-r] [--retry] [-s] [-u]
- -a,--assembly <arg>                          Override the assembly name.
- -c,--create                                  Create a new Assembly specified by
+
+usage: 
+
+* boo [-a <arg>] [-c] [-d <DIR>] [-f <FILE>] [--force] [--get-ips <environment> <compute-class>] [-h] [-l <arg>] [--no-deploy] [--procedure <platform> <component> <action>] [--procedure-arguments <arglist>] [--procedure-instances <instanceList>] [--procedure-step-size <size>] [--quiet] [-r] [--retry] [-s] [-u]
+* -a,--assembly <arg>                          Override the assembly name.
+* -c,--create                                  Create a new Assembly specified by
                                               -d or -f. If Assembly automatic
                                               naming is enabled, each invocation
                                               will create a new Assembly.
                                        
- -d,--config-dir <DIR>                        Use all configuration files in
+* -d,--config-dir <DIR>                       Use all configuration files in
                                               given directory, required if -f not
                                               used
                                        
- -f,--config-file <FILE>                      Use specified configuration file,
+* -f,--config-file <FILE>                      Use specified configuration file,
                                               required if -d not used
                                        
- --force                                      Do not prompt for --remove
+* --force                                      Do not prompt for --remove
  
- --get-ips <environment> <compute-class>      Get IPs of deployed nodes specified
- --get-ips <environment>                      by -d or -f
- --get-ips
+* --get-ips <environment> <compute-class>      Get IPs of deployed nodes specified
+* --get-ips <environment>                      by -d or -f
+* --get-ips
  
- --no-deploy                                  Create assembly without
+* --no-deploy                                  Create assembly without
                                               deployments
                                       
- -h,--help                                    show help.
+* -h,--help                                    show help.
  
- -l,--list                                    Return a list of instances applicable 
+* -l,--list                                    Return a list of instances applicable 
                                               to the identifier provided..
---procedure <platform> <component> <action>   Execute actions. 'list'
+* --procedure <platform> <component> <action>   Execute actions. 'list'
                                               is for all actions that
                                               available to use.
---procedure-arguments <arglist>               Arguments to pass to the
+* --procedure-arguments <arglist>               Arguments to pass to the
                                               procedure call. Example:
                                               '{"backup_type":"increme
                                               ntal"}'
---procedure-instances <instanceList>          Comma-separated list of
+* --procedure-instances <instanceList>          Comma-separated list of
                                               component instance
                                               names. 'list' to show
                                               all available component
                                               instances.
---procedure-step-size <size>                  Percent of nodes to
+* --procedure-step-size <size>                  Percent of nodes to
                                               preform procuedure on,
                                               default is 100.                                       
- --quiet                                      Silence the textual output.
+* --quiet                                      Silence the textual output.
     
- -r,--remove                                  Remove all deployed configurations
+* -r,--remove                                  Remove all deployed configurations
                                               specified by -d or -f
                                        
- --retry                                      Retry deployments of configurations
+* --retry                                      Retry deployments of configurations
                                               specified by -d or -f
                                        
- -s,--status                                  Get status of deployments specified
+* -s,--status                                  Get status of deployments specified
                                               by -d or -f
                                        
- -u,--update                                  Update configurations specified by
+* -u,--update                                  Update configurations specified by
                                               -d or -f.
                                        
 The tool is managed by BFD team.
