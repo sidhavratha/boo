@@ -26,9 +26,8 @@ Run boo as a bash script:
 
 
 ## Usage:
-usage: boo [-c] [-d DIR] [-f FILE] [--get-ips environment compute-class]
-       [-h] [-l] [--quiet] [-r] [--retry] [-s] [-u]
-       
+usage: boo [-a <arg>] [-c] [-d <DIR>] [-f <FILE>] [--force] [--get-ips <environment> <compute-class>] [-h] [-l <arg>] [--no-deploy] [--procedure <platform> <component> <action>] [--procedure-arguments <arglist>] [--procedure-instances <instanceList>] [--procedure-step-size <size>] [--quiet] [-r] [--retry] [-s] [-u]
+ -a,--assembly <arg>                          Override the assembly name.
  -c,--create                                  Create a new Assembly specified by
                                               -d or -f. If Assembly automatic
                                               naming is enabled, each invocation
@@ -52,15 +51,29 @@ usage: boo [-c] [-d DIR] [-f FILE] [--get-ips environment compute-class]
                                       
  -h,--help                                    show help.
  
- -l,--list                                    List all YAML files specified by -d
-                                              or -f
-                                       
- --quiet                                       Silence the textual output.
+ -l,--list                                    Return a list of instances applicable 
+                                              to the identifier provided..
+--procedure <platform> <component> <action>   Execute actions. 'list'
+                                              is for all actions that
+                                              available to use.
+--procedure-arguments <arglist>               Arguments to pass to the
+                                              procedure call. Example:
+                                              '{"backup_type":"increme
+                                              ntal"}'
+--procedure-instances <instanceList>          Comma-separated list of
+                                              component instance
+                                              names. 'list' to show
+                                              all available component
+                                              instances.
+--procedure-step-size <size>                  Percent of nodes to
+                                              preform procuedure on,
+                                              default is 100.                                       
+ --quiet                                      Silence the textual output.
     
  -r,--remove                                  Remove all deployed configurations
                                               specified by -d or -f
                                        
- --retry                                       Retry deployments of configurations
+ --retry                                      Retry deployments of configurations
                                               specified by -d or -f
                                        
  -s,--status                                  Get status of deployments specified
