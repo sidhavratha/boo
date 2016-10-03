@@ -361,12 +361,37 @@ public class BooCli {
 
   private void executeAction(String platformName, String componentName, String actionName,
       String arglist, List<String> instanceList, int rollAt) {
+    String procedureId = null;
     try {
-      flow.executeAction(platformName, componentName, actionName, arglist, instanceList, rollAt);
-      System.out.println(Constants.SUCCEED);
+      procedureId =
+          flow.executeAction(platformName, componentName, actionName, arglist, instanceList, rollAt);
+
     } catch (OneOpsClientAPIException e) {
       System.err.println(e.getMessage());
     }
+    if (procedureId != null) {
+      String procStatus = "active";
+      try {
+
+        while (procStatus != null
+            && (procStatus.equalsIgnoreCase("active") || procStatus.equalsIgnoreCase("pending"))) {
+          procStatus = flow.getProcedureStatusForAction(procedureId);
+          try {
+            Thread.sleep(3000);
+          } catch (InterruptedException e) {
+            // Ignore
+          }
+        }
+      } catch (OneOpsClientAPIException e) {
+        // Ignore
+      }
+      if (procStatus.equalsIgnoreCase("complete")) {
+        System.out.println(Constants.SUCCEED);
+      } else {
+        System.err.println(Constants.PROCEDURE_NOT_COMPLETE);
+      }
+    }
+
   }
 
   @SuppressWarnings("resource")
