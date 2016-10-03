@@ -22,7 +22,7 @@ public class Constants {
   final public static String ACTIVE = "active";
   final public static String SIZE = "size";
   final public static String CINAME = "ciName";
-  //final public static String ASSEMBLY_PREFIX = "CUBEBOO-"; // Magic string.
+  // final public static String ASSEMBLY_PREFIX = "CUBEBOO-"; // Magic string.
   final public static String ASSEMBLY_NAME_TOO_LONG =
       "Assembly name cannot be more than 32 characters long. Please fix your assembly name in YAML.";
   /**
