@@ -363,6 +363,7 @@ public class BooCli {
       String arglist, List<String> instanceList, int rollAt) {
     String procedureId = null;
     try {
+      System.out.println(Constants.PROCEDURE_RUNNING);
       procedureId =
           flow.executeAction(platformName, componentName, actionName, arglist, instanceList, rollAt);
 
@@ -372,7 +373,6 @@ public class BooCli {
     if (procedureId != null) {
       String procStatus = "active";
       try {
-
         while (procStatus != null
             && (procStatus.equalsIgnoreCase("active") || procStatus.equalsIgnoreCase("pending"))) {
           procStatus = flow.getProcedureStatusForAction(procedureId);
