@@ -10,9 +10,9 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    BooCli cli = new BooCli(args);
+    BooCli cli = new BooCli();
     try {
-      cli.parse();
+      cli.parse(args);
     } catch (Exception e) {
       System.err.println(e.getMessage());
       System.exit(2);

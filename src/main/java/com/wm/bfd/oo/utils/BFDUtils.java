@@ -190,7 +190,7 @@ public class BFDUtils {
     for (Map.Entry<String, Object> entry : map.entrySet()) {
       String key = entry.getKey();
       Object value = entry.getValue();
-      System.out.printf("%s %s: key: %s; value:%s: \n", str.toString(), log, key,
+      System.out.printf("%s %s: key: %s; value:%s: %n", str.toString(), log, key,
           value == null ? "" : value.getClass());
       if (value instanceof Map) {
         printMap((Map<String, Object>) value, ++depth);
