@@ -22,10 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class BuildAllPlatforms.
- */
+
 public class BuildAllPlatforms extends AbstractWorkflow {
   
   /** The Constant LOG. */
