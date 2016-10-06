@@ -32,22 +32,17 @@ public class ClientConfig {
 
   public ClientConfig(String file) throws JsonParseException, JsonMappingException,
       FileNotFoundException, IOException {
-    // this.setMap(MAPPER.readValue(new FileInputStream(new File(file)),
-    // new TypeReference<HashMap<String, Object>>() {
-    // }));
+    FileInputStream input = null;
     try {
-      this.yaml = MAPPER.readValue(new FileInputStream(new File(file)), Yaml.class);
+      input = new FileInputStream(new File(file));
+      this.yaml = MAPPER.readValue(input, Yaml.class);
     } catch (Exception e) {
       e.printStackTrace();
+    } finally {
+      if (input != null) {
+        input.close();
+      }
     }
-
-  }
-
-  private void readValueToObject(String file, Class someClass) throws JsonParseException,
-      JsonMappingException, FileNotFoundException, IOException {
-
-    MAPPER.readValue(new FileInputStream(new File(file)), someClass);
-
   }
 
   public Yaml getYaml() {

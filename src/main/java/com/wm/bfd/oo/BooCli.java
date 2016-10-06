@@ -47,15 +47,13 @@ public class BooCli {
   private static boolean isForced = false;
   private static boolean isNoDeploy = false;
   private BuildAllPlatforms flow;
-  private String[] args = null;
   private Options options = new Options();
   private static int BUFFER = 1024;
   private ClientConfig config;
   private Injector injector;
   private BFDUtils bfdUtils = new BFDUtils();
 
-  public BooCli(String[] args) {
-    this.args = args;
+  public BooCli() {
     Option help = new Option("h", "help", false, "show help.");
     Option create =
         Option
@@ -185,13 +183,13 @@ public class BooCli {
    * @throws BFDOOException
    * @throws OneOpsClientAPIException
    */
-  public void parse() throws ParseException, BFDOOException, OneOpsClientAPIException {
+  public void parse(String[] arg) throws ParseException, BFDOOException, OneOpsClientAPIException {
     CommandLineParser parser = new DefaultParser();
     // CommandLineParser parser = new GnuParser();
     try {
 
       String assembly = null;
-      CommandLine cmd = parser.parse(options, args);
+      CommandLine cmd = parser.parse(options, arg);
       /**
        * Handle command without configuration file dependency first.
        */
@@ -322,7 +320,7 @@ public class BooCli {
             arglist = cmd.getOptionValue("procedure-arguments");
           }
           if (cmd.hasOption("procedure-step-size")) {
-            rollAt = Integer.valueOf(cmd.getOptionValue("procedure-step-size"));
+            rollAt = Integer.parseInt(cmd.getOptionValue("procedure-step-size"));
           }
           List<String> instances = null;
           if (cmd.hasOption("procedure-instances")) {
@@ -478,15 +476,6 @@ public class BooCli {
     return assemblies;
   }
 
-  private void listFilesOld(String dir) {
-    File dirs = new File(dir);
-    File[] files = dirs.listFiles();
-    for (File file : files) {
-      if (StringUtils.containsIgnoreCase(file.getName(), YAML))
-        System.out.println(file.getName());
-    }
-  }
-
   private List<String> listConfigFiles(String dir, String file) {
     List<String> list = new ArrayList<String>();
     File dirs = new File(dir);
@@ -502,42 +491,6 @@ public class BooCli {
       }
     }
     return list;
-  }
-
-  private String randomName() {
-    return UUID.randomUUID().toString();
-  }
-
-  private String copyFile(String src) {
-    String des = null;
-    InputStream inStream = null;
-    OutputStream outStream = null;
-    try {
-
-      File source = new File(src);
-      File destination = new File(src + FILE_NAME_SPLIT + this.randomName());
-      System.out.printf(Constants.WORKING_FILE, destination.getPath());
-      System.out.println();
-      des = destination.getPath();
-
-      inStream = new FileInputStream(source);
-      outStream = new FileOutputStream(destination);
-
-      byte[] buffer = new byte[BUFFER];
-
-      int length;
-      while ((length = inStream.read(buffer)) > 0) {
-        outStream.write(buffer, 0, length);
-      }
-
-      if (inStream != null)
-        inStream.close();
-      if (outStream != null)
-        outStream.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return des;
   }
 
   public void createPacks(boolean isUpdate, boolean isAssemblyOnly) throws BFDOOException,
@@ -565,17 +518,6 @@ public class BooCli {
     rand = rand > 8 ? 8 : rand;
     name.append(UUID.randomUUID().toString().substring(0, rand));
     return name.toString();
-  }
-
-  private void deleteFile(String dir, String file) {
-    if (StringUtils.isEmpty(file))
-      return;
-    if (LOG.isWarnEnabled())
-      LOG.warn("Deleting yaml file {}", file);
-    File f = new File(dir + "/" + file);
-    if (f.exists()) {
-      f.deleteOnExit();
-    }
   }
 
   private String trimFileName(String file) {

@@ -81,7 +81,7 @@ public class Constants {
   final public static String COMPUTE_SIZE = "Updating the compute size in %s - %s";
   final public static String NEED_ANOTHER_CLEANUP =
       "A deployment has been started to remove active nodes. Please execute this command again once the deployment is complete to finish deleting remaining elements.";
-  final public static String NOTFOUND_ERROR = "Cannot find assembly %s!\n";
+  final public static String NOTFOUND_ERROR = "Cannot find assembly %s! %n";
   final public static String NO_DEPLOYMENT = "404 Not Found";
   final public static String SUCCEED = "Succeed!";
   final public static String PROCEDURE_NOT_COMPLETE = "Procedure did not complete";
