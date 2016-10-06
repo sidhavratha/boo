@@ -1,17 +1,15 @@
 package com.wm.bfd.oo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.UUID;
+import com.wm.bfd.oo.exception.BfdOoException;
+import com.wm.bfd.oo.utils.BfdUtils;
+import com.wm.bfd.oo.workflow.BuildAllPlatforms;
+import com.wm.bfd.oo.yaml.Constants;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.jayway.restassured.RestAssured;
+import com.oo.api.OOInstance;
+import com.oo.api.exception.OneOpsClientAPIException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -24,35 +22,65 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.jayway.restassured.RestAssured;
-import com.oo.api.OOInstance;
-import com.oo.api.exception.OneOpsClientAPIException;
-import com.wm.bfd.oo.exception.BFDOOException;
-import com.wm.bfd.oo.utils.BFDUtils;
-import com.wm.bfd.oo.workflow.BuildAllPlatforms;
-import com.wm.bfd.oo.yaml.Constants;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.UUID;
 
+/**
+ * The Class BooCli.
+ */
 public class BooCli {
-  final private static Logger LOG = LoggerFactory.getLogger(BooCli.class);
-  final private static String YAML = "yaml";
-  final private static String FILE_NAME_SPLIT = "-";
-  final private static String TEMPLATE_FILE = ".yaml" + FILE_NAME_SPLIT;
-  final private static String YES_NO =
-      "WARNING! There are %s instances using the %s configuration. Do you want to destroy all of them? (y/n) ";
-  private String configDir;
-  private String configFile;
-  private static boolean isQuiet = false;
-  private static boolean isForced = false;
-  private static boolean isNoDeploy = false;
-  private BuildAllPlatforms flow;
-  private Options options = new Options();
-  private static int BUFFER = 1024;
-  private ClientConfig config;
-  private Injector injector;
-  private BFDUtils bfdUtils = new BFDUtils();
 
+  /** The Constant LOG. */
+  private static final Logger LOG = LoggerFactory.getLogger(BooCli.class);
+
+  /** The Constant FILE_NAME_SPLIT. */
+  private static final String FILE_NAME_SPLIT = "-";
+
+  /** The Constant TEMPLATE_FILE. */
+  private static final String TEMPLATE_FILE = ".yaml" + FILE_NAME_SPLIT;
+
+  /** The is quiet. */
+  private static boolean isQuiet = false;
+
+  /** The is forced. */
+  private static boolean isForced = false;
+
+  /** The is no deploy. */
+  private static boolean isNoDeploy = false;
+
+  /** The Constant YES_NO. */
+  private static final String YES_NO =
+      "WARNING! There are %s instances using the %s configuration. Do you want to destroy all of them? (y/n)";
+
+  /** The config dir. */
+  private String configDir;
+
+  /** The config file. */
+  private String configFile;
+
+  /** The flow. */
+  private BuildAllPlatforms flow;
+
+  /** The options. */
+  private Options options = new Options();
+
+  /** The config. */
+  private ClientConfig config;
+
+  /** The injector. */
+  private Injector injector;
+
+  /** The bfd utils. */
+  private BfdUtils bfdUtils = new BfdUtils();
+
+  /**
+   * Instantiates a new boo cli.
+   */
   public BooCli() {
     Option help = new Option("h", "help", false, "show help.");
     Option create =
@@ -69,7 +97,7 @@ public class BooCli {
         Option.builder("s").longOpt("status")
             .desc("Get status of deployments specified by -d or -f").build();
 
-    Option config_dir =
+    Option configDir =
         Option.builder("d").longOpt("config-dir").argName("DIR").hasArg()
             .desc("Use all configuration files in given directory, required if -f not used")
             .build();
@@ -131,7 +159,7 @@ public class BooCli {
             .desc("Percent of nodes to preform procuedure on, default is 100.").build();
     options.addOption(help);
     options.addOption(config);
-    options.addOption(config_dir);
+    options.addOption(configDir);
     options.addOption(create);
     options.addOption(update);
     options.addOption(status);
@@ -153,9 +181,18 @@ public class BooCli {
     RestAssured.useRelaxedHTTPSValidation();
   }
 
-  public void init(String template, String assembly) throws BFDOOException {
-    if (LOG.isDebugEnabled())
+  /**
+   * Inits the YAML template.
+   *
+   * @param template the template
+   * @param assembly the assembly
+   * @throws BfdOoException the BFDOO exception
+   */
+  public void init(String template, String assembly) throws BfdOoException {
+    if (LOG.isDebugEnabled()) {
       LOG.debug("Loading {}", template);
+    }
+
     injector = Guice.createInjector(new JaywayHttpModule(this.configFile));
     config = injector.getInstance(ClientConfig.class);
     bfdUtils.verifyTemplate(config);
@@ -164,7 +201,13 @@ public class BooCli {
     }
   }
 
-  public void initOO(ClientConfig config, String assembly) {
+  /**
+   * Inits the OO.
+   *
+   * @param config the config
+   * @param assembly the assembly
+   */
+  public void initOo(ClientConfig config, String assembly) {
     OOInstance oo = injector.getInstance(OOInstance.class);
     try {
       if (assembly != null) {
@@ -177,13 +220,14 @@ public class BooCli {
   }
 
   /**
-   * Parse user's input
-   * 
-   * @throws ParseException
-   * @throws BFDOOException
-   * @throws OneOpsClientAPIException
+   * Parse user's input.
+   *
+   * @param arg the arg
+   * @throws ParseException the parse exception
+   * @throws BfdOoException the BFDOO exception
+   * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public void parse(String[] arg) throws ParseException, BFDOOException, OneOpsClientAPIException {
+  public void parse(String[] arg) throws ParseException, BfdOoException, OneOpsClientAPIException {
     CommandLineParser parser = new DefaultParser();
     // CommandLineParser parser = new GnuParser();
     try {
@@ -238,7 +282,7 @@ public class BooCli {
       }
 
       this.init(this.configFile, assembly);
-      this.initOO(config, null);
+      this.initOo(config, null);
       if (cmd.hasOption("l")) {
         String prefix = cmd.getOptionValue("l");
         if (prefix == null) {
@@ -259,7 +303,7 @@ public class BooCli {
         }
       } else if (cmd.hasOption("c")) {
         if (config.getYaml().getAssembly().getAutoGen()) {
-          this.initOO(
+          this.initOo(
               this.config,
               this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(), config
                   .getYaml().getAssembly().getName()));
@@ -276,7 +320,7 @@ public class BooCli {
         } else {
           List<String> assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());
           for (String asm : assemblies) {
-            this.initOO(config, asm);
+            this.initOo(config, asm);
             this.createPacks(Boolean.TRUE, isNoDeploy);
           }
         }
@@ -328,10 +372,12 @@ public class BooCli {
             if (ins != null && ins.trim().length() > 0) {
               if (ins.equalsIgnoreCase("list")) {
                 List<String> list = flow.listInstances(args[0], args[1]);
-                if (list != null)
+                if (list != null) {
                   for (String instance : list) {
                     System.out.println(instance);
                   }
+                }
+
                 System.exit(0);
               }
               instances = Arrays.asList(ins.split(","));
@@ -339,10 +385,12 @@ public class BooCli {
           }
           if ("list".equalsIgnoreCase(args[2])) {
             List<String> list = flow.listActions(args[0], args[1]);
-            if (list != null)
+            if (list != null) {
               for (String instance : list) {
                 System.out.println(instance);
               }
+            }
+
           } else {
             this.executeAction(args[0], args[1], args[2], arglist, instances, rollAt);
           }
@@ -357,6 +405,16 @@ public class BooCli {
     }
   }
 
+  /**
+   * Execute action.
+   *
+   * @param platformName the platform name
+   * @param componentName the component name
+   * @param actionName the action name
+   * @param arglist the arglist
+   * @param instanceList the instance list
+   * @param rollAt the roll at
+   */
   private void executeAction(String platformName, String componentName, String actionName,
       String arglist, List<String> instanceList, int rollAt) {
     String procedureId = null;
@@ -392,6 +450,12 @@ public class BooCli {
 
   }
 
+  /**
+   * User input.
+   *
+   * @param msg the msg
+   * @return the string
+   */
   @SuppressWarnings("resource")
   private String userInput(String msg) {
     System.out.println(msg);
@@ -400,6 +464,11 @@ public class BooCli {
     return input;
   }
 
+  /**
+   * Gets the ips 0.
+   *
+   * @return the ips 0
+   */
   private void getIps0() {
     Map<String, Object> platforms = flow.getConfig().getYaml().getPlatforms();
     List<String> computes = bfdUtils.getComponentOfCompute(this.flow);
@@ -413,6 +482,12 @@ public class BooCli {
     }
   }
 
+  /**
+   * Gets the ips 1.
+   *
+   * @param inputEnv the input env
+   * @return the ips 1
+   */
   private void getIps1(String inputEnv) {
     String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
     if (yamlEnv.equals(inputEnv)) {
@@ -422,6 +497,13 @@ public class BooCli {
     }
   }
 
+  /**
+   * Gets the ips 2.
+   *
+   * @param inputEnv the input env
+   * @param componentName the component name
+   * @return the ips 2
+   */
   private void getIps2(String inputEnv, String componentName) {
     String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
     if (inputEnv.equals("*") || yamlEnv.equals(inputEnv)) {
@@ -445,6 +527,13 @@ public class BooCli {
     }
   }
 
+  /**
+   * Gets the ips.
+   *
+   * @param platformName the platform name
+   * @param componentName the component name
+   * @return the ips
+   */
   private String getIps(String platformName, String componentName) {
     try {
       return flow.printIps(platformName, componentName);
@@ -454,15 +543,32 @@ public class BooCli {
     return null;
   }
 
+  /**
+   * Retry deployment.
+   *
+   * @return true, if successful
+   */
   private boolean retryDeployment() {
     return flow.retryDeployment();
   }
 
+  /**
+   * Help.
+   *
+   * @param header the header
+   * @param footer the footer
+   */
   private void help(String header, String footer) {
     HelpFormatter formatter = new HelpFormatter();
     formatter.printHelp("boo", header, options, footer, true);
   }
 
+  /**
+   * List files.
+   *
+   * @param prefix the prefix
+   * @return the list
+   */
   private List<String> listFiles(String prefix) {
     if (prefix == null || prefix.trim().length() == 0) {
       System.err.println(Constants.ASSEMBLY_PREFIX_ERROR);
@@ -470,12 +576,21 @@ public class BooCli {
     }
     List<String> assemblies = flow.getAllAutoGenAssemblies(prefix);
     for (String assembly : assemblies) {
-      if (assembly != null)
+      if (assembly != null) {
         System.out.println(assembly);
+      }
+
     }
     return assemblies;
   }
 
+  /**
+   * List config files.
+   *
+   * @param dir the dir
+   * @param file the file
+   * @return the list
+   */
   private List<String> listConfigFiles(String dir, String file) {
     List<String> list = new ArrayList<String>();
     File dirs = new File(dir);
@@ -486,22 +601,33 @@ public class BooCli {
     } else {
       String startWith = ori.getName() + FILE_NAME_SPLIT;
       for (File f : files) {
-        if (StringUtils.startsWithIgnoreCase(f.getName(), startWith))
+        if (StringUtils.startsWithIgnoreCase(f.getName(), startWith)) {
           list.add(f.getName());
+        }
       }
     }
     return list;
   }
 
-  public void createPacks(boolean isUpdate, boolean isAssemblyOnly) throws BFDOOException,
+  /**
+   * Creates the packs.
+   *
+   * @param isUpdate the is update
+   * @param isAssemblyOnly the is assembly only
+   * @throws BfdOoException the BFDOO exception
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
+  public void createPacks(boolean isUpdate, boolean isAssemblyOnly) throws BfdOoException,
       OneOpsClientAPIException {
     flow.process(isUpdate, isAssemblyOnly);
   }
 
   /**
-   * Limit to 32 characters long
-   * 
-   * @return
+   * Limit to 32 characters long.
+   *
+   * @param isAutoGen the is auto gen
+   * @param assemblyName the assembly name
+   * @return the string
    */
   private String autoGenAssemblyName(boolean isAutoGen, String assemblyName) {
     if (isAutoGen) {
@@ -512,6 +638,12 @@ public class BooCli {
     return assemblyName;
   }
 
+  /**
+   * Random string.
+   *
+   * @param assemblyName the assembly name
+   * @return the string
+   */
   private String randomString(String assemblyName) {
     StringBuilder name = new StringBuilder();
     int rand = 32 - assemblyName.length() - 1;
@@ -520,12 +652,23 @@ public class BooCli {
     return name.toString();
   }
 
+  /**
+   * Trim file name.
+   *
+   * @param file the file
+   * @return the string
+   */
   private String trimFileName(String file) {
     String name = new File(file).getName();
     return (name == null || name.lastIndexOf('.') < 0) ? "" : name.substring(0,
         name.lastIndexOf('.'));
   }
 
+  /**
+   * Cleanup.
+   *
+   * @param assemblies the assemblies
+   */
   public void cleanup(List<String> assemblies) {
     if (assemblies.size() == 0) {
       System.out.println("There is no instance to remove");
@@ -535,13 +678,15 @@ public class BooCli {
       String str =
           String.format(YES_NO, assemblies.size(), this.config.getYaml().getAssembly().getName());
       str = this.userInput(str);
-      if (!"y".equalsIgnoreCase(str.trim()))
+      if (!"y".equalsIgnoreCase(str.trim())) {
         return;
+      }
+
     }
     boolean isSuc = true;
     for (String assembly : assemblies) {
       LogUtils.info("Destroying OneOps assembly %s \n", assembly);
-      this.initOO(config, assembly);
+      this.initOo(config, assembly);
       if (flow.isAssemblyExist(assembly)) {
         boolean isDone;
         try {
@@ -560,6 +705,9 @@ public class BooCli {
     }
   }
 
+  /**
+   * Cleanup old.
+   */
   public void cleanupOld() {
     List<String> files = this.listConfigFiles(this.configDir, this.configFile);
     if (files.size() == 0) {
@@ -569,8 +717,10 @@ public class BooCli {
     if (isForced == false) {
       String str = String.format(YES_NO, files.size(), trimFileName(this.configFile));
       str = this.userInput(str);
-      if (!"y".equalsIgnoreCase(str.trim()))
+      if (!"y".equalsIgnoreCase(str.trim())) {
         return;
+      }
+
     }
     boolean isSuc = true;
     for (String file : files) {
@@ -584,7 +734,7 @@ public class BooCli {
           }
         }
         // this.deleteFile(this.configDir, file);
-      } catch (BFDOOException e) {
+      } catch (BfdOoException e) {
         // Ignore
         isSuc = false;
       } catch (OneOpsClientAPIException e) {
@@ -598,26 +748,57 @@ public class BooCli {
 
   }
 
-  public String getStatus() throws BFDOOException {
+  /**
+   * Gets the status.
+   *
+   * @return the status
+   * @throws BfdOoException the BFDOO exception
+   */
+  public String getStatus() throws BfdOoException {
     return flow.getStatus();
   }
 
+  /**
+   * Checks if is quiet.
+   *
+   * @return true, if is quiet
+   */
   public static boolean isQuiet() {
     return isQuiet;
   }
 
+  /**
+   * Sets the quiet.
+   *
+   * @param isQuiet the new quiet
+   */
   public static void setQuiet(boolean isQuiet) {
     BooCli.isQuiet = isQuiet;
   }
 
+  /**
+   * Sets the forced.
+   *
+   * @param isForced the new forced
+   */
   public static void setForced(boolean isForced) {
     BooCli.isForced = isForced;
   }
 
+  /**
+   * Sets the no deploy.
+   *
+   * @param isNoDeploy the new no deploy
+   */
   public static void setNoDeploy(boolean isNoDeploy) {
     BooCli.isNoDeploy = isNoDeploy;
   }
 
+  /**
+   * Checks if is no deploy.
+   *
+   * @return true, if is no deploy
+   */
   public static boolean isNoDeploy() {
     return isNoDeploy;
   }

@@ -1,9 +1,9 @@
 package com.wm.bfd.oo.yaml;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BooBean {

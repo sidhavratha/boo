@@ -1,26 +1,41 @@
 package com.wm.bfd.oo.yaml.helper;
 
+import com.wm.bfd.oo.yaml.PlatformBean;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.wm.bfd.oo.yaml.PlatformBean;
-
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PlatformBeanHelper.
+ */
 public final class PlatformBeanHelper {
-  final private static Logger LOG = LoggerFactory.getLogger(PlatformBeanHelper.class);
-  /**
-   * Platform
-   */
-  final private static String DEPLOY_ORDER = "deploy_order";
-  final private static String PACK = "pack";
-  final private static String PACK_VERSION = "pack_version";
-  final private static String VARIABLES = "variables";
-  final private static String ENCRYPTED_VARIABLES = "encrypted_variables";
-  final private static String COMPONENTS = "components";
+  
+  /** The Constant DEPLOY_ORDER. */
+  private static final String DEPLOY_ORDER = "deploy_order";
+  
+  /** The Constant PACK. */
+  private static final String PACK = "pack";
+  
+  /** The Constant PACK_VERSION. */
+  private static final String PACK_VERSION = "pack_version";
+  
+  /** The Constant VARIABLES. */
+  private static final String VARIABLES = "variables";
+  
+  /** The Constant ENCRYPTED_VARIABLES. */
+  private static final String ENCRYPTED_VARIABLES = "encrypted_variables";
+  
+  /** The Constant COMPONENTS. */
+  private static final String COMPONENTS = "components";
 
+  /**
+   * Gets the platforms.
+   *
+   * @param platformsMap the platforms map
+   * @return the platforms
+   */
   @SuppressWarnings({"rawtypes", "unchecked"})
   public static List<PlatformBean> getPlatforms(Map<String, Object> platformsMap) {
     List<PlatformBean> platforms = new ArrayList<PlatformBean>();

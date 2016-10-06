@@ -1,16 +1,17 @@
 package com.wm.bfd.oo.yaml;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.wm.bfd.oo.yaml.helper.EnvironmentBeanHelper;
+import com.wm.bfd.oo.yaml.helper.PlatformBeanHelper;
+import com.wm.bfd.oo.yaml.helper.PlatformConfigBeanHelper;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.wm.bfd.oo.yaml.helper.EnvironmentBeanHelper;
-import com.wm.bfd.oo.yaml.helper.PlatformBeanHelper;
-import com.wm.bfd.oo.yaml.helper.PlatformConfigBeanHelper;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Yaml {
@@ -27,7 +28,7 @@ public class Yaml {
 
   @JsonIgnore
   private List<ScalBean> envList;
-  
+
   @JsonIgnore
   private EnvironmentBean environmentBean;
 
@@ -63,25 +64,37 @@ public class Yaml {
     return (Map<String, Object>) this.others.get(Constants.PLATFORMS);
   }
 
+  /**
+   * Gets the platforms list.
+   *
+   * @return the platforms list
+   */
   @JsonIgnore
   public List<PlatformBean> getPlatformsList() {
-    if (platformsList == null)
+    if (platformsList == null) {
       platformsList = PlatformBeanHelper.getPlatforms(this.getPlatforms());
+    }
     return platformsList;
   }
 
+  /**
+   * Gets the scales.
+   *
+   * @return the scales
+   */
   @JsonIgnore
   public List<ScalBean> getScales() {
-    if (envList == null)
+    if (envList == null) {
       envList = EnvironmentBeanHelper.getScales(this.getScale());
+    }
     return envList;
   }
 
   public Map<String, Object> getExtract() {
-    //return (Map<String, Object>) this.others.get(Constants.EXTRACT);
+    // return (Map<String, Object>) this.others.get(Constants.EXTRACT);
     return extract;
   }
-  
+
   @JsonIgnore
   public Map<String, PlatformConfigBean> getExtractBean() {
     return PlatformConfigBeanHelper.getExtractBeans(this.extract);
@@ -91,7 +104,7 @@ public class Yaml {
   public EnvironmentBean getEnvironmentBean() {
     return EnvironmentBeanHelper.getEnvironment(this.environment);
   }
-  
+
   @SuppressWarnings("unchecked")
   @JsonIgnore
   public Map<String, Object> getGlobalVariables() {

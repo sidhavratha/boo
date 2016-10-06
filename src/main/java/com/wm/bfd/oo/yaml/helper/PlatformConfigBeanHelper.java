@@ -1,16 +1,27 @@
 package com.wm.bfd.oo.yaml.helper;
 
+import com.wm.bfd.oo.yaml.PlatformConfigBean;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import com.wm.bfd.oo.yaml.PlatformConfigBean;
-
 public final class PlatformConfigBeanHelper {
 
+  /** The custom format. */
   private static String CUSTOM_FORMAT = "custom_format";
+  
+  /** The custom split. */
   private static String CUSTOM_SPLIT = "custom_split";
+  
+  /** The custom component. */
   private static String CUSTOM_COMPONENT = "custom_component";
 
+  /**
+   * Gets the extract beans.
+   *
+   * @param extra the extra
+   * @return the extract beans
+   */
   @SuppressWarnings("unchecked")
   public static Map<String, PlatformConfigBean> getExtractBeans(Map<String, Object> extra) {
     Map<String, PlatformConfigBean> platformConfigs = new HashMap<String, PlatformConfigBean>();

@@ -1,38 +1,39 @@
 package com.wm.bfd.oo.yaml.helper;
 
+import com.wm.bfd.oo.yaml.CloudBean;
+import com.wm.bfd.oo.yaml.EnvironmentBean;
+import com.wm.bfd.oo.yaml.ScalBean;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.wm.bfd.oo.yaml.CloudBean;
-import com.wm.bfd.oo.yaml.EnvironmentBean;
-import com.wm.bfd.oo.yaml.ScalBean;
-
 public final class EnvironmentBeanHelper {
-  final private static Logger LOG = LoggerFactory.getLogger(EnvironmentBeanHelper.class);
   /**
-   * Platform
+   * Platform.
    */
-  final private static String SCALING = "scaling";
-  final private static String COMPUTE = "compute";
-  final private static String CURRENT = "current";
-  final private static String MIN = "min";
-  final private static String MAX = "max";
-  final private static String STEP_UP = "step_up";
-  final private static String STEP_DOWN = "step_down";
-  final private static String PERCENT_DEPLOY = "percent_deploy";
+  private static final String SCALING = "scaling";
+  private static final String CURRENT = "current";
+  private static final String MIN = "min";
+  private static final String MAX = "max";
+  private static final String STEP_UP = "step_up";
+  private static final String STEP_DOWN = "step_down";
+  private static final String PERCENT_DEPLOY = "percent_deploy";
 
-  final private static String CLOUDS = "clouds";
-  final private static String PLATFORMS = "platforms";
+  private static final String CLOUDS = "clouds";
+  private static final String PLATFORMS = "platforms";
 
-  final public static String PRIORITY = "priority";
-  final public static String DPMT_ORDER = "dpmt_order";
-  final public static String PCT_SCALE = "pct_scale";
+  public static final String PRIORITY = "priority";
+  public static final String DPMT_ORDER = "dpmt_order";
+  public static final String PCT_SCALE = "pct_scale";
 
+  /**
+   * Gets the scales.
+   *
+   * @param scaleMap the scale map
+   * @return the scales
+   */
   @SuppressWarnings({"rawtypes", "unchecked"})
   public static List<ScalBean> getScales(Map<String, Object> scaleMap) {
     if (scaleMap == null) {
@@ -44,8 +45,8 @@ public final class EnvironmentBeanHelper {
       Object value = entry.getValue();
       if (value instanceof Map) {
         Map<String, Map> map = (Map<String, Map>) value;
-        Map<String, Map> s = (Map<String, Map>) map.get(SCALING);
-        for (Map.Entry<String, Map> scale : s.entrySet()) {
+        Map<String, Map> scaleMaps = (Map<String, Map>) map.get(SCALING);
+        for (Map.Entry<String, Map> scale : scaleMaps.entrySet()) {
           String component = scale.getKey();
           Map<String, String> map2 = scale.getValue();
           // Map<String, String> map2 = ((Map<String, Map>) map.get(SCALING)).get(COMPUTE);
@@ -60,6 +61,12 @@ public final class EnvironmentBeanHelper {
     return scales;
   }
 
+  /**
+   * Gets the environment.
+   *
+   * @param environmentsMap the environments map
+   * @return the environment
+   */
   @SuppressWarnings("unchecked")
   public static EnvironmentBean getEnvironment(Map<String, Object> environmentsMap) {
     Map<String, String> attris = new HashMap<String, String>();
@@ -70,9 +77,9 @@ public final class EnvironmentBeanHelper {
       if (CLOUDS.equalsIgnoreCase(key)) {
         Map<String, Object> map = (Map<String, Object>) value;
         for (Map.Entry<String, Object> entry1 : map.entrySet()) {
-          Map<String, String> m = (Map<String, String>) entry1.getValue();
+          Map<String, String> config = (Map<String, String>) entry1.getValue();
           CloudBean cloud =
-              new CloudBean(entry1.getKey(), m.get(PCT_SCALE), m.get(DPMT_ORDER), m.get(PRIORITY));
+              new CloudBean(entry1.getKey(), config.get(PCT_SCALE), config.get(DPMT_ORDER), config.get(PRIORITY));
           env.addClouds(cloud);
         }
 

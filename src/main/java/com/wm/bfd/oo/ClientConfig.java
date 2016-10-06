@@ -1,35 +1,46 @@
 package com.wm.bfd.oo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import com.wm.bfd.oo.yaml.Yaml;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Singleton;
-import com.wm.bfd.oo.yaml.Yaml;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @Singleton
 public class ClientConfig {
-  final private static ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
+  private static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
   private Yaml yaml;
 
   // For add user component in design
-  final public static String SSH_KEY = "authorized_keys";
-  final public static String USER_NAME = "username";
-  final public static String USER = "user";
+  public static final String SSH_KEY = "authorized_keys";
+  public static final String USER_NAME = "username";
+  public static final String USER = "user";
 
   // Platform yarn variables
-  final public static String ZK_HOST = "zk_hosts";
+  public static final String ZK_HOST = "zk_hosts";
 
   // Compute size
-  final public static String SIZE = "size";
+  public static final String SIZE = "size";
 
-  final public static String COMPUTE = "compute";
+  /** The Constant COMPUTE. */
+  public static final String COMPUTE = "compute";
 
+  /**
+   * Instantiates a new client config.
+   *
+   * @param file the file
+   * @throws JsonParseException the json parse exception
+   * @throws JsonMappingException the json mapping exception
+   * @throws FileNotFoundException the file not found exception
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public ClientConfig(String file) throws JsonParseException, JsonMappingException,
       FileNotFoundException, IOException {
     FileInputStream input = null;
