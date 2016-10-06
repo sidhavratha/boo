@@ -1,11 +1,11 @@
 package com.wm.bfd.oo.yaml;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class EnvironmentBean {
 

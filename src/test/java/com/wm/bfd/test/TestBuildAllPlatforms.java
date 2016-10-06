@@ -1,7 +1,8 @@
 package com.wm.bfd.test;
 
-import java.util.List;
-import java.util.Map;
+import com.wm.bfd.oo.workflow.BuildAllPlatforms;
+
+import com.oo.api.exception.OneOpsClientAPIException;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -9,19 +10,20 @@ import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.oo.api.exception.OneOpsClientAPIException;
-import com.wm.bfd.oo.workflow.BuildAllPlatforms;
+import java.util.List;
+import java.util.Map;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBuildAllPlatforms extends BFDOOTest {
+public class TestBuildAllPlatforms extends BfdOoTest {
   private static Logger LOG = LoggerFactory.getLogger(TestBuildAllPlatforms.class);
   BuildAllPlatforms build;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    if (build == null)
+    if (build == null) {
       build = new BuildAllPlatforms(oo, config);
+    }
   }
 
   @Test

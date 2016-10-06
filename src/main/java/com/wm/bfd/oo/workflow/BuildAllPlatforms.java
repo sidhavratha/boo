@@ -1,40 +1,68 @@
 package com.wm.bfd.oo.workflow;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.wm.bfd.oo.BooCli;
+import com.wm.bfd.oo.ClientConfig;
+import com.wm.bfd.oo.LogUtils;
+import com.wm.bfd.oo.utils.BfdUtils;
+import com.wm.bfd.oo.yaml.Constants;
+import com.wm.bfd.oo.yaml.PlatformBean;
+import com.wm.bfd.oo.yaml.ScalBean;
 
 import com.jayway.restassured.path.json.JsonPath;
 import com.oo.api.OOInstance;
 import com.oo.api.exception.OneOpsClientAPIException;
 import com.oo.api.exception.OneOpsComponentExistException;
 import com.oo.api.resource.model.RedundancyConfig;
-import com.wm.bfd.oo.BooCli;
-import com.wm.bfd.oo.ClientConfig;
-import com.wm.bfd.oo.LogUtils;
-import com.wm.bfd.oo.utils.BFDUtils;
-import com.wm.bfd.oo.yaml.Constants;
-import com.wm.bfd.oo.yaml.PlatformBean;
-import com.wm.bfd.oo.yaml.ScalBean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class BuildAllPlatforms.
+ */
 public class BuildAllPlatforms extends AbstractWorkflow {
-  final private static Logger LOG = LoggerFactory.getLogger(BuildAllPlatforms.class);
+  
+  /** The Constant LOG. */
+  private static final Logger LOG = LoggerFactory.getLogger(BuildAllPlatforms.class);
+  
+  /** The Constant ACTIVE. */
   // final private static String NAME = "ciName"; // Get component name.
-  final private static String ACTIVE = "active";
-  final private static String FAILED = "failed";
-  final private static String NEWLINE = System.getProperty("line.separator");
-  final private BFDUtils utils = new BFDUtils();
+  private static final String ACTIVE = "active";
+  
+  /** The Constant FAILED. */
+  private static final String FAILED = "failed";
+  
+  /** The Constant NEWLINE. */
+  private static final String NEWLINE = System.getProperty("line.separator");
+
+  /** The utils. */
+  private final BfdUtils utils = new BfdUtils();
+  
+  /** The retries. */
   private int retries = 6;
 
+  /**
+   * Instantiates a new builds the all platforms.
+   *
+   * @param instance the instance
+   * @param config the config
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   public BuildAllPlatforms(OOInstance instance, ClientConfig config)
       throws OneOpsClientAPIException {
     super(instance, config);
   }
 
+  
+  /* (non-Javadoc)
+   * @see com.wm.bfd.oo.workflow.AbstractWorkflow#process(boolean, boolean)
+   */
   public boolean process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
     boolean isAssemblyExist = this.isAssemblyExist();
     if (isUpdate && !isAssemblyExist) {
@@ -85,8 +113,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     boolean retry = true;
     String deployError = null;
     this.relayEnableDelivery(config.getYaml().getBoo().isEnable());
-    if (isUpdate)
+    if (isUpdate) {
       this.commitEnv();
+    }
     if (BooCli.isNoDeploy()) {
       this.bar.update(100, 100);
       LogUtils.info(Constants.CREATE_WITHOUT_DEPLOYMENT);
@@ -119,6 +148,12 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return true;
   }
 
+  /**
+   * Relay enable delivery.
+   *
+   * @param enable the enable
+   * @return true, if successful
+   */
   public boolean relayEnableDelivery(boolean enable) {
     try {
       transition.updateRelay(this.envName, "default", null, null, null, null, null, false, enable);
@@ -129,8 +164,16 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return Boolean.FALSE;
   }
 
-  public boolean isPlatformExist(String platformName)
-      throws OneOpsClientAPIException, OneOpsComponentExistException {
+  /**
+   * Checks if is platform exist.
+   *
+   * @param platformName the platform name
+   * @return true, if is platform exist
+   * @throws OneOpsClientAPIException the one ops client API exception
+   * @throws OneOpsComponentExistException the one ops component exist exception
+   */
+  public boolean isPlatformExist(String platformName) throws OneOpsClientAPIException,
+      OneOpsComponentExistException {
     JsonPath response = null;
     try {
       response = design.getPlatform(platformName);
@@ -141,6 +184,14 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return response == null ? false : true;
   }
 
+ 
+  /**
+   * Creates the platforms.
+   *
+   * @param isUpdate the is update
+   * @return true, if successful
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   @SuppressWarnings("unchecked")
   public boolean createPlatforms(boolean isUpdate) throws OneOpsClientAPIException {
     List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
@@ -148,8 +199,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     for (PlatformBean platform : platforms) {
       LogUtils.info(Constants.CREATING_PLATFORM, platform.getName());
       this.createPlatform(platform);
-      if (platform.getComponents() == null)
+      if (platform.getComponents() == null) {
         continue;
+      }
       for (Map.Entry<String, Object> entry : platform.getComponents().entrySet()) {
         String componentName = entry.getKey();
         Object value = entry.getValue();
@@ -158,8 +210,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
           this.handleAttachments(components, platform.getName(), componentName);
           this.updateComponentVariables(platform.getName(), componentName, components);
         } else {
-          if (LOG.isInfoEnabled())
+          if (LOG.isInfoEnabled()) {
             LOG.info("Unknow type {}.", value.getClass());
+          }
         }
       }
     }
@@ -169,9 +222,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   /**
    * We tolerate that if update attachment failed, won't stop the whole process.
    * 
-   * @param components
-   * @param platformName
-   * @param componentName
+   * @param components Components map.
+   * @param platformName Platform name.
+   * @param componentName Component name.
    */
   private void handleAttachments(Map<String, Object> components, String platformName,
       String componentName) {
@@ -186,6 +239,15 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
   }
 
+  /**
+   * Handle attachments intl.
+   *
+   * @param components the components
+   * @param platformName the platform name
+   * @param componentName the component name
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
+  @SuppressWarnings("unchecked")
   private void handleAttachmentsIntl(Map<String, Object> components, String platformName,
       String componentName) throws OneOpsClientAPIException {
     if (components.get(Constants.ATTACHMENTS) != null) {
@@ -203,6 +265,13 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 
   }
 
+  /**
+   * Creates the platform.
+   *
+   * @param platform the platform
+   * @return true, if successful
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   public boolean createPlatform(PlatformBean platform) throws OneOpsClientAPIException {
     boolean isExist = false;
     try {
@@ -214,8 +283,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       JsonPath response =
           design.createPlatform(platform.getName(), platform.getPack(), platform.getPackVersion(),
               platform.getPackSource(), Constants.DESCRIPTION, Constants.DESCRIPTION);
-      if (response != null)
+      if (response != null) {
         design.commitDesign();
+      }
       LogUtils.info(Constants.CREATING_PLATFORM_SUCCEED, platform.getName());
     } else {
       LogUtils.info(Constants.PLATFORM_EXISTING, platform.getName());
@@ -224,6 +294,15 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 
   }
 
+  /**
+   * Checks if is component exist.
+   *
+   * @param platformName the platform name
+   * @param componentName the component name
+   * @return true, if is component exist
+   * @throws OneOpsClientAPIException the one ops client API exception
+   * @throws OneOpsComponentExistException the one ops component exist exception
+   */
   private boolean isComponentExist(String platformName, String componentName)
       throws OneOpsClientAPIException, OneOpsComponentExistException {
     boolean isExist = false;
@@ -238,26 +317,46 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
 
+  /**
+   * Update platform variables.
+   *
+   * @param isUpdate the is update
+   * @return true, if successful
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   private boolean updatePlatformVariables(boolean isUpdate) throws OneOpsClientAPIException {
     List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
     for (PlatformBean platform : platforms) {
       Map<String, String> secureVariables = platform.getSecureVariables();
-      if (secureVariables != null && secureVariables.size() > 0)
+      if (secureVariables != null && secureVariables.size() > 0) {
         this.updateOrAddPlatformVariables(platform.getName(), secureVariables, true, isUpdate);
+      }
       Map<String, String> variables = platform.getVariables();
-      if (variables != null && variables.size() > 0)
+      if (variables != null && variables.size() > 0) {
         this.updateOrAddPlatformVariables(platform.getName(), variables, false, isUpdate);
+      }
     }
-    if (platforms.size() > 0)
+    if (platforms.size() > 0) {
       design.commitDesign();
+    }
     return true;
   }
 
+  /**
+   * Update or add platform variables.
+   *
+   * @param platformName the platform name
+   * @param variables the variables
+   * @param isSecure the is secure
+   * @param isUpdate the is update
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   @SuppressWarnings("serial")
   private void updateOrAddPlatformVariables(String platformName, Map<String, String> variables,
       boolean isSecure, boolean isUpdate) throws OneOpsClientAPIException {
-    if (variables == null || variables.size() == 0)
+    if (variables == null || variables.size() == 0) {
       return;
+    }
     for (final Map.Entry<String, String> entry : variables.entrySet()) {
       this.updateOrAddPlatformVariablesIntl(platformName, new HashMap<String, String>() {
         {
@@ -268,12 +367,13 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
   /**
-   * Have to add isExist method later
-   * 
-   * @param platformName
-   * @param variables
-   * @param isSecure
-   * @throws OneOpsClientAPIException
+   * Have to add isExist method later.
+   *
+   * @param platformName Platform name.
+   * @param variables A map of variables.
+   * @param isSecure Is secure variable.
+   * @param isUpdate the is update
+   * @throws OneOpsClientAPIException when update failed.
    */
   private void updateOrAddPlatformVariablesIntl(String platformName, Map<String, String> variables,
       boolean isSecure, boolean isUpdate) throws OneOpsClientAPIException {
@@ -290,11 +390,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 
   /**
    * Right now support components with two layers config.
-   * 
-   * @param platformName
-   * @param componentName
-   * @param attributes
-   * @throws OneOpsClientAPIException
+   *
+   * @param platformName Platform name.
+   * @param componentName Component name.
+   * @param attributes Component variables.
+   * @throws OneOpsClientAPIException the one ops client API exception
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void updateComponentVariables(String platformName, String componentName,
@@ -318,6 +418,16 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 
   }
 
+  /**
+   * Update component variables internal.
+   *
+   * @param platformName the platform name
+   * @param componentName the component name
+   * @param uniqueName the unique name
+   * @param attributes the attributes
+   * @return true, if successful
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   private boolean updateComponentVariablesInternal(String platformName, String componentName,
       String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
     LogUtils.info(Constants.UPDATE_COMPONENTS, componentName, platformName);
@@ -337,13 +447,28 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return true;
   }
 
+  /**
+   * Gets the custom ips.
+   *
+   * @param platformName the platform name
+   * @param componentName the component name
+   * @return the custom ips
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   public String getCustomIps(String platformName, String componentName)
       throws OneOpsClientAPIException {
     return utils.getIps(platformName, componentName, this);
   }
 
-  public String printIps(String platformName, String componentName)
-      throws OneOpsClientAPIException {
+  /**
+   * Prints the ips.
+   *
+   * @param platformName the platform name
+   * @param componentName the component name
+   * @return the string
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
+  public String printIps(String platformName, String componentName) throws OneOpsClientAPIException {
     List<Map<String, String>> ips = this.getIpsInternal(platformName, componentName);
     StringBuilder str = new StringBuilder();
     for (Map<String, String> ip : ips) {
@@ -353,6 +478,12 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return str.toString();
   }
 
+  /**
+   * Update scaling.
+   *
+   * @return true, if successful
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   public boolean updateScaling() throws OneOpsClientAPIException {
     List<ScalBean> scales = this.config.getYaml().getScales();
     if (scales == null) {

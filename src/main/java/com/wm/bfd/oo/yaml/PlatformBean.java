@@ -13,6 +13,11 @@ public class PlatformBean implements Comparable {
   private Map<String, String> secureVariables;
   private Map<String, Object> components;
 
+  /**
+   * Instantiates a new platform bean.
+   *
+   * @param builder the builder
+   */
   public PlatformBean(PlatformBeanBuilder builder) {
     this.name = builder.name;
     this.pack = builder.pack;
@@ -21,8 +26,9 @@ public class PlatformBean implements Comparable {
     this.secureVariables = builder.secureVariables;
     this.components = builder.components;
     this.deployOrder = builder.deployOrder;
-    if (pack != null)
+    if (pack != null) {
       this.packs = pack.split("[\\W]");
+    }
   }
 
   public Map<String, String> getSecureVariables() {
@@ -109,8 +115,11 @@ public class PlatformBean implements Comparable {
 
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
   @Override
-  public int compareTo(Object o) {
-    return this.deployOrder - ((PlatformBean) o).deployOrder;
+  public int compareTo(Object object) {
+    return this.deployOrder - ((PlatformBean) object).deployOrder;
   }
 }

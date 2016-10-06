@@ -1,17 +1,18 @@
 package com.wm.bfd.test;
 
+import com.wm.bfd.oo.yaml.PlatformBean;
+
+import com.oo.api.exception.OneOpsClientAPIException;
+
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.oo.api.exception.OneOpsClientAPIException;
-import com.wm.bfd.oo.yaml.PlatformBean;
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestPlatformBeanBuilder extends BFDOOTest {
-  final private static Logger LOG = LoggerFactory.getLogger(TestPlatformBeanBuilder.class);
+public class TestPlatformBeanBuilder extends BfdOoTest {
+  private static final Logger LOG = LoggerFactory.getLogger(TestPlatformBeanBuilder.class);
 
   @Test
   public void testGetAssembly() throws OneOpsClientAPIException {
