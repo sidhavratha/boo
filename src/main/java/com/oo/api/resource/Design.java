@@ -237,6 +237,44 @@ public class Design extends APIClient {
   }
 
   /**
+   * Deletes the platform component
+   * 
+   * @param platformName
+   * @param componentName
+   * @return
+   * @throws OneOpsClientAPIException
+   */
+  public JsonPath deleteComponent(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    if (platformName == null || platformName.length() == 0) {
+      String msg = String.format("Missing platform name to delete");
+      throw new OneOpsClientAPIException(msg);
+    }
+    if (componentName == null || componentName.length() == 0) {
+      String msg = String.format("Missing component name to delete");
+      throw new OneOpsClientAPIException(msg);
+    }
+    JsonPath componentDetails = getPlatformComponent(platformName, componentName);
+    if (componentDetails != null) {
+      String ciId = componentDetails.getString("ciId");
+      RequestSpecification request = createRequest();
+      Response response =
+          request.delete(DESIGN_URI + "platforms/" + platformName + "/components/" + ciId);
+      if (response != null) {
+        if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
+          return response.getBody().jsonPath();
+        } else {
+          String msg = String.format("Failed to delete component with name %s", componentName);
+          throw new OneOpsClientAPIException(msg);
+        }
+      }
+    }
+    String msg = String.format("Failed to delete component with name %s due to null response",
+        componentName);
+    throw new OneOpsClientAPIException(msg);
+  }
+
+  /**
    * List platform components for a given assembly/design/platform
    * 
    * @param environmentName
@@ -464,8 +502,8 @@ public class Design extends APIClient {
     throw new OneOpsClientAPIException(msg);
   }
 
-  public JsonPath getPlatformComponentAttachment(String platformName, String componentName, String attachmentName)
-      throws OneOpsClientAPIException {
+  public JsonPath getPlatformComponentAttachment(String platformName, String componentName,
+      String attachmentName) throws OneOpsClientAPIException {
     if (platformName == null || platformName.length() == 0) {
       String msg = String.format("Missing platform name to update component attributes");
       throw new OneOpsClientAPIException(msg);
@@ -480,8 +518,8 @@ public class Design extends APIClient {
 
       String ciId = componentDetails.getString("ciId");
       RequestSpecification request = createRequest();
-      Response response = request.get(
-          DESIGN_URI + "platforms/" + platformName + "/components/" + ciId + "/attachments/" + attachmentName + ".json");
+      Response response = request.get(DESIGN_URI + "platforms/" + platformName + "/components/"
+          + ciId + "/attachments/" + attachmentName + ".json");
       if (response != null) {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
           return response.getBody().jsonPath();
