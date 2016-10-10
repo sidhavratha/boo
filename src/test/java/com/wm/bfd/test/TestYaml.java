@@ -1,5 +1,6 @@
 package com.wm.bfd.test;
 
+import com.wm.bfd.oo.utils.BfdUtils;
 import com.wm.bfd.oo.yaml.PlatformBean;
 import com.wm.bfd.oo.yaml.Yaml;
 
@@ -17,6 +18,7 @@ import java.util.Map;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestYaml extends BfdOoTest {
   private static final Logger LOG = LoggerFactory.getLogger(TestYaml.class);
+  private BfdUtils util = new BfdUtils();
 
   @Test
   public void testGetAssembly() throws OneOpsClientAPIException {
@@ -37,6 +39,16 @@ public class TestYaml extends BfdOoTest {
   public void testGetPlatforms() throws OneOpsClientAPIException {
     Yaml yaml = config.getYaml();
     assertNotNull(yaml.getPlatforms());
+  }
+
+  @Test
+  public void testGetMultiplelines() throws OneOpsClientAPIException {
+    Yaml yaml = config.getYaml();
+    List<PlatformBean> list = yaml.getPlatformsList();
+    for (PlatformBean platform : list) {
+      Map<String, Object> components = platform.getComponents();
+      // util.printMap(components, 5);
+    }
   }
 
   @Test
