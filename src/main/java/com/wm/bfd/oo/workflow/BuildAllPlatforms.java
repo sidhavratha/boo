@@ -527,9 +527,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
         Object value = entry.getValue();
         if (value instanceof Map) {
           Map<String, Object> target = (Map<String, Object>) value;
-          for (String str : target.keySet()) {
-            set.add(str);
-          }
+          set.addAll(target.keySet());
         }
       }
       JsonPath response = design.listPlatformComponents(platform.getName());
@@ -537,7 +535,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       for (String component : compList) {
         if (this.isUserRelatedComponent(platform.getName(), component)
             && !set.contains(component)) {
-          this.design.deletePlatformComponent(platform.getName(), component);
+          design.deletePlatformComponent(platform.getName(), component);
         }
       }
     }
