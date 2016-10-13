@@ -178,11 +178,6 @@
             <artifactId>checkstyle</artifactId>
             <version>7.1.2</version>
           </dependency>
-          <dependency>
-            <groupId>com.github.sevntu.checkstyle</groupId>
-            <artifactId>sevntu-checkstyle-maven-plugin</artifactId>
-            <version>1.21.0</version>
-          </dependency>
         </dependencies>
       </plugin>
       <!-- Maven Assembly Plugin -->
@@ -317,11 +312,4 @@
       </plugin>
     </plugins>
   </reporting>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>sevntu-maven</id>
-      <name>sevntu-maven</name>
-      <url>http://sevntu-checkstyle.github.io/sevntu.checkstyle/maven2</url>
-    </pluginRepository>
-  </pluginRepositories>
 </project>
