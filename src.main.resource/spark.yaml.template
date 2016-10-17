@@ -35,14 +35,41 @@ platforms: # In OneOps design.
         hive_connect_url: ''
         hive_tarball_url: '' 
         hive_standalone_namenode: ''
-        extra_core_site: '<property>\r\n  <name>fs.swift.service.strati-cdc-demo.auth.endpoint.prefix</name>\r\n
- <value>${fs.swift.service.strati.auth.endpoint.prefix}</value>\r\n</property>\r\n\r\n<property>\r\n
- <name>fs.swift.service.strati-cdc-demo.auth.url</name>\r\n  <value>${fs.swift.service.strati.auth.url}</value>\r\n</property>\r\n\r\n<property>\r\n
- <name>fs.swift.service.strati-cdc-demo.username</name>\r\n  <value>${fs.swift.service.strati.username}</value>\r\n</property>\r\n\r\n<property>\r\n
- <name>fs.swift.service.strati-cdc-demo.password</name>\r\n  <value>${fs.swift.service.strati.password}</value>\r\n</property>\r\n\r\n<property>\r\n
- <name>fs.swift.service.strati-cdc-demo.public</name>\r\n  <value>${fs.swift.service.strati.public}</value>\r\n</property>\r\n\r\n<property>\r\n
- <name>fs.swift.service.strati-cdc-demo.region</name>\r\n  <value>RegionOne</value>\r\n</property>\r\n\r\n<property>\r\n
- <name>fs.swift.service.strati-cdc-demo.tenant</name>\r\n  <value>${fs.swift.service.strati.tenant}</value>\r\n</property>\r\n'
+        extra_core_site: |
+            <property>
+              <name>fs.swift.service.strati-cdc-demo.auth.endpoint.prefix</name>
+              <value>${fs.swift.service.strati.auth.endpoint.prefix}</value>
+            </property>
+            
+            <property>
+              <name>fs.swift.service.strati-cdc-demo.auth.url</name>
+              <value>${fs.swift.service.strati.auth.url}</value>
+            </property>
+            
+            <property>
+              <name>fs.swift.service.strati-cdc-demo.username</name>
+              <value>${fs.swift.service.strati.username}</value>
+            </property>
+            
+            <property>
+              <name>fs.swift.service.strati-cdc-demo.password</name>
+              <value>${fs.swift.service.strati.password}</value>
+            </property>
+            
+            <property>
+              <name>fs.swift.service.strati-cdc-demo.public</name>
+              <value>${fs.swift.service.strati.public}</value>
+            </property>
+            
+            <property>
+              <name>fs.swift.service.strati-cdc-demo.region</name>
+              <value>RegionOne</value>
+            </property>
+            
+            <property>
+              <name>fs.swift.service.strati-cdc-demo.tenant</name>
+              <value>${fs.swift.service.strati.tenant}</value>
+            </property>
       hadoop-yarn-master:
         swift_password: '' 
         hive_db_password: '' 

@@ -244,7 +244,7 @@ public class Design extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath deleteComponent(String platformName, String componentName)
+  public JsonPath deletePlatformComponent(String platformName, String componentName)
       throws OneOpsClientAPIException {
     if (platformName == null || platformName.length() == 0) {
       String msg = String.format("Missing platform name to delete");

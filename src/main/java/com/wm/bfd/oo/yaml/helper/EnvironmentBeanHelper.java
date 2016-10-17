@@ -24,6 +24,7 @@ public final class EnvironmentBeanHelper {
   private static final String CLOUDS = "clouds";
   private static final String PLATFORMS = "platforms";
 
+  public static final String ADMINSTATUS = "adminstatus";
   public static final String PRIORITY = "priority";
   public static final String DPMT_ORDER = "dpmt_order";
   public static final String PCT_SCALE = "pct_scale";

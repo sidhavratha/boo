@@ -134,7 +134,7 @@ public class BooCli {
     Option action =
         Option.builder().longOpt("procedure").numberOfArgs(3).optionalArg(Boolean.TRUE)
             .argName("platform> <component> <action")
-            .desc("Execute actions. 'list' is for all actions that available to use.").build();
+            .desc("Execute actions. Use 'list' as an action to show available actions.").build();
     Option procedureArguments =
         Option
             .builder()
@@ -156,7 +156,7 @@ public class BooCli {
 
     Option stepSize =
         Option.builder().longOpt("procedure-step-size").argName("size").hasArg()
-            .desc("Percent of nodes to preform procuedure on, default is 100.").build();
+            .desc("Percent of nodes to perform procedure on, default is 100.").build();
     options.addOption(help);
     options.addOption(config);
     options.addOption(configDir);

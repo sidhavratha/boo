@@ -1501,14 +1501,14 @@ public class Transition extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to update platforms cloud scale with name %s due to %s",
-            environmentName, response.getStatusLine());
+        String msg = String.format("Failed to update platforms cloud scale with cloud id %s due to %s",
+            cloudId, response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
     String msg =
-        String.format("Failed to update platforms cloud scale with name %s due to null response",
-            environmentName);
+        String.format("Failed to update platforms cloud scale with cloud id %s due to null response",
+            cloudId);
     throw new OneOpsClientAPIException(msg);
   }
 }

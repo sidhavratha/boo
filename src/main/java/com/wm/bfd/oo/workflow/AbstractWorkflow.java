@@ -77,7 +77,8 @@ public abstract class AbstractWorkflow {
    * @param config the config
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public AbstractWorkflow(OOInstance instance, ClientConfig config) throws OneOpsClientAPIException {
+  public AbstractWorkflow(OOInstance instance, ClientConfig config)
+      throws OneOpsClientAPIException {
 
     this.instance = instance;
     this.config = config;
@@ -328,7 +329,8 @@ public abstract class AbstractWorkflow {
    * @param attachmentName the attachment name
    * @return true, if is attachment exists
    */
-  public boolean isAttachmentExists(String platformName, String componentName, String attachmentName) {
+  public boolean isAttachmentExists(String platformName, String componentName,
+      String attachmentName) {
     boolean isExist = true;
     JsonPath response = null;
     try {
@@ -338,6 +340,21 @@ public abstract class AbstractWorkflow {
     }
     return (response == null || !isExist) ? false : true;
   }
+
+  /**
+   * Checks whether the component is user related.
+   *
+   */
+  public boolean isUserRelatedComponent(String platformName, String componentName)
+      throws OneOpsClientAPIException {
+    JsonPath componentDetails = design.getPlatformComponent(platformName, componentName);
+    Map<String, String> attr = componentDetails.getMap("ciAttributes");
+    if (attr.containsKey("authorized_keys")) {
+      return Boolean.TRUE;
+    }
+    return Boolean.FALSE;
+  }
+
 
   /**
    * Cancel deployment.
@@ -754,10 +771,10 @@ public abstract class AbstractWorkflow {
       // String availability = cloudMap.get(Constants.AVAILABILITY);
       // if (StringUtils.isEmpty(availability))
       // throw new OneOpsClientAPIException(Constants.NO_AVAILABILITY);
-      response =
-          transition.createEnvironment(envName, config.getYaml().getEnvironmentBean().getOthers()
-              .get(Constants.AVAILABILITY), config.getYaml().getEnvironmentBean().getOthers(),
-              null, cloudMaps, Constants.DESCRIPTION);
+      response = transition.createEnvironment(envName,
+          config.getYaml().getEnvironmentBean().getOthers().get(Constants.AVAILABILITY),
+          config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps,
+          Constants.DESCRIPTION);
       response = transition.getEnvironment(envName);
 
       transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
@@ -801,14 +818,27 @@ public abstract class AbstractWorkflow {
   public boolean updatePlatformCloudScale() throws OneOpsClientAPIException {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
       if (this.platformExist(platform.getName())) {
+        Map<String, Object> sysClouds = transition.getEnvironment(envName).getMap(Constants.CLOUDS);
         List<CloudBean> clouds = config.getYaml().getEnvironmentBean().getClouds();
         for (CloudBean cloud : clouds) {
+          if (sysClouds.containsKey(this.getCloudId(cloud.getCloudName()))) {
+            Map<String, String> cloudMap = new HashMap<String, String>();
+            cloudMap.put(EnvironmentBeanHelper.ADMINSTATUS, Constants.ACTIVE);
+            cloudMap.put(EnvironmentBeanHelper.PRIORITY, cloud.getPriority());
+            cloudMap.put(EnvironmentBeanHelper.DPMT_ORDER, cloud.getDpmtOrder());
+            cloudMap.put(EnvironmentBeanHelper.PCT_SCALE, cloud.getPctScale());
+            transition.updatePlatformCloudScale(envName, platform.getName(),
+                this.getCloudId(cloud.getCloudName()), cloudMap);
+            // If cloud exists in yaml, remove the cloud name from the system clouds map after
+            // updating cloud.
+            sysClouds.remove(this.getCloudId(cloud.getCloudName()));
+          }
+        }
+        // For rest clouds not in yaml, set them as shutdown.
+        for (String cloud : sysClouds.keySet()) {
           Map<String, String> cloudMap = new HashMap<String, String>();
-          cloudMap.put(EnvironmentBeanHelper.PRIORITY, cloud.getPriority());
-          cloudMap.put(EnvironmentBeanHelper.DPMT_ORDER, cloud.getDpmtOrder());
-          cloudMap.put(EnvironmentBeanHelper.PCT_SCALE, cloud.getPctScale());
-          transition.updatePlatformCloudScale(envName, platform.getName(),
-              this.getCloudId(cloud.getCloudName()), cloudMap);
+          cloudMap.put(EnvironmentBeanHelper.ADMINSTATUS, Constants.OFFLINE);
+          transition.updatePlatformCloudScale(envName, platform.getName(), cloud, cloudMap);
         }
       }
     }

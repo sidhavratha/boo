@@ -19,28 +19,30 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class BuildAllPlatforms extends AbstractWorkflow {
-  
+
   /** The Constant LOG. */
   private static final Logger LOG = LoggerFactory.getLogger(BuildAllPlatforms.class);
-  
+
   /** The Constant ACTIVE. */
   // final private static String NAME = "ciName"; // Get component name.
   private static final String ACTIVE = "active";
-  
+
   /** The Constant FAILED. */
   private static final String FAILED = "failed";
-  
+
   /** The Constant NEWLINE. */
   private static final String NEWLINE = System.getProperty("line.separator");
 
   /** The utils. */
   private final BfdUtils utils = new BfdUtils();
-  
+
   /** The retries. */
   private int retries = 6;
 
@@ -56,8 +58,10 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     super(instance, config);
   }
 
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see com.wm.bfd.oo.workflow.AbstractWorkflow#process(boolean, boolean)
    */
   public boolean process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
@@ -75,6 +79,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.bar.update(5, 100);
     this.createPlatforms(isUpdate);
     this.bar.update(15, 100);
+    if (isUpdate) {
+      this.updateUserComponents();
+    }
     this.updatePlatformVariables(isUpdate);
     this.bar.update(20, 100);
     this.createEnv();
@@ -169,8 +176,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @throws OneOpsClientAPIException the one ops client API exception
    * @throws OneOpsComponentExistException the one ops component exist exception
    */
-  public boolean isPlatformExist(String platformName) throws OneOpsClientAPIException,
-      OneOpsComponentExistException {
+  public boolean isPlatformExist(String platformName)
+      throws OneOpsClientAPIException, OneOpsComponentExistException {
     JsonPath response = null;
     try {
       response = design.getPlatform(platformName);
@@ -181,7 +188,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return response == null ? false : true;
   }
 
- 
+
   /**
    * Creates the platforms.
    *
@@ -339,6 +346,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return true;
   }
 
+
   /**
    * Update or add platform variables.
    *
@@ -465,7 +473,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @return the string
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public String printIps(String platformName, String componentName) throws OneOpsClientAPIException {
+  public String printIps(String platformName, String componentName)
+      throws OneOpsClientAPIException {
     List<Map<String, String>> ips = this.getIpsInternal(platformName, componentName);
     StringBuilder str = new StringBuilder();
     for (Map<String, String> ip : ips) {
@@ -497,6 +506,39 @@ public class BuildAllPlatforms extends AbstractWorkflow {
           config);
     }
     transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    return true;
+  }
+
+  /**
+   * Update User related Component.
+   *
+   * @return true, if successful
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
+  public boolean updateUserComponents() throws OneOpsClientAPIException {
+    List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
+    for (PlatformBean platform : platforms) {
+      Map<String, Object> yamlComponents = platform.getComponents();
+      if (yamlComponents == null) {
+        continue;
+      }
+      Set<String> set = new HashSet<String>();
+      for (Map.Entry<String, Object> entry : yamlComponents.entrySet()) {
+        Object value = entry.getValue();
+        if (value instanceof Map) {
+          Map<String, Object> target = (Map<String, Object>) value;
+          set.addAll(target.keySet());
+        }
+      }
+      JsonPath response = design.listPlatformComponents(platform.getName());
+      List<String> compList = response.getList(Constants.CINAME);
+      for (String component : compList) {
+        if (this.isUserRelatedComponent(platform.getName(), component)
+            && !set.contains(component)) {
+          design.deletePlatformComponent(platform.getName(), component);
+        }
+      }
+    }
     return true;
   }
 
