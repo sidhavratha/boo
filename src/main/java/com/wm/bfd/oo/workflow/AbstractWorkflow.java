@@ -818,14 +818,26 @@ public abstract class AbstractWorkflow {
   public boolean updatePlatformCloudScale() throws OneOpsClientAPIException {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
       if (this.platformExist(platform.getName())) {
+        Map<String, Object> sysClouds = transition.getEnvironment(envName).getMap(Constants.CLOUDS);
         List<CloudBean> clouds = config.getYaml().getEnvironmentBean().getClouds();
         for (CloudBean cloud : clouds) {
+          if (sysClouds.containsKey(this.getCloudId(cloud.getCloudName()))) {
+            Map<String, String> cloudMap = new HashMap<String, String>();
+            cloudMap.put(EnvironmentBeanHelper.PRIORITY, cloud.getPriority());
+            cloudMap.put(EnvironmentBeanHelper.DPMT_ORDER, cloud.getDpmtOrder());
+            cloudMap.put(EnvironmentBeanHelper.PCT_SCALE, cloud.getPctScale());
+            transition.updatePlatformCloudScale(envName, platform.getName(),
+                this.getCloudId(cloud.getCloudName()), cloudMap);
+            // If cloud exists in yaml, remove the cloud name from the system clouds map after
+            // updating cloud.
+            sysClouds.remove(this.getCloudId(cloud.getCloudName()));
+          }
+        }
+        // For rest clouds not in yaml, set them as shutdown.
+        for (String cloud : sysClouds.keySet()) {
           Map<String, String> cloudMap = new HashMap<String, String>();
-          cloudMap.put(EnvironmentBeanHelper.PRIORITY, cloud.getPriority());
-          cloudMap.put(EnvironmentBeanHelper.DPMT_ORDER, cloud.getDpmtOrder());
-          cloudMap.put(EnvironmentBeanHelper.PCT_SCALE, cloud.getPctScale());
-          transition.updatePlatformCloudScale(envName, platform.getName(),
-              this.getCloudId(cloud.getCloudName()), cloudMap);
+          cloudMap.put(EnvironmentBeanHelper.ADMINSTATUS, Constants.OFFLINE);
+          transition.updatePlatformCloudScale(envName, platform.getName(), cloud, cloudMap);
         }
       }
     }
