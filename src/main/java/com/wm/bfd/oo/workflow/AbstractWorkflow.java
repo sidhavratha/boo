@@ -823,6 +823,7 @@ public abstract class AbstractWorkflow {
         for (CloudBean cloud : clouds) {
           if (sysClouds.containsKey(this.getCloudId(cloud.getCloudName()))) {
             Map<String, String> cloudMap = new HashMap<String, String>();
+            cloudMap.put(EnvironmentBeanHelper.ADMINSTATUS, Constants.ACTIVE);
             cloudMap.put(EnvironmentBeanHelper.PRIORITY, cloud.getPriority());
             cloudMap.put(EnvironmentBeanHelper.DPMT_ORDER, cloud.getDpmtOrder());
             cloudMap.put(EnvironmentBeanHelper.PCT_SCALE, cloud.getPctScale());
