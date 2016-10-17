@@ -27,6 +27,14 @@ public class Constants {
   // public static final String ASSEMBLY_PREFIX = "CUBEBOO-"; // Magic string.
   public static final String ASSEMBLY_NAME_TOO_LONG =
       "Assembly name cannot be more than 32 characters long. Please fix your assembly name in YAML.";
+
+  /**
+   * Exit code
+   */
+  public static final int EXIT_ZERO = 0; // Normal
+  public static final int EXIT_ONE = 1; // Error happen.
+  public static final int EXIT_TWO = 2; // YAML not found.
+
   /**
    * Customize config.
    */
