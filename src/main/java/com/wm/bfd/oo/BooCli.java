@@ -372,9 +372,11 @@ public class BooCli {
         }
       }
     } catch (ParseException e) {
+      exit = Constants.EXIT_ONE;
       System.err.println(e.getMessage());
       this.help(null, Constants.BFD_TOOL);
     } catch (Exception e) {
+      exit = Constants.EXIT_ONE;
       System.err.println(e.getMessage());
     }
     return exit;
