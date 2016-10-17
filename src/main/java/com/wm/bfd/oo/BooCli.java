@@ -18,11 +18,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,12 +36,6 @@ public class BooCli {
   /** The Constant LOG. */
   private static final Logger LOG = LoggerFactory.getLogger(BooCli.class);
 
-  /** The Constant FILE_NAME_SPLIT. */
-  private static final String FILE_NAME_SPLIT = "-";
-
-  /** The Constant TEMPLATE_FILE. */
-  private static final String TEMPLATE_FILE = ".yaml" + FILE_NAME_SPLIT;
-
   /** The is quiet. */
   private static boolean isQuiet = false;
 
@@ -57,8 +49,6 @@ public class BooCli {
   private static final String YES_NO =
       "WARNING! There are %s instances using the %s configuration. Do you want to destroy all of them? (y/n)";
 
-  /** The config dir. */
-  private String configDir;
 
   /** The config file. */
   private String configFile;
@@ -96,11 +86,6 @@ public class BooCli {
     Option status =
         Option.builder("s").longOpt("status")
             .desc("Get status of deployments specified by -d or -f").build();
-
-    Option configDir =
-        Option.builder("d").longOpt("config-dir").argName("DIR").hasArg()
-            .desc("Use all configuration files in given directory, required if -f not used")
-            .build();
 
     Option config =
         Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
@@ -159,7 +144,6 @@ public class BooCli {
             .desc("Percent of nodes to perform procedure on, default is 100.").build();
     options.addOption(help);
     options.addOption(config);
-    options.addOption(configDir);
     options.addOption(create);
     options.addOption(update);
     options.addOption(status);
@@ -267,17 +251,8 @@ public class BooCli {
         System.out.println();
       }
 
-      if (cmd.hasOption("d")) {
-        this.configDir = cmd.getOptionValue("d");
-        this.configDir = bfdUtils.getAbsolutePath(configDir);
-        System.out.printf(Constants.CONFIG_DIR, this.configDir);
-        System.out.println();
-      }
 
-
-      if (this.configDir == null && this.configFile != null) {
-        this.configDir = this.configFile.substring(0, this.configFile.lastIndexOf('/'));
-      } else if (this.configDir == null && this.configFile == null) {
+      if (this.configFile == null) {
         this.help(null, "No YAML file found.");
         return Constants.EXIT_TWO;
       }
@@ -588,31 +563,6 @@ public class BooCli {
   }
 
   /**
-   * List config files.
-   *
-   * @param dir the dir
-   * @param file the file
-   * @return the list
-   */
-  private List<String> listConfigFiles(String dir, String file) {
-    List<String> list = new ArrayList<String>();
-    File dirs = new File(dir);
-    File ori = new File(file);
-    File[] files = dirs.listFiles();
-    if (file.indexOf(TEMPLATE_FILE) > 0) {
-      list.add(ori.getName());
-    } else {
-      String startWith = ori.getName() + FILE_NAME_SPLIT;
-      for (File f : files) {
-        if (StringUtils.startsWithIgnoreCase(f.getName(), startWith)) {
-          list.add(f.getName());
-        }
-      }
-    }
-    return list;
-  }
-
-  /**
    * Creates the packs.
    *
    * @param isUpdate the is update
@@ -656,18 +606,6 @@ public class BooCli {
   }
 
   /**
-   * Trim file name.
-   *
-   * @param file the file
-   * @return the string
-   */
-  private String trimFileName(String file) {
-    String name = new File(file).getName();
-    return (name == null || name.lastIndexOf('.') < 0) ? "" : name.substring(0,
-        name.lastIndexOf('.'));
-  }
-
-  /**
    * Cleanup.
    *
    * @param assemblies the assemblies
@@ -706,49 +644,6 @@ public class BooCli {
     if (!isSuc) {
       LogUtils.error(Constants.NEED_ANOTHER_CLEANUP);
     }
-  }
-
-  /**
-   * Cleanup old.
-   */
-  public void cleanupOld() {
-    List<String> files = this.listConfigFiles(this.configDir, this.configFile);
-    if (files.size() == 0) {
-      System.out.println("There is no instance to remove");
-      return;
-    }
-    if (isForced == false) {
-      String str = String.format(YES_NO, files.size(), trimFileName(this.configFile));
-      str = this.userInput(str);
-      if (!"y".equalsIgnoreCase(str.trim())) {
-        return;
-      }
-
-    }
-    boolean isSuc = true;
-    for (String file : files) {
-      LogUtils.info("Destroying OneOps instance %s \n", file);
-      try {
-        this.init(file, null);
-        if (flow.isAssemblyExist()) {
-          boolean isDone = flow.cleanup();
-          if (!isDone && isSuc) {
-            isSuc = false;
-          }
-        }
-        // this.deleteFile(this.configDir, file);
-      } catch (BfdOoException e) {
-        // Ignore
-        isSuc = false;
-      } catch (OneOpsClientAPIException e) {
-        // Ignore
-        isSuc = false;
-      }
-    }
-    if (!isSuc) {
-      LogUtils.error(Constants.NEED_ANOTHER_CLEANUP);
-    }
-
   }
 
   /**
