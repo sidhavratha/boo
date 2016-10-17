@@ -227,8 +227,9 @@ public class BooCli {
    * @throws BfdOoException the BFDOO exception
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public void parse(String[] arg) throws ParseException, BfdOoException, OneOpsClientAPIException {
+  public int parse(String[] arg) throws ParseException, BfdOoException, OneOpsClientAPIException {
     CommandLineParser parser = new DefaultParser();
+    int exit = 0;
     // CommandLineParser parser = new GnuParser();
     try {
 
@@ -239,7 +240,7 @@ public class BooCli {
        */
       if (cmd.hasOption("h")) {
         this.help(null, Constants.BFD_TOOL);
-        System.exit(0);
+        return exit;
       }
 
       if (cmd.hasOption("quiet")) {
@@ -278,7 +279,7 @@ public class BooCli {
         this.configDir = this.configFile.substring(0, this.configFile.lastIndexOf('/'));
       } else if (this.configDir == null && this.configFile == null) {
         this.help(null, "No YAML file found.");
-        System.exit(-1);
+        return Constants.EXIT_TWO;
       }
 
       this.init(this.configFile, assembly);
@@ -290,7 +291,7 @@ public class BooCli {
         } else {
           this.listFiles(prefix.trim());
         }
-        System.exit(0);
+        return Constants.EXIT_ZERO;
       }
       /**
        * Handle other commands.
@@ -355,7 +356,7 @@ public class BooCli {
         if (cmd.getOptionValues("procedure").length != 3) {
           System.err
               .println("Wrong prameters! --prodedure <platformName> <componentName> <actionName>");
-          System.exit(1);
+          return Constants.EXIT_ONE;
         } else {
           String[] args = cmd.getOptionValues("procedure");
           String arglist = "";
@@ -377,8 +378,7 @@ public class BooCli {
                     System.out.println(instance);
                   }
                 }
-
-                System.exit(0);
+                return Constants.EXIT_ZERO;
               }
               instances = Arrays.asList(ins.split(","));
             }
@@ -390,9 +390,8 @@ public class BooCli {
                 System.out.println(instance);
               }
             }
-
           } else {
-            this.executeAction(args[0], args[1], args[2], arglist, instances, rollAt);
+            exit = this.executeAction(args[0], args[1], args[2], arglist, instances, rollAt);
           }
 
         }
@@ -403,6 +402,7 @@ public class BooCli {
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
+    return exit;
   }
 
   /**
@@ -415,8 +415,9 @@ public class BooCli {
    * @param instanceList the instance list
    * @param rollAt the roll at
    */
-  private void executeAction(String platformName, String componentName, String actionName,
+  private int executeAction(String platformName, String componentName, String actionName,
       String arglist, List<String> instanceList, int rollAt) {
+    int returnCode = 0;
     String procedureId = null;
     try {
       System.out.println(Constants.PROCEDURE_RUNNING);
@@ -425,6 +426,7 @@ public class BooCli {
 
     } catch (OneOpsClientAPIException e) {
       System.err.println(e.getMessage());
+      returnCode = Constants.EXIT_ONE;
     }
     if (procedureId != null) {
       String procStatus = "active";
@@ -445,9 +447,10 @@ public class BooCli {
         System.out.println(Constants.SUCCEED);
       } else {
         System.err.println(Constants.PROCEDURE_NOT_COMPLETE);
+        returnCode = Constants.EXIT_ONE;
       }
     }
-
+    return returnCode;
   }
 
   /**

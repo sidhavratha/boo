@@ -1,5 +1,7 @@
 package com.wm.bfd.oo;
 
+import com.wm.bfd.oo.yaml.Constants;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -17,10 +19,11 @@ public class Main {
   public static void main(String[] args) {
     BooCli cli = new BooCli();
     try {
-      cli.parse(args);
+      int exit = cli.parse(args);
+      System.exit(exit);
     } catch (Exception e) {
       System.err.println(e.getMessage());
-      System.exit(2);
+      System.exit(Constants.EXIT_ONE);
     }
   }
 }
