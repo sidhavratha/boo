@@ -129,7 +129,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     while (retry && retries > 0) {
       utils.waitTimeout(2);
       try {
-        this.deploy();
+        this.deploy(isUpdate);
         retry = false;
       } catch (Exception e) {
         deployError = e.getMessage();
@@ -151,6 +151,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     return true;
   }
+  
 
   /**
    * Relay enable delivery.
@@ -505,7 +506,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(),
           config);
     }
-    transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    if (this.comments == null) {
+      transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    } else {
+      transition.commitEnvironment(envName, null, comments);
+    }
     return true;
   }
 

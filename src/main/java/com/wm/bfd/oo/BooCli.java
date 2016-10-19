@@ -73,75 +73,56 @@ public class BooCli {
    */
   public BooCli() {
     Option help = new Option("h", "help", false, "show help.");
-    Option create =
-        Option
-            .builder("c")
-            .longOpt("create")
-            .desc(
-                "Create a new Assembly specified by -d or -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.")
-            .build();
-    Option update =
-        Option.builder("u").longOpt("update").desc("Update configurations specified by -d or -f.")
-            .build();
-    Option status =
-        Option.builder("s").longOpt("status")
-            .desc("Get status of deployments specified by -d or -f").build();
+    Option create = Option.builder("c").longOpt("create")
+        .desc(
+            "Create a new Assembly specified by -d or -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.")
+        .build();
+    Option update = Option.builder("u").longOpt("update")
+        .desc("Update configurations specified by -d or -f.").build();
+    Option status = Option.builder("s").longOpt("status")
+        .desc("Get status of deployments specified by -d or -f").build();
 
-    Option config =
-        Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
-            .desc("Use specified configuration file, required if -d not used").build();
+    Option config = Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
+        .desc("Use specified configuration file, required if -d not used").build();
 
-    Option cleanup =
-        Option.builder("r").longOpt("remove")
-            .desc("Remove all deployed configurations specified by -d or -f").build();
-    Option list =
-        Option.builder("l").longOpt("list").numberOfArgs(1).optionalArg(Boolean.TRUE)
-            .desc("Return a list of instances applicable to the identifier provided..").build();
+    Option cleanup = Option.builder("r").longOpt("remove")
+        .desc("Remove all deployed configurations specified by -d or -f").build();
+    Option list = Option.builder("l").longOpt("list").numberOfArgs(1).optionalArg(Boolean.TRUE)
+        .desc("Return a list of instances applicable to the identifier provided..").build();
 
     Option force = Option.builder().longOpt("force").desc("Do not prompt for --remove").build();
 
     Option nodeploy =
         Option.builder().longOpt("no-deploy").desc("Create assembly without deployments").build();
 
-    Option getIps =
-        Option.builder().longOpt("get-ips").argName("environment> <compute-class")
-            .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
+    Option getIps = Option.builder().longOpt("get-ips").argName("environment> <compute-class")
+        .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
     getIps.setOptionalArg(true);
     getIps.setArgs(Option.UNLIMITED_VALUES);
 
-    Option retry =
-        Option.builder().longOpt("retry")
-            .desc("Retry deployments of configurations specified by -d or -f").build();
+    Option retry = Option.builder().longOpt("retry")
+        .desc("Retry deployments of configurations specified by -d or -f").build();
     Option quiet = Option.builder().longOpt("quiet").desc("Silence the textual output.").build();
-    Option assembly =
-        Option.builder("a").longOpt("assembly").hasArg().desc("Override the assembly name.")
-            .build();
-    Option action =
-        Option.builder().longOpt("procedure").numberOfArgs(3).optionalArg(Boolean.TRUE)
-            .argName("platform> <component> <action")
-            .desc("Execute actions. Use 'list' as an action to show available actions.").build();
+    Option assembly = Option.builder("a").longOpt("assembly").hasArg()
+        .desc("Override the assembly name.").build();
+    Option action = Option.builder().longOpt("procedure").numberOfArgs(3).optionalArg(Boolean.TRUE)
+        .argName("platform> <component> <action")
+        .desc("Execute actions. Use 'list' as an action to show available actions.").build();
     Option procedureArguments =
-        Option
-            .builder()
-            .longOpt("procedure-arguments")
-            .argName("arglist")
-            .hasArg()
+        Option.builder().longOpt("procedure-arguments").argName("arglist").hasArg()
             .desc(
                 "Arguments to pass to the procedure call. Example: '{\"backup_type\":\"incremental\"}'")
             .build();
     Option instanceList =
-        Option
-            .builder()
-            .longOpt("procedure-instances")
-            .argName("instanceList")
-            .hasArg()
+        Option.builder().longOpt("procedure-instances").argName("instanceList").hasArg()
             .desc(
                 "Comma-separated list of component instance names. 'list' to show all available component instances.")
             .build();
 
-    Option stepSize =
-        Option.builder().longOpt("procedure-step-size").argName("size").hasArg()
-            .desc("Percent of nodes to perform procedure on, default is 100.").build();
+    Option stepSize = Option.builder().longOpt("procedure-step-size").argName("size").hasArg()
+        .desc("Percent of nodes to perform procedure on, default is 100.").build();
+    Option comment = Option.builder("m").longOpt("message").argName("description").hasArg()
+        .desc("Customize the comment for deployments").build();
     options.addOption(help);
     options.addOption(config);
     options.addOption(create);
@@ -159,6 +140,7 @@ public class BooCli {
     options.addOption(procedureArguments);
     options.addOption(instanceList);
     options.addOption(stepSize);
+    options.addOption(comment);
   }
 
   static {
@@ -237,7 +219,7 @@ public class BooCli {
       if (cmd.hasOption("no-deploy")) {
         BooCli.setNoDeploy(Boolean.TRUE);
       }
-
+      
       if (cmd.hasOption("a")) {
         assembly = cmd.getOptionValue("a");
       }
@@ -259,6 +241,11 @@ public class BooCli {
 
       this.init(this.configFile, assembly);
       this.initOo(config, null);
+      
+      if (cmd.hasOption("m")) {
+        this.flow.setComments(cmd.getOptionValue("m"));
+      }
+      
       if (cmd.hasOption("l")) {
         String prefix = cmd.getOptionValue("l");
         if (prefix == null) {
@@ -279,10 +266,9 @@ public class BooCli {
         }
       } else if (cmd.hasOption("c")) {
         if (config.getYaml().getAssembly().getAutoGen()) {
-          this.initOo(
-              this.config,
-              this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(), config
-                  .getYaml().getAssembly().getName()));
+          this.initOo(this.config,
+              this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(),
+                  config.getYaml().getAssembly().getName()));
           LogUtils.info(Constants.CREATING_ASSEMBLY, config.getYaml().getAssembly().getName());
         }
         this.createPacks(Boolean.FALSE, isNoDeploy);
@@ -398,8 +384,8 @@ public class BooCli {
     String procedureId = null;
     try {
       System.out.println(Constants.PROCEDURE_RUNNING);
-      procedureId =
-          flow.executeAction(platformName, componentName, actionName, arglist, instanceList, rollAt);
+      procedureId = flow.executeAction(platformName, componentName, actionName, arglist,
+          instanceList, rollAt);
 
     } catch (OneOpsClientAPIException e) {
       System.err.println(e.getMessage());
@@ -473,7 +459,7 @@ public class BooCli {
     if (yamlEnv.equals(inputEnv)) {
       getIps0();
     } else {
-      System.out.println("No such environment");
+      System.out.println(Constants.NO_ENVIRONMENT);
     }
   }
 
@@ -491,8 +477,8 @@ public class BooCli {
       List<String> computes = bfdUtils.getComponentOfCompute(this.flow);
       for (String s : computes) {
         if (s.equals(componentName)) {
-          System.out.println("Environment name: "
-              + flow.getConfig().getYaml().getBoo().getEnvName());
+          System.out
+              .println("Environment name: " + flow.getConfig().getYaml().getBoo().getEnvName());
           for (String pname : platforms.keySet()) {
             System.out.println("Platform name: " + pname);
             System.out.println("Compute name: " + componentName);
@@ -572,8 +558,8 @@ public class BooCli {
    * @throws BfdOoException the BFDOO exception
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public void createPacks(boolean isUpdate, boolean isAssemblyOnly) throws BfdOoException,
-      OneOpsClientAPIException {
+  public void createPacks(boolean isUpdate, boolean isAssemblyOnly)
+      throws BfdOoException, OneOpsClientAPIException {
     flow.process(isUpdate, isAssemblyOnly);
   }
 
@@ -586,9 +572,8 @@ public class BooCli {
    */
   private String autoGenAssemblyName(boolean isAutoGen, String assemblyName) {
     if (isAutoGen) {
-      assemblyName =
-          (assemblyName == null ? this.randomString("") : (assemblyName + Constants.DASH + this
-              .randomString(assemblyName)));
+      assemblyName = (assemblyName == null ? this.randomString("")
+          : (assemblyName + Constants.DASH + this.randomString(assemblyName)));
     }
     return assemblyName;
   }

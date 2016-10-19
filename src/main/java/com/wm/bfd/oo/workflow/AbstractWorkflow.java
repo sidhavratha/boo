@@ -70,6 +70,9 @@ public abstract class AbstractWorkflow {
   /** The bar. */
   ProgressBar bar;
 
+  /** The comments */
+  String comments = null;
+
   /**
    * Instantiates a new abstract workflow.
    *
@@ -121,6 +124,10 @@ public abstract class AbstractWorkflow {
     }
     this.deleteAssembly();
     return true;
+  }
+
+  public void setComments(String str) {
+    this.comments = str;
   }
 
   /**
@@ -442,7 +449,11 @@ public abstract class AbstractWorkflow {
     try {
       transition.disableAllPlatforms(envName);
       transition.commitEnvironment(envName, null, "Clean up " + envName);
-      transition.deploy(envName, "test deploy!");
+      if (this.comments == null) {
+        transition.deploy(envName, Constants.CLEANUP_DESCRIPTION);
+      } else {
+        transition.deploy(envName, comments);
+      }
     } catch (Exception e) {
       // Ignore
     }
@@ -776,8 +787,12 @@ public abstract class AbstractWorkflow {
           config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps,
           Constants.DESCRIPTION);
       response = transition.getEnvironment(envName);
+      if (this.comments == null) {
+        transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+      } else {
+        transition.commitEnvironment(envName, null, comments);
+      }
 
-      transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
     } else {
       LogUtils.info(Constants.ENV_EXISTING, envName);
     }
@@ -861,7 +876,12 @@ public abstract class AbstractWorkflow {
    * @throws OneOpsClientAPIException the one ops client API exception
    */
   public boolean commitEnv() throws OneOpsClientAPIException {
-    JsonPath response = transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    JsonPath response;
+    if (this.comments == null) {
+      response = transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    } else {
+      response = transition.commitEnvironment(envName, null, comments);
+    }
     return response == null ? false : true;
   }
 
@@ -871,9 +891,17 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean deploy() throws OneOpsClientAPIException {
-
-    JsonPath response = transition.deploy(envName, Constants.DESCRIPTION);
+  public boolean deploy(boolean isUpdate) throws OneOpsClientAPIException {
+    JsonPath response;
+    if (this.comments == null) {
+      if (isUpdate) {
+        response = transition.deploy(envName, Constants.UPDATE_DESCRIPTION);
+      } else {
+        response = transition.deploy(envName, Constants.CREATE_DESCRIPTION);
+      }
+    } else {
+      response = transition.deploy(envName, comments);
+    }
     return response == null ? false : true;
   }
 
