@@ -80,7 +80,7 @@ public abstract class AbstractWorkflow {
    * @param config the config
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public AbstractWorkflow(OOInstance instance, ClientConfig config)
+  public AbstractWorkflow(OOInstance instance, ClientConfig config, String comment)
       throws OneOpsClientAPIException {
 
     this.instance = instance;
@@ -96,6 +96,9 @@ public abstract class AbstractWorkflow {
     this.config = config;
 
     this.bar = new ProgressBar();
+    if (comment != null) {
+      this.comments = comment;
+    }
   }
 
   /**
@@ -124,10 +127,6 @@ public abstract class AbstractWorkflow {
     }
     this.deleteAssembly();
     return true;
-  }
-
-  public void setComments(String str) {
-    this.comments = str;
   }
 
   /**

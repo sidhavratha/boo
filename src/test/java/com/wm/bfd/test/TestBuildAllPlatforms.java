@@ -22,7 +22,7 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   protected void setUp() throws Exception {
     super.setUp();
     if (build == null) {
-      build = new BuildAllPlatforms(oo, config);
+      build = new BuildAllPlatforms(oo, config, null);
     }
   }
 

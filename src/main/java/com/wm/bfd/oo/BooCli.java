@@ -68,6 +68,8 @@ public class BooCli {
   /** The bfd utils. */
   private BfdUtils bfdUtils = new BfdUtils();
 
+  private String comment = null;
+
   /**
    * Instantiates a new boo cli.
    */
@@ -173,13 +175,13 @@ public class BooCli {
    * @param config the config
    * @param assembly the assembly
    */
-  public void initOo(ClientConfig config, String assembly) {
+  public void initOo(ClientConfig config, String assembly, String comment) {
     OOInstance oo = injector.getInstance(OOInstance.class);
     try {
       if (assembly != null) {
         config.getYaml().getAssembly().setName(assembly);
       }
-      flow = new BuildAllPlatforms(oo, config);
+      flow = new BuildAllPlatforms(oo, config, comment);
     } catch (OneOpsClientAPIException e) {
       System.err.println("Init failed! Quit!");
     }
@@ -219,7 +221,7 @@ public class BooCli {
       if (cmd.hasOption("no-deploy")) {
         BooCli.setNoDeploy(Boolean.TRUE);
       }
-      
+
       if (cmd.hasOption("a")) {
         assembly = cmd.getOptionValue("a");
       }
@@ -239,13 +241,13 @@ public class BooCli {
         return Constants.EXIT_TWO;
       }
 
-      this.init(this.configFile, assembly);
-      this.initOo(config, null);
-      
       if (cmd.hasOption("m")) {
-        this.flow.setComments(cmd.getOptionValue("m"));
+        this.comment = cmd.getOptionValue("m");
       }
-      
+
+      this.init(this.configFile, assembly);
+      this.initOo(config, null, comment);
+
       if (cmd.hasOption("l")) {
         String prefix = cmd.getOptionValue("l");
         if (prefix == null) {
@@ -268,7 +270,7 @@ public class BooCli {
         if (config.getYaml().getAssembly().getAutoGen()) {
           this.initOo(this.config,
               this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(),
-                  config.getYaml().getAssembly().getName()));
+                  config.getYaml().getAssembly().getName()), comment);
           LogUtils.info(Constants.CREATING_ASSEMBLY, config.getYaml().getAssembly().getName());
         }
         this.createPacks(Boolean.FALSE, isNoDeploy);
@@ -282,7 +284,7 @@ public class BooCli {
         } else {
           List<String> assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());
           for (String asm : assemblies) {
-            this.initOo(config, asm);
+            this.initOo(config, asm, comment);
             this.createPacks(Boolean.TRUE, isNoDeploy);
           }
         }
@@ -614,7 +616,7 @@ public class BooCli {
     boolean isSuc = true;
     for (String assembly : assemblies) {
       LogUtils.info("Destroying OneOps assembly %s \n", assembly);
-      this.initOo(config, assembly);
+      this.initOo(config, assembly, comment);
       if (flow.isAssemblyExist(assembly)) {
         boolean isDone;
         try {

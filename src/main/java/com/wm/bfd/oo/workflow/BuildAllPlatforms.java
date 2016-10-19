@@ -53,9 +53,10 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @param config the config
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public BuildAllPlatforms(OOInstance instance, ClientConfig config)
+  
+  public BuildAllPlatforms(OOInstance instance, ClientConfig config, String comment)
       throws OneOpsClientAPIException {
-    super(instance, config);
+    super(instance, config, comment);
   }
 
 
