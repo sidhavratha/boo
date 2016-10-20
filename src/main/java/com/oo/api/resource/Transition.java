@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import com.google.common.base.Strings;
@@ -196,7 +197,7 @@ public class Transition extends APIClient {
       }
       jo.put("exclude_platforms", sb.toString());
     }
-    if (comment != null)
+    if (!StringUtils.isBlank(comment))
       jo.put("desc", comment);
     Response response =
         request.body(jo.toString()).post(TRANSITION_ENV_URI + environmentName + "/commit");
@@ -248,7 +249,7 @@ public class Transition extends APIClient {
           Map<String, String> properties = new HashMap<String, String>();
           properties.put("nsPath", nsPath);
           properties.put("releaseId", releaseId + "");
-          if (comments != null) {
+          if (!StringUtils.isBlank(comments)) {
             properties.put("comments", comments);
           }
           ResourceObject ro = new ResourceObject();

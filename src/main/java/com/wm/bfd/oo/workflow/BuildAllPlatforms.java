@@ -14,6 +14,7 @@ import com.oo.api.exception.OneOpsClientAPIException;
 import com.oo.api.exception.OneOpsComponentExistException;
 import com.oo.api.resource.model.RedundancyConfig;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -507,7 +508,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(),
           config);
     }
-    if (this.comments == null) {
+    if (StringUtils.isBlank(this.comments)) {
       transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
     } else {
       transition.commitEnvironment(envName, null, comments);

@@ -18,6 +18,7 @@ import com.oo.api.resource.Design;
 import com.oo.api.resource.Operation;
 import com.oo.api.resource.Transition;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +97,7 @@ public abstract class AbstractWorkflow {
     this.config = config;
 
     this.bar = new ProgressBar();
-    if (comment != null) {
+    if (!StringUtils.isBlank(comment)) {
       this.comments = comment;
     }
   }
@@ -448,7 +449,7 @@ public abstract class AbstractWorkflow {
     try {
       transition.disableAllPlatforms(envName);
       transition.commitEnvironment(envName, null, "Clean up " + envName);
-      if (this.comments == null) {
+      if (StringUtils.isBlank(this.comments)) {
         transition.deploy(envName, Constants.CLEANUP_DESCRIPTION);
       } else {
         transition.deploy(envName, comments);
@@ -786,7 +787,7 @@ public abstract class AbstractWorkflow {
           config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps,
           Constants.DESCRIPTION);
       response = transition.getEnvironment(envName);
-      if (this.comments == null) {
+      if (StringUtils.isBlank(this.comments)) {
         transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
       } else {
         transition.commitEnvironment(envName, null, comments);
@@ -876,7 +877,7 @@ public abstract class AbstractWorkflow {
    */
   public boolean commitEnv() throws OneOpsClientAPIException {
     JsonPath response;
-    if (this.comments == null) {
+    if (StringUtils.isBlank(this.comments)) {
       response = transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
     } else {
       response = transition.commitEnvironment(envName, null, comments);
@@ -892,7 +893,7 @@ public abstract class AbstractWorkflow {
    */
   public boolean deploy(boolean isUpdate) throws OneOpsClientAPIException {
     JsonPath response;
-    if (this.comments == null) {
+    if (StringUtils.isBlank(this.comments)) {
       if (isUpdate) {
         response = transition.deploy(envName, Constants.UPDATE_DESCRIPTION);
       } else {
