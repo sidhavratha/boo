@@ -53,7 +53,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @param config the config
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  
+
   public BuildAllPlatforms(OOInstance instance, ClientConfig config, String comment)
       throws OneOpsClientAPIException {
     super(instance, config, comment);
@@ -152,7 +152,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     return true;
   }
-  
+
 
   /**
    * Relay enable delivery.

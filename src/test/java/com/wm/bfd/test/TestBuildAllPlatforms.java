@@ -144,7 +144,7 @@ public class TestBuildAllPlatforms extends BfdOoTest {
     boolean isSuc = build.updatePlatformCloudScale();
     assertEquals(isSuc, true);
   }
-  
+
   @Test
   public void testUpdateUserComponents() throws OneOpsClientAPIException {
     boolean isSuc = build.updateUserComponents();
