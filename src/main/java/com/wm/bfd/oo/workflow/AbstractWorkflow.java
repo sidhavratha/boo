@@ -18,6 +18,7 @@ import com.oo.api.resource.Design;
 import com.oo.api.resource.Operation;
 import com.oo.api.resource.Transition;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +71,9 @@ public abstract class AbstractWorkflow {
   /** The bar. */
   ProgressBar bar;
 
+  /** The comments */
+  String comments = null;
+
   /**
    * Instantiates a new abstract workflow.
    *
@@ -77,7 +81,7 @@ public abstract class AbstractWorkflow {
    * @param config the config
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public AbstractWorkflow(OOInstance instance, ClientConfig config)
+  public AbstractWorkflow(OOInstance instance, ClientConfig config, String comment)
       throws OneOpsClientAPIException {
 
     this.instance = instance;
@@ -93,6 +97,9 @@ public abstract class AbstractWorkflow {
     this.config = config;
 
     this.bar = new ProgressBar();
+    if (!StringUtils.isBlank(comment)) {
+      this.comments = comment;
+    }
   }
 
   /**
@@ -442,7 +449,11 @@ public abstract class AbstractWorkflow {
     try {
       transition.disableAllPlatforms(envName);
       transition.commitEnvironment(envName, null, "Clean up " + envName);
-      transition.deploy(envName, "test deploy!");
+      if (StringUtils.isBlank(this.comments)) {
+        transition.deploy(envName, Constants.CLEANUP_DESCRIPTION);
+      } else {
+        transition.deploy(envName, comments);
+      }
     } catch (Exception e) {
       // Ignore
     }
@@ -776,8 +787,12 @@ public abstract class AbstractWorkflow {
           config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps,
           Constants.DESCRIPTION);
       response = transition.getEnvironment(envName);
+      if (StringUtils.isBlank(this.comments)) {
+        transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+      } else {
+        transition.commitEnvironment(envName, null, comments);
+      }
 
-      transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
     } else {
       LogUtils.info(Constants.ENV_EXISTING, envName);
     }
@@ -861,7 +876,12 @@ public abstract class AbstractWorkflow {
    * @throws OneOpsClientAPIException the one ops client API exception
    */
   public boolean commitEnv() throws OneOpsClientAPIException {
-    JsonPath response = transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    JsonPath response;
+    if (StringUtils.isBlank(this.comments)) {
+      response = transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    } else {
+      response = transition.commitEnvironment(envName, null, comments);
+    }
     return response == null ? false : true;
   }
 
@@ -871,9 +891,17 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean deploy() throws OneOpsClientAPIException {
-
-    JsonPath response = transition.deploy(envName, Constants.DESCRIPTION);
+  public boolean deploy(boolean isUpdate) throws OneOpsClientAPIException {
+    JsonPath response;
+    if (StringUtils.isBlank(this.comments)) {
+      if (isUpdate) {
+        response = transition.deploy(envName, Constants.UPDATE_DESCRIPTION);
+      } else {
+        response = transition.deploy(envName, Constants.CREATE_DESCRIPTION);
+      }
+    } else {
+      response = transition.deploy(envName, comments);
+    }
     return response == null ? false : true;
   }
 

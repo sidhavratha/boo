@@ -14,6 +14,7 @@ import com.oo.api.exception.OneOpsClientAPIException;
 import com.oo.api.exception.OneOpsComponentExistException;
 import com.oo.api.resource.model.RedundancyConfig;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +54,10 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @param config the config
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public BuildAllPlatforms(OOInstance instance, ClientConfig config)
+
+  public BuildAllPlatforms(OOInstance instance, ClientConfig config, String comment)
       throws OneOpsClientAPIException {
-    super(instance, config);
+    super(instance, config, comment);
   }
 
 
@@ -129,7 +131,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     while (retry && retries > 0) {
       utils.waitTimeout(2);
       try {
-        this.deploy();
+        this.deploy(isUpdate);
         retry = false;
       } catch (Exception e) {
         deployError = e.getMessage();
@@ -151,6 +153,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     return true;
   }
+
 
   /**
    * Relay enable delivery.
@@ -505,7 +508,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(),
           config);
     }
-    transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    if (StringUtils.isBlank(this.comments)) {
+      transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    } else {
+      transition.commitEnvironment(envName, null, comments);
+    }
     return true;
   }
 
