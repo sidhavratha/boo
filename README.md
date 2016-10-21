@@ -29,7 +29,12 @@ Run boo as a bash script:
 
 usage: 
 
-* boo [-a <arg>] [-c] [-d <DIR>] [-f <FILE>] [--force] [--get-ips <environment> <compute-class>] [-h] [-l <arg>] [--no-deploy] [--procedure <platform> <component> <action>] [--procedure-arguments <arglist>] [--procedure-instances <instanceList>] [--procedure-step-size <size>] [--quiet] [-r] [--retry] [-s] [-u]
+* boo [-a <arg>] [-c] [-f <FILE>] [--force] [--get-ips <environment>
+       <compute-class>] [-h] [-l <arg>] [-m <description>] [--no-deploy]
+       [--procedure <platform> <component> <action>]
+       [--procedure-arguments <arglist>] [--procedure-instances
+       <instanceList>] [--procedure-step-size <size>] [--quiet] [-r]
+       [--retry] [-s] [-u]
 * -a,--assembly <arg>                          Override the assembly name.
 * -c,--create                                  Create a new Assembly specified by
                                               -d or -f. If Assembly automatic
@@ -56,9 +61,13 @@ usage:
  
 * -l,--list                                    Return a list of instances applicable 
                                               to the identifier provided..
-* --procedure <platform> <component> <action>   Execute actions. 'list'
-                                              is for all actions that
-                                              available to use.
+* -m,--message <description>                   Customize the comment
+                                              for deployments
+* --no-deploy                                  Create assembly without
+                                              deployments
+* --procedure <platform> <component> <action>   Execute actions. Use
+                                              'list' as an action to
+                                              show available actions.
 * --procedure-arguments <arglist>               Arguments to pass to the
                                               procedure call. Example:
                                               '{"backup_type":"increme
