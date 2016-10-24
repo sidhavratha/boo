@@ -529,7 +529,7 @@ public class BooCli {
    */
   private void help(String header, String footer) {
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("boo", header, options, footer, true);
+    formatter.printHelp(120, "boo", header, options, footer, true);
   }
 
   /**
