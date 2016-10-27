@@ -41,8 +41,8 @@ public class ClientConfig {
    * @throws FileNotFoundException the file not found exception
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public ClientConfig(String file) throws JsonParseException, JsonMappingException,
-      FileNotFoundException, IOException {
+  public ClientConfig(String file)
+      throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
     FileInputStream input = null;
     try {
       input = new FileInputStream(new File(file));

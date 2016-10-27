@@ -79,8 +79,8 @@ public final class EnvironmentBeanHelper {
         Map<String, Object> map = (Map<String, Object>) value;
         for (Map.Entry<String, Object> entry1 : map.entrySet()) {
           Map<String, String> config = (Map<String, String>) entry1.getValue();
-          CloudBean cloud =
-              new CloudBean(entry1.getKey(), config.get(PCT_SCALE), config.get(DPMT_ORDER), config.get(PRIORITY));
+          CloudBean cloud = new CloudBean(entry1.getKey(), config.get(PCT_SCALE),
+              config.get(DPMT_ORDER), config.get(PRIORITY));
           env.addClouds(cloud);
         }
 

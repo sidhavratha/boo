@@ -62,8 +62,8 @@ public class JaywayHttpModule extends AbstractModule {
    */
   @Provides
   @Singleton
-  ClientConfig getClientConfig() throws JsonParseException, JsonMappingException,
-      FileNotFoundException, IOException {
+  ClientConfig getClientConfig()
+      throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
     // test
     if (CLIENT == null) {
       CLIENT = new ClientConfig(this.yaml);
@@ -82,8 +82,8 @@ public class JaywayHttpModule extends AbstractModule {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   @Provides
-  OOInstance getOoInstance() throws JsonParseException, JsonMappingException,
-      FileNotFoundException, IOException {
+  OOInstance getOoInstance()
+      throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
     OOInstance instance = new OOInstance();
     ClientConfig client = this.getClientConfig();
     instance.setAuthtoken(client.getYaml().getBoo().getApikey());

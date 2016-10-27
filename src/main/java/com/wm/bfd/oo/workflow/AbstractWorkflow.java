@@ -71,7 +71,7 @@ public abstract class AbstractWorkflow {
   /** The bar. */
   ProgressBar bar;
 
-  /** The comments */
+  /** The comments. */
   String comments = null;
 
   /**

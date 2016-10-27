@@ -7,22 +7,22 @@ import java.util.List;
 import java.util.Map;
 
 public final class PlatformBeanHelper {
-  
+
   /** The Constant DEPLOY_ORDER. */
   private static final String DEPLOY_ORDER = "deploy_order";
-  
+
   /** The Constant PACK. */
   private static final String PACK = "pack";
-  
+
   /** The Constant PACK_VERSION. */
   private static final String PACK_VERSION = "pack_version";
-  
+
   /** The Constant VARIABLES. */
   private static final String VARIABLES = "variables";
-  
+
   /** The Constant ENCRYPTED_VARIABLES. */
   private static final String ENCRYPTED_VARIABLES = "encrypted_variables";
-  
+
   /** The Constant COMPONENTS. */
   private static final String COMPONENTS = "components";
 
@@ -46,10 +46,10 @@ public final class PlatformBeanHelper {
         }
         platforms.add(new PlatformBean.PlatformBeanBuilder((String) platformMap.get(PACK),
             (String) platformMap.get(PACK_VERSION)).setName(key)
-            .setComponents((Map<String, Object>) platformMap.get(COMPONENTS))
-            .setSecureVariables((Map<String, String>) platformMap.get(ENCRYPTED_VARIABLES))
-            .setVariables((Map<String, String>) platformMap.get(VARIABLES))
-            .setDeployOrder(deployOrder).build());
+                .setComponents((Map<String, Object>) platformMap.get(COMPONENTS))
+                .setSecureVariables((Map<String, String>) platformMap.get(ENCRYPTED_VARIABLES))
+                .setVariables((Map<String, String>) platformMap.get(VARIABLES))
+                .setDeployOrder(deployOrder).build());
       }
     }
     return platforms;

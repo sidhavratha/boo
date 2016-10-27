@@ -25,14 +25,14 @@ import java.net.URL;
 public abstract class BfdOoTest extends TestCase {
   private static final Logger LOG = LoggerFactory.getLogger(BfdOoTest.class);
   private static final Injector injector = Guice.createInjector(new JaywayHttpModule(getConfig()));
-  
+
   /** The config. */
   ClientConfig config;
   OOInstance oo;
   String assemblyName;
   String envName;
   JaywayHttpModule module;
-  
+
   /** The bfd utils. */
   BfdUtils bfdUtils = new BfdUtils();
 
