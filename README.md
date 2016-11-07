@@ -37,21 +37,16 @@ usage:
        [--retry] [-s] [-u]
 * -a,--assembly <arg>                          Override the assembly name.
 * -c,--create                                  Create a new Assembly specified by
-                                              -d or -f. If Assembly automatic
+                                              -f. If Assembly automatic
                                               naming is enabled, each invocation
                                               will create a new Assembly.
                                        
-* -d,--config-dir <DIR>                       Use all configuration files in
-                                              given directory, required if -f not
-                                              used
-                                       
 * -f,--config-file <FILE>                      Use specified configuration file,
-                                              required if -d not used
                                        
 * --force                                      Do not prompt for --remove
  
 * --get-ips <environment> <compute-class>      Get IPs of deployed nodes specified
-* --get-ips <environment>                      by -d or -f
+* --get-ips <environment>                      by -f
 * --get-ips
  
 * --no-deploy                                  Create assembly without
@@ -83,15 +78,15 @@ usage:
 * --quiet                                      Silence the textual output.
     
 * -r,--remove                                  Remove all deployed configurations
-                                              specified by -d or -f
+                                              specified by -f
                                        
 * --retry                                      Retry deployments of configurations
-                                              specified by -d or -f
+                                              specified by -f
                                        
 * -s,--status                                  Get status of deployments specified
-                                              by -d or -f
+                                              by -f
                                        
 * -u,--update                                  Update configurations specified by
-                                              -d or -f.
+                                              -f.
                                        
 The tool is managed by BFD team.

@@ -77,18 +77,18 @@ public class BooCli {
     Option help = new Option("h", "help", false, "show help.");
     Option create = Option.builder("c").longOpt("create")
         .desc(
-            "Create a new Assembly specified by -d or -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.")
+            "Create a new Assembly specified by -f. If Assembly automatic naming is enabled, each invocation will create a new Assembly.")
         .build();
     Option update = Option.builder("u").longOpt("update")
-        .desc("Update configurations specified by -d or -f.").build();
+        .desc("Update configurations specified by -f.").build();
     Option status = Option.builder("s").longOpt("status")
-        .desc("Get status of deployments specified by -d or -f").build();
+        .desc("Get status of deployments specified by -f").build();
 
     Option config = Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
-        .desc("Use specified configuration file, required if -d not used").build();
+        .desc("Use specified configuration file").build();
 
     Option cleanup = Option.builder("r").longOpt("remove")
-        .desc("Remove all deployed configurations specified by -d or -f").build();
+        .desc("Remove all deployed configurations specified by -f").build();
     Option list = Option.builder("l").longOpt("list").numberOfArgs(1).optionalArg(Boolean.TRUE)
         .desc("Return a list of instances applicable to the identifier provided..").build();
 
@@ -98,12 +98,12 @@ public class BooCli {
         Option.builder().longOpt("no-deploy").desc("Create assembly without deployments").build();
 
     Option getIps = Option.builder().longOpt("get-ips").argName("environment> <compute-class")
-        .desc("Get IPs of deployed nodes specified by -d or -f; Args are optional.").build();
+        .desc("Get IPs of deployed nodes specified by -f; Args are optional.").build();
     getIps.setOptionalArg(true);
     getIps.setArgs(Option.UNLIMITED_VALUES);
 
     Option retry = Option.builder().longOpt("retry")
-        .desc("Retry deployments of configurations specified by -d or -f").build();
+        .desc("Retry deployments of configurations specified by -f").build();
     Option quiet = Option.builder().longOpt("quiet").desc("Silence the textual output.").build();
     Option assembly = Option.builder("a").longOpt("assembly").hasArg()
         .desc("Override the assembly name.").build();
