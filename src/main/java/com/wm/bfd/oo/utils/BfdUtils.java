@@ -179,6 +179,8 @@ public class BfdUtils {
   public String getAbsolutePath(String template) {
     if (template == null || template.length() == 0 || template.charAt(0) == Constants.SLASH) {
       return template;
+    } else if (template.length() > 2 && template.substring(0, 2).equals(Constants.DOUBLE_PERIOD)) {
+      return parseDoublePeriodPath(template);
     } else if (template.charAt(0) == Constants.DOT && template.length() > 1
         && template.charAt(1) == Constants.DOT) {
       return getAbsolutePath(template.substring(2));
@@ -189,6 +191,18 @@ public class BfdUtils {
       sb.append(template);
       return sb.toString();
     }
+  }
+
+  public String parseDoublePeriodPath(String template) {
+    String userDir = System.getProperty("user.dir");
+    while (template.substring(0, 2).equals(Constants.DOUBLE_PERIOD)) {
+      int lastSlash = userDir.lastIndexOf(Constants.SLASH);
+      if (lastSlash != 0) {
+        userDir = userDir.substring(0, lastSlash);
+      }
+      template = template.substring(3);
+    }
+    return userDir + Constants.SLASH + template;
   }
 
   /**

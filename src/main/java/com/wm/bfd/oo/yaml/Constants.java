@@ -50,6 +50,7 @@ public class Constants {
   public static final char SLASH = '/';
   public static final char DOT = '.';
   public static final char DASH = '-';
+  public static final String DOUBLE_PERIOD = "..";
   public static final String ATTACHMENTS = "attachments";
 
   public static final String BFD_TOOL = "The tool is managed by BFD team.";
