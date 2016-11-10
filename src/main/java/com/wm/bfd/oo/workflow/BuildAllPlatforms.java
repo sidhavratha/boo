@@ -440,6 +440,12 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     executor.shutdown();
     while (!executor.isTerminated()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
   }
 
