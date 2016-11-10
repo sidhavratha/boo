@@ -412,7 +412,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void updateComponentVariables(String platformName, String componentName,
       Map<String, Object> attributes) throws OneOpsClientAPIException {
-
     // Create thread pool to add users parallel
     ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREAD);
 
@@ -422,11 +421,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       // Another Map, so key is ciName
       if (value instanceof Map) {
         Map<String, String> attris = (Map<String, String>) value;
-        // System.out.println("In map:" + key + ":" + componentName + "; " + attris);
         if (attris.containsKey(Constants.AUTHO_KEYS)) {
-          Runnable worker =
-              new UpdateComponentTask(this, platformName, componentName, key, attris);
-          // this.updateComponentVariablesInternal(platformName, componentName, key, attris);
+          Runnable worker = new UpdateComponentTask(this, platformName, componentName, key, attris);
           executor.execute(worker);
         } else {
           this.updateComponentVariablesInternal(platformName, componentName, key, attris);
@@ -434,8 +430,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       } else if (value instanceof String) {
         Map<String, String> att = (Map) attributes;
         if (att.containsKey(Constants.AUTHO_KEYS)) {
-          Runnable worker =
-              new UpdateComponentTask(this, platformName, componentName, key, att);
+          Runnable worker = new UpdateComponentTask(this, platformName, componentName, key, att);
           executor.execute(worker);
         } else {
           this.updateComponentVariablesInternal(platformName, componentName, componentName, att);

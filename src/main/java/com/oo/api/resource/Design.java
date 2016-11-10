@@ -589,7 +589,6 @@ public class Design extends APIClient {
       LOG.debug("Json in addPlatformComponent {}", jsonObject.toString());
       Response response = request.body(jsonObject.toString())
           .post(DESIGN_URI + "platforms/" + platformName + "/components/");
-      System.out.println(DESIGN_URI + "platforms/" + platformName + "/components/");
       if (response != null) {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
           return response.getBody().jsonPath();

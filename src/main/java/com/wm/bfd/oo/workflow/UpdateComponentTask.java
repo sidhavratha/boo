@@ -26,7 +26,7 @@ public class UpdateComponentTask implements Runnable {
 
   @Override
   public void run() {
-    LogUtils.info(Constants.UPDATE_COMPONENTS, componentName, platformName);
+    LogUtils.info(Constants.UPDATE_COMPONENTS2, componentName, uniqueName, platformName);
     Map<String, String> attributes = (Map<String, String>) att;
 
     boolean isExist = Boolean.FALSE;

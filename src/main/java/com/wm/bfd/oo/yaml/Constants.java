@@ -78,6 +78,7 @@ public class Constants {
 
   public static final String CREATE_COMPONENTS = "Creating component %s for %s ...";
   public static final String UPDATE_COMPONENTS = "Updating component %s for %s ...";
+  public static final String UPDATE_COMPONENTS2 = "Updating component %s %s for %s ...";
 
   public static final String CREATING_PLATFORM_SUCCEED = "Created platform %s.";
   public static final String START_DEPLOYMENT = "Starting the deployment now.";
