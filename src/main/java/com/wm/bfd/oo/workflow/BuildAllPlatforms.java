@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class BuildAllPlatforms extends AbstractWorkflow {
@@ -46,6 +48,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 
   /** The retries. */
   private int retries = 6;
+
+  //
+  private int NUM_OF_THREAD = 32;
 
   /**
    * Instantiates a new builds the all platforms.
@@ -310,7 +315,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @throws OneOpsClientAPIException the one ops client API exception
    * @throws OneOpsComponentExistException the one ops component exist exception
    */
-  private boolean isComponentExist(String platformName, String componentName)
+  public boolean isComponentExist(String platformName, String componentName)
       throws OneOpsClientAPIException, OneOpsComponentExistException {
     boolean isExist = false;
     try {
@@ -407,6 +412,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void updateComponentVariables(String platformName, String componentName,
       Map<String, Object> attributes) throws OneOpsClientAPIException {
+    // Create thread pool to add users parallel
+    ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREAD);
 
     for (Map.Entry<String, Object> entry : attributes.entrySet()) {
       String key = entry.getKey();
@@ -414,16 +421,30 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       // Another Map, so key is ciName
       if (value instanceof Map) {
         Map<String, String> attris = (Map<String, String>) value;
-        // System.out.println("In map:" + key + ":" + componentName + "; " + attris);
-        this.updateComponentVariablesInternal(platformName, componentName, key, attris);
+        if (attris.containsKey(Constants.AUTHO_KEYS)) {
+          Runnable worker = new UpdateComponentTask(this, platformName, componentName, key, attris);
+          executor.execute(worker);
+        } else {
+          this.updateComponentVariablesInternal(platformName, componentName, key, attris);
+        }
       } else if (value instanceof String) {
         Map<String, String> att = (Map) attributes;
-        this.updateComponentVariablesInternal(platformName, componentName, componentName, att);
+        if (att.containsKey(Constants.AUTHO_KEYS)) {
+          Runnable worker = new UpdateComponentTask(this, platformName, componentName, key, att);
+          executor.execute(worker);
+        } else {
+          this.updateComponentVariablesInternal(platformName, componentName, componentName, att);
+        }
         break;
       }
-
     }
-
+    executor.shutdown();
+    while (!executor.isTerminated()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e) {
+      }
+    }
   }
 
   /**

@@ -356,7 +356,7 @@ public abstract class AbstractWorkflow {
       throws OneOpsClientAPIException {
     JsonPath componentDetails = design.getPlatformComponent(platformName, componentName);
     Map<String, String> attr = componentDetails.getMap("ciAttributes");
-    if (attr.containsKey("authorized_keys")) {
+    if (attr.containsKey(Constants.AUTHO_KEYS)) {
       return Boolean.TRUE;
     }
     return Boolean.FALSE;
