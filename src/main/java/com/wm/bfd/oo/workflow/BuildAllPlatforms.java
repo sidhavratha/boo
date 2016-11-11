@@ -8,6 +8,7 @@ import com.wm.bfd.oo.yaml.Constants;
 import com.wm.bfd.oo.yaml.PlatformBean;
 import com.wm.bfd.oo.yaml.ScalBean;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.jayway.restassured.path.json.JsonPath;
 import com.oo.api.OOInstance;
 import com.oo.api.exception.OneOpsClientAPIException;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class BuildAllPlatforms extends AbstractWorkflow {
@@ -440,10 +442,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     executor.shutdown();
     while (!executor.isTerminated()) {
-      try {
-        Thread.sleep(1);
-      } catch (InterruptedException e) {
-      }
+      Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS);
     }
   }
 
