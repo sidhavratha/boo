@@ -263,6 +263,7 @@ public class BooCli {
       if (cmd.hasOption("s")) {
         if (!flow.isAssemblyExist()) {
           System.err.printf(Constants.NOTFOUND_ERROR, config.getYaml().getAssembly().getName());
+          return Constants.EXIT_TWO;
         } else {
           System.out.println(this.getStatus());
         }
