@@ -195,7 +195,7 @@ public class BfdUtils {
 
   public String parseDoublePeriodPath(String template) {
     String userDir = System.getProperty("user.dir");
-    while (template.substring(0, 2).equals(Constants.DOUBLE_PERIOD)) {
+    while (template.length() > 2 && template.substring(0, 2).equals(Constants.DOUBLE_PERIOD)) {
       int lastSlash = userDir.lastIndexOf(Constants.SLASH);
       if (lastSlash != 0) {
         userDir = userDir.substring(0, lastSlash);
