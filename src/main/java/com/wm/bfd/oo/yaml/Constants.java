@@ -38,7 +38,8 @@ public class Constants {
   public static final int EXIT_ZERO = 0; // Normal
   public static final int EXIT_ONE = 1; // Error happen.
   public static final int EXIT_TWO = 2; // YAML not found.
-
+  public static final int EXIT_THREE = 3; // Assembly not found.
+  
   /**
    * Customize config.
    */
