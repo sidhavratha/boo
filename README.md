@@ -16,7 +16,7 @@ Run boo as a bash script:
 ##Build to a RPM:
 
 1. Run: mvn clean package -DskipTests -Pbuild-rpms
-2. Then install the BFDOneOpsAutomation-<version>.noarch.rpm to your server
+2. Then install the BFDOneOpsAutomation-\<version\>.noarch.rpm to your server
 3. After that, you can run boo command
 
 ##Install RPM:
@@ -35,18 +35,18 @@ usage:
        [--procedure-arguments <arglist>] [--procedure-instances
        <instanceList>] [--procedure-step-size <size>] [--quiet] [-r]
        [--retry] [-s] [-u]
-* -a,--assembly <arg>                          Override the assembly name.
+* -a,--assembly \<arg\>                          Override the assembly name.
 * -c,--create                                  Create a new Assembly specified by
                                               -f. If Assembly automatic
                                               naming is enabled, each invocation
                                               will create a new Assembly.
                                        
-* -f,--config-file <FILE>                      Use specified configuration file,
+* -f,--config-file \<file\>                      Use specified configuration file,
                                        
 * --force                                      Do not prompt for --remove
  
-* --get-ips <environment> <compute-class>      Get IPs of deployed nodes specified
-* --get-ips <environment>                      by -f
+* --get-ips \<environment\> \<compute-class\>      Get IPs of deployed nodes specified by -f
+* --get-ips \<environment\>        
 * --get-ips
  
 * --no-deploy                                  Create assembly without
@@ -56,23 +56,23 @@ usage:
  
 * -l,--list                                    Return a list of instances applicable 
                                               to the identifier provided..
-* -m,--message <description>                   Customize the comment
+* -m,--message \<description\>                   Customize the comment
                                               for deployments
 * --no-deploy                                  Create assembly without
                                               deployments
-* --procedure <platform> <component> <action>   Execute actions. Use
+* --procedure \<platform\> \<component\> \<action\>   Execute actions. Use
                                               'list' as an action to
                                               show available actions.
-* --procedure-arguments <arglist>               Arguments to pass to the
+* --procedure-arguments \<arglist>\               Arguments to pass to the
                                               procedure call. Example:
                                               '{"backup_type":"increme
                                               ntal"}'
-* --procedure-instances <instanceList>          Comma-separated list of
+* --procedure-instances \<instanceList\>          Comma-separated list of
                                               component instance
                                               names. 'list' to show
                                               all available component
                                               instances.
-* --procedure-step-size <size>                  Percent of nodes to
+* --procedure-step-size \<size\>                  Percent of nodes to
                                               preform procuedure on,
                                               default is 100.                                       
 * --quiet                                      Silence the textual output.
