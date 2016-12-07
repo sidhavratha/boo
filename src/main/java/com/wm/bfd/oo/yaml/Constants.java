@@ -39,7 +39,7 @@ public class Constants {
   public static final int EXIT_PARSE_ERROR = 1; // Exception when paring YAML.
   public static final int EXIT_YAML_NOT_FOUND = 2; // YAML is not found.
   public static final int EXIT_ASSEMBLY_NOT_FOUND = 3; // Assembly is not found.
-  public static final int EXIT_WRONG_PRAMETER = 3; // Command line has wrong parameters.
+  public static final int EXIT_WRONG_PRAMETER = 4; // Command line has wrong parameters.
   public static final int EXIT_BOO = 5; // BfdOoException.
   public static final int EXIT_CLIENT = 6; // OneOpsClientAPIException.
   public static final int EXIT_UNKOWN= 7; // Unknown error.
