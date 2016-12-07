@@ -238,7 +238,7 @@ public class BooCli {
 
       if (this.configFile == null) {
         this.help(null, "No YAML file found.");
-        return Constants.EXIT_TWO;
+        return Constants.EXIT_YAML_NOT_FOUND;
       }
 
       if (cmd.hasOption("m")) {
@@ -255,7 +255,7 @@ public class BooCli {
         } else {
           this.listFiles(prefix.trim());
         }
-        return Constants.EXIT_ZERO;
+        return Constants.EXIT_NORMAL;
       }
       /**
        * Handle other commands.
@@ -263,7 +263,7 @@ public class BooCli {
       if (cmd.hasOption("s")) {
         if (!flow.isAssemblyExist()) {
           System.err.printf(Constants.NOTFOUND_ERROR, config.getYaml().getAssembly().getName());
-          return Constants.EXIT_THREE;
+          return Constants.EXIT_ASSEMBLY_NOT_FOUND;
         } else {
           System.out.println(this.getStatus());
         }
@@ -321,7 +321,7 @@ public class BooCli {
         if (cmd.getOptionValues("procedure").length != 3) {
           System.err
               .println("Wrong prameters! --prodedure <platformName> <componentName> <actionName>");
-          return Constants.EXIT_ONE;
+          return Constants.EXIT_WRONG_PRAMETER;
         } else {
           String[] args = cmd.getOptionValues("procedure");
           String arglist = "";
@@ -343,7 +343,7 @@ public class BooCli {
                     System.out.println(instance);
                   }
                 }
-                return Constants.EXIT_ZERO;
+                return Constants.EXIT_NORMAL;
               }
               instances = Arrays.asList(ins.split(","));
             }
@@ -362,11 +362,11 @@ public class BooCli {
         }
       }
     } catch (ParseException e) {
-      exit = Constants.EXIT_ONE;
+      exit = Constants.EXIT_PARSE_ERROR;
       System.err.println(e.getMessage());
       this.help(null, Constants.BFD_TOOL);
     } catch (Exception e) {
-      exit = Constants.EXIT_ONE;
+      exit = Constants.EXIT_UNKOWN;
       System.err.println(e.getMessage());
     }
     return exit;
@@ -393,7 +393,7 @@ public class BooCli {
 
     } catch (OneOpsClientAPIException e) {
       System.err.println(e.getMessage());
-      returnCode = Constants.EXIT_ONE;
+      returnCode = Constants.EXIT_CLIENT;
     }
     if (procedureId != null) {
       String procStatus = "active";
@@ -414,7 +414,7 @@ public class BooCli {
         System.out.println(Constants.SUCCEED);
       } else {
         System.err.println(Constants.PROCEDURE_NOT_COMPLETE);
-        returnCode = Constants.EXIT_ONE;
+        returnCode = Constants.Exit_NOT_COMPLETE;
       }
     }
     return returnCode;

@@ -35,10 +35,15 @@ public class Constants {
   /**
    * Exit code.
    */
-  public static final int EXIT_ZERO = 0; // Normal
-  public static final int EXIT_ONE = 1; // Error happen.
-  public static final int EXIT_TWO = 2; // YAML not found.
-  public static final int EXIT_THREE = 3; // Assembly not found.
+  public static final int EXIT_NORMAL = 0; // Normal
+  public static final int EXIT_PARSE_ERROR = 1; // Exception when paring YAML.
+  public static final int EXIT_YAML_NOT_FOUND = 2; // YAML is not found.
+  public static final int EXIT_ASSEMBLY_NOT_FOUND = 3; // Assembly is not found.
+  public static final int EXIT_WRONG_PRAMETER = 3; // Command line has wrong parameters.
+  public static final int EXIT_BOO = 5; // BfdOoException.
+  public static final int EXIT_CLIENT = 6; // OneOpsClientAPIException.
+  public static final int EXIT_UNKOWN= 7; // Unknown error.
+  public static final int Exit_NOT_COMPLETE= 8;// Procedure did not complete.
   
   /**
    * Customize config.

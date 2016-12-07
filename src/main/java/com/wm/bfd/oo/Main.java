@@ -1,7 +1,11 @@
 package com.wm.bfd.oo;
 
+import com.wm.bfd.oo.exception.BfdOoException;
 import com.wm.bfd.oo.yaml.Constants;
 
+import com.oo.api.exception.OneOpsClientAPIException;
+
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -18,12 +22,24 @@ public class Main {
    */
   public static void main(String[] args) {
     BooCli cli = new BooCli();
+    int exit = 0;
     try {
-      int exit = cli.parse(args);
-      System.exit(exit);
+      exit = cli.parse(args);
+    } catch (ParseException e) {
+      System.err.println(e.getMessage());
+      exit = Constants.EXIT_PARSE_ERROR;
+    } catch (BfdOoException e) {
+      System.err.println(e.getMessage());
+      exit = Constants.EXIT_BOO;
+    } catch (OneOpsClientAPIException e) {
+      System.err.println(e.getMessage());
+      exit = Constants.EXIT_CLIENT;
     } catch (Exception e) {
       System.err.println(e.getMessage());
-      System.exit(Constants.EXIT_ONE);
+      exit = Constants.EXIT_UNKOWN;
+    } finally {
+      System.exit(exit);
     }
+
   }
 }
