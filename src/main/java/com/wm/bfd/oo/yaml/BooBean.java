@@ -57,8 +57,8 @@ public class BooBean {
   }
 
   public String getHost() {
-    if (host != null && host.length() != 0 && host.charAt(host.length() - 1) != '/') {
-      return host + "/";
+    if (host != null && !host.endsWith("/")) {
+      return host.concat("/");
     }
     return host;
   }
