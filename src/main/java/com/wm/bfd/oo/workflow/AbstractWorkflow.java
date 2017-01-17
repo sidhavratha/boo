@@ -356,7 +356,7 @@ public abstract class AbstractWorkflow {
       throws OneOpsClientAPIException {
     JsonPath componentDetails = design.getPlatformComponent(platformName, componentName);
     Map<String, Object> ciAttrProps = componentDetails.getMap(Constants.CIATTRPROPS);
-    if (ciAttrProps == null || ciAttrProps.get(Constants.OWNER) == null) {
+    if (ciAttrProps == null || !ciAttrProps.containsKey(Constants.OWNER)) {
       return false;
     }
     Map<String, String> ciAttrPropsMap = (Map<String, String>) ciAttrProps.get(Constants.OWNER);

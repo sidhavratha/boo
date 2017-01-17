@@ -549,21 +549,21 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       if (yamlComponents == null) {
         continue;
       }
-      Set<String> set = new HashSet<String>();
+      Set<String> yamlCompSet = new HashSet<String>();
       for (Map.Entry<String, Object> entry : yamlComponents.entrySet()) {
-        set.add(entry.getKey());
+        yamlCompSet.add(entry.getKey());
         Object value = entry.getValue();
         if (value instanceof Map) {
           Map<String, Object> target = (Map<String, Object>) value;
-          set.addAll(target.keySet());
+          yamlCompSet.addAll(target.keySet());
         }
       }
       JsonPath response = design.listPlatformComponents(platform.getName());
-      List<String> compList = response.getList(Constants.CINAME);
-      for (String component : compList) {
-        if (this.isUserCustomizedComponent(platform.getName(), component)
-            && !set.contains(component)) {
-          design.deletePlatformComponent(platform.getName(), component);
+      List<String> servCompList = response.getList(Constants.CINAME);
+      for (String servComp : servCompList) {
+        if (this.isUserCustomizedComponent(platform.getName(), servComp)
+            && !yamlCompSet.contains(servComp)) {
+          design.deletePlatformComponent(platform.getName(), servComp);
         }
       }
     }
