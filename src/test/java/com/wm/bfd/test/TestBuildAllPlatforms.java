@@ -147,7 +147,7 @@ public class TestBuildAllPlatforms extends BfdOoTest {
 
   @Test
   public void testUpdateUserComponents() throws OneOpsClientAPIException {
-    boolean isSuc = build.updateUserComponents();
+    boolean isSuc = build.updatePlatformComponents();
     assertEquals(isSuc, true);
   }
 

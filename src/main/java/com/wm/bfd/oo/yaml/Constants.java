@@ -28,6 +28,8 @@ public class Constants {
   public static final String CINAME = "ciName";
   public static final String OFFLINE = "offline";
   public static final String AUTHO_KEYS = "authorized_keys";
+  public static final String CIATTRPROPS = "ciAttrProps";
+  public static final String OWNER = "owner";
   // public static final String ASSEMBLY_PREFIX = "CUBEBOO-"; // Magic string.
   public static final String ASSEMBLY_NAME_TOO_LONG =
       "Assembly name cannot be more than 32 characters long. Please fix your assembly name in YAML.";
@@ -42,9 +44,9 @@ public class Constants {
   public static final int EXIT_WRONG_PRAMETER = 4; // Command line has wrong parameters
   public static final int EXIT_BOO = 5; // BOO internal error
   public static final int EXIT_CLIENT = 6; // Exception from OneOps client APIs
-  public static final int EXIT_UNKOWN= 7; // Unknown error
-  public static final int Exit_NOT_COMPLETE= 8;// Procedure was not completed
-  
+  public static final int EXIT_UNKOWN = 7; // Unknown error
+  public static final int Exit_NOT_COMPLETE = 8;// Procedure was not completed
+
   /**
    * Customize config.
    */

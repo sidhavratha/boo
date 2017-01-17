@@ -352,14 +352,15 @@ public abstract class AbstractWorkflow {
    * Checks whether the component is user related.
    *
    */
-  public boolean isUserRelatedComponent(String platformName, String componentName)
+  public boolean isUserCustomizedComponent(String platformName, String componentName)
       throws OneOpsClientAPIException {
     JsonPath componentDetails = design.getPlatformComponent(platformName, componentName);
-    Map<String, String> attr = componentDetails.getMap("ciAttributes");
-    if (attr.containsKey(Constants.AUTHO_KEYS)) {
-      return Boolean.TRUE;
+    Map<String, Object> ciAttrProps = componentDetails.getMap(Constants.CIATTRPROPS);
+    if (ciAttrProps == null || ciAttrProps.get(Constants.OWNER) == null) {
+      return false;
     }
-    return Boolean.FALSE;
+    Map<String, String> ciAttrPropsMap = (Map<String, String>) ciAttrProps.get(Constants.OWNER);
+    return !ciAttrPropsMap.isEmpty();
   }
 
 

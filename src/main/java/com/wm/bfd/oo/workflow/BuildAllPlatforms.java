@@ -52,7 +52,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   private int retries = 6;
 
   //
-  private int NUM_OF_THREAD = 32;
+  private int numOfThreads = 32;
 
   /**
    * Instantiates a new builds the all platforms.
@@ -89,7 +89,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.createPlatforms(isUpdate);
     this.bar.update(15, 100);
     if (isUpdate) {
-      this.updateUserComponents();
+      this.updatePlatformComponents();
     }
     this.updatePlatformVariables(isUpdate);
     this.bar.update(20, 100);
@@ -415,7 +415,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   private void updateComponentVariables(String platformName, String componentName,
       Map<String, Object> attributes) throws OneOpsClientAPIException {
     // Create thread pool to add users parallel
-    ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREAD);
+    ExecutorService executor = Executors.newFixedThreadPool(numOfThreads);
 
     for (Map.Entry<String, Object> entry : attributes.entrySet()) {
       String key = entry.getKey();
@@ -542,7 +542,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean updateUserComponents() throws OneOpsClientAPIException {
+  public boolean updatePlatformComponents() throws OneOpsClientAPIException {
     List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
     for (PlatformBean platform : platforms) {
       Map<String, Object> yamlComponents = platform.getComponents();
@@ -551,6 +551,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       }
       Set<String> set = new HashSet<String>();
       for (Map.Entry<String, Object> entry : yamlComponents.entrySet()) {
+        set.add(entry.getKey());
         Object value = entry.getValue();
         if (value instanceof Map) {
           Map<String, Object> target = (Map<String, Object>) value;
@@ -560,7 +561,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       JsonPath response = design.listPlatformComponents(platform.getName());
       List<String> compList = response.getList(Constants.CINAME);
       for (String component : compList) {
-        if (this.isUserRelatedComponent(platform.getName(), component)
+        if (this.isUserCustomizedComponent(platform.getName(), component)
             && !set.contains(component)) {
           design.deletePlatformComponent(platform.getName(), component);
         }
