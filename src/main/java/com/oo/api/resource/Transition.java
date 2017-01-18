@@ -374,7 +374,7 @@ public class Transition extends APIClient {
     req.put("platformCiIds", platformIds);
 
     RequestSpecification request = createRequest();
-    Response response = request.queryParam("platformCiIds", platformIds)
+    Response response = request.queryParam("platformCiIds[]", platformIds)
         .put(TRANSITION_ENV_URI + environmentName + "/disable");
     if (response != null) {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
