@@ -41,3 +41,8 @@ Thumbs.db
 src/test/java/com/wm/bfd/test/Test.java
 resource/yarn.yaml
 src/test/resources/test.yaml
+
+# Eclipse
+.classpath
+.project
+.settings/
