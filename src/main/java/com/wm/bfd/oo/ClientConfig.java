@@ -2,20 +2,15 @@ package com.wm.bfd.oo;
 
 import com.wm.bfd.oo.yaml.Yaml;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Singleton;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Singleton
 public class ClientConfig {
-  private static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
+  public static final File ONEOPS_CONFIG = new File(new File(System.getProperty("user.home"), ".oneops"), "config");
+  public static final String ONEOPS_DEFAULT_PROFILE = "default";
   private Yaml yaml;
 
   // For add user component in design
@@ -35,29 +30,16 @@ public class ClientConfig {
   /**
    * Instantiates a new client config.
    *
-   * @param file the file
-   * @throws JsonParseException the json parse exception
-   * @throws JsonMappingException the json mapping exception
-   * @throws FileNotFoundException the file not found exception
+   * @param booYamlFile the file
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public ClientConfig(String file)
-      throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
-    FileInputStream input = null;
-    try {
-      input = new FileInputStream(new File(file));
-      this.yaml = MAPPER.readValue(input, Yaml.class);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      if (input != null) {
-        input.close();
-      }
-    }
+  public ClientConfig(File booYamlFile) throws IOException {
+    ClientConfigReader reader = new ClientConfigReader();
+    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    this.yaml = reader.read(interpolator.interpolate(booYamlFile, ONEOPS_CONFIG, ONEOPS_DEFAULT_PROFILE));
   }
 
   public Yaml getYaml() {
     return yaml;
   }
-
 }

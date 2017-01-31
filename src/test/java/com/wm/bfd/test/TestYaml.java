@@ -1,5 +1,7 @@
 package com.wm.bfd.test;
 
+import static org.junit.Assert.assertNotNull;
+
 import com.wm.bfd.oo.utils.BfdUtils;
 import com.wm.bfd.oo.yaml.PlatformBean;
 import com.wm.bfd.oo.yaml.Yaml;

@@ -1,15 +1,25 @@
 package com.wm.bfd.test;
 
+import static com.wm.bfd.oo.ClientConfig.ONEOPS_CONFIG;
+import static com.wm.bfd.oo.ClientConfig.ONEOPS_DEFAULT_PROFILE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
+
+import com.wm.bfd.oo.ClientConfigIniReader;
 import com.wm.bfd.oo.workflow.BuildAllPlatforms;
 
 import com.oo.api.exception.OneOpsClientAPIException;
 
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.util.List;
 import java.util.Map;
 
@@ -18,12 +28,33 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   private static Logger LOG = LoggerFactory.getLogger(TestBuildAllPlatforms.class);
   BuildAllPlatforms build;
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void beforeMethod() throws Exception {
+    assumeTrue(bfdOneOpsAvailable() && bfdDeveloper());
     if (build == null) {
       build = new BuildAllPlatforms(oo, config, null);
     }
+  }
+
+  private boolean bfdDeveloper() throws IOException {
+    if (ONEOPS_CONFIG.exists()) {
+      ClientConfigIniReader reader = new ClientConfigIniReader();
+      Map<String, String> config = reader.read(ONEOPS_CONFIG, ONEOPS_DEFAULT_PROFILE);
+      String organization = config.get("organization");
+      if (organization != null && organization.equals("bfd")) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  private boolean bfdOneOpsAvailable() {
+    try (Socket s = new Socket("web.bfd.dev.cloud.wal-mart.com", 443)) {
+      return true;
+    } catch (IOException ex) {
+      // Ignore
+    }
+    return false;
   }
 
   @Test

@@ -7,7 +7,7 @@
 ##Build to a executable command:
 Run boo as a bash script:
 
-1. Run: mvn clean package -DskipTests
+1. Run: mvn clean package
 
 2. Move the ./target/BFDOneOpsAutomation-1.0-executable.jar to your target server, and rename to boo.
 
@@ -27,66 +27,64 @@ Run boo as a bash script:
 
 ## Usage:
 
-usage: 
+```
+boo -h
+```
 
-* boo [-a <arg>] [-c] [-f <FILE>] [--force] [--get-ips <environment>
-       <compute-class>] [-h] [-l <arg>] [-m <description>] [--no-deploy]
-       [--procedure <platform> <component> <action>]
-       [--procedure-arguments <arglist>] [--procedure-instances
-       <instanceList>] [--procedure-step-size <size>] [--quiet] [-r]
-       [--retry] [-s] [-u]
-* -a,--assembly \<arg\>                          Override the assembly name.
-* -c,--create                                  Create a new Assembly specified by
-                                              -f. If Assembly automatic
-                                              naming is enabled, each invocation
-                                              will create a new Assembly.
-                                       
-* -f,--config-file \<file\>                      Use specified configuration file,
-                                       
-* --force                                      Do not prompt for --remove
- 
-* --get-ips \<environment\> \<compute-class\>      Get IPs of deployed nodes specified by -f
-* --get-ips \<environment\>        
-* --get-ips
- 
-* --no-deploy                                  Create assembly without
-                                              deployments
-                                      
-* -h,--help                                    show help.
- 
-* -l,--list                                    Return a list of instances applicable 
-                                              to the identifier provided..
-* -m,--message \<description\>                   Customize the comment
-                                              for deployments
-* --no-deploy                                  Create assembly without
-                                              deployments
-* --procedure \<platform\> \<component\> \<action\>   Execute actions. Use
-                                              'list' as an action to
-                                              show available actions.
-* --procedure-arguments \<arglist>\               Arguments to pass to the
-                                              procedure call. Example:
-                                              '{"backup_type":"increme
-                                              ntal"}'
-* --procedure-instances \<instanceList\>          Comma-separated list of
-                                              component instance
-                                              names. 'list' to show
-                                              all available component
-                                              instances.
-* --procedure-step-size \<size\>                  Percent of nodes to
-                                              preform procuedure on,
-                                              default is 100.                                       
-* --quiet                                      Silence the textual output.
-    
-* -r,--remove                                  Remove all deployed configurations
-                                              specified by -f
-                                       
-* --retry                                      Retry deployments of configurations
-                                              specified by -f
-                                       
-* -s,--status                                  Get status of deployments specified
-                                              by -f
-                                       
-* -u,--update                                  Update configurations specified by
-                                              -f.
-                                       
+## Configuration
+
+Boo YAML templates are processed with [Mustache][1] to allow variable interpolation when the standard `~/.oneops/config` file contains a `default` profile. If you have a `default` profile that looks like the following:
+
+```
+[default]
+host=https://oneops.prod.walmart.com
+organization=devtools
+api_key=XXX
+email=jvanzyl@walmart.com
+
+[bfd]
+host=https://web.bfd.dev.cloud.wal-mart.com
+organization=bdf
+api_key=XXX
+email=jvanzyl@walmart.com
+```
+
+With a Boo YAML template that looks like this:
+
+```
+boo:
+  oneops_host: '{{host}}'
+  organization: '{{organization}}'
+  api_key: '{{api_key}}'
+  email: '{{email}}'
+  environment_name: 'dev'
+  ip_output: 'json'
+
+...
+
+```
+
+It will yield the following:
+
+```
+boo:
+  oneops_host: 'https://oneops.prod.walmart.com'
+  organization: 'devtools'
+  api_key: 'XXX'
+  email: 'jvanzyl@walmart.com'
+  environment_name: 'dev'
+  ip_output: 'json'
+
+...
+
+```
+If you want to see what your Boo YAML template will look like with interpolated values you can use the following command:
+
+```
+boo -f boo.yml -v
+```
+
+
 The tool is managed by BFD team.
+
+[1]: https://github.com/spullara/mustache.java

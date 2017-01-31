@@ -2,8 +2,8 @@
 # This template guides you to create a yarn cluster automatically, include zookeeper platform.
 # Except the fields that labeled optional all other fields are required.
 boo:
-  oneops_host: https://web.bfd.dev.cloud.wal-mart.com/
-  organization: 'bfd' # OneOps org name
+  oneops_host: {{host}}
+  organization: '{{organization}}' # OneOps org name
   api_key: '{{api_key}}' # copy from OneOps UI->profile->authentication->API Token
   email: '{{email}}'
   environment_name: 'env-yarn' # All the deployment in this template adds to this environment.
