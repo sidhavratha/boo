@@ -85,7 +85,7 @@ public class BooCli {
         .desc("Get status of deployments specified by -f").build();
 
     Option config = Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
-        .desc("Use specified configuration file").build();
+        .desc("Use specified Boo YAML file").build();
 
     Option cleanup = Option.builder("r").longOpt("remove")
         .desc("Remove all deployed configurations specified by -f").build();
