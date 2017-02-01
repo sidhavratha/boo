@@ -100,6 +100,16 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     this.updateEnv();
     this.bar.update(40, 100);
+    utils.waitTimeout(1);
+    if (isUpdate) {
+      try {
+        this.pullDesign();
+      } catch (Exception e) {
+        // Ignore
+        // e.printStackTrace();
+      }
+    }
+    this.bar.update(50, 100);
     String status = this.getStatus();
     if (ACTIVE.equalsIgnoreCase(status)) {
       LogUtils.info(Constants.ACTIVE_DEPLOYMENT_EXISTING);
@@ -111,16 +121,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       return false;
     }
     this.updateScaling();
-    this.bar.update(50, 100);
-    utils.waitTimeout(1);
-    if (isUpdate) {
-      try {
-        this.pullDesign();
-      } catch (Exception e) {
-        // Ignore
-        // e.printStackTrace();
-      }
-    }
     this.bar.update(70, 100);
     // Added retries
     boolean retry = true;
