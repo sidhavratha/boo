@@ -6,14 +6,8 @@ import com.wm.bfd.oo.yaml.Constants;
 import com.oo.api.exception.OneOpsClientAPIException;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 public class Main {
-
-  static {
-    Logger.getRootLogger().setLevel(Level.OFF);
-  }
 
   /**
    * The main method.
