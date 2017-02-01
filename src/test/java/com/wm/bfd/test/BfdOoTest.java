@@ -12,17 +12,16 @@ import com.google.inject.ProvisionException;
 import com.jayway.restassured.RestAssured;
 import com.oo.api.OOInstance;
 
-import junit.framework.TestCase;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.URL;
 
 /**
  * Parent class of all unit testing.
  */
-public abstract class BfdOoTest extends TestCase {
+public abstract class BfdOoTest {
   private static final Logger LOG = LoggerFactory.getLogger(BfdOoTest.class);
   private static final Injector injector = Guice.createInjector(new JaywayHttpModule(getConfig()));
 
@@ -57,15 +56,14 @@ public abstract class BfdOoTest extends TestCase {
 
   }
 
-  static String getConfig() {
+  static File getConfig() {
     URL url = BfdOoTest.class.getResource(Constants.TEMPLATE);
     LOG.info("Using config file {}", url);
     if (url == null) {
       System.err.println("The test.yaml not found!");
       System.exit(-1);
     }
-    String config = url.getFile();
-    return config;
+    return new File(url.getFile());
   }
 
   void init() throws BfdOoException, ProvisionException {

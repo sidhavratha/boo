@@ -10,6 +10,7 @@ import com.oo.api.OOInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -25,14 +26,14 @@ public class JaywayHttpModule extends AbstractModule {
   private static ClientConfig CLIENT = null;
 
   /** The yaml. */
-  private String yaml;
+  private File yaml;
 
   /**
    * Instantiates a new jayway http module.
    *
    * @param yaml the yaml
    */
-  public JaywayHttpModule(String yaml) {
+  public JaywayHttpModule(File yaml) {
     this.yaml = yaml;
     if (LOG.isDebugEnabled()) {
       LOG.debug("Using config {}", yaml);

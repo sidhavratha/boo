@@ -4,8 +4,8 @@
 boo:
   oneops_host: https://web.bfd.dev.cloud.wal-mart.com/
   organization: 'bfd' # OneOps org name
-  api_key: '' # copy from OneOps UI->profile->authentication->API Token
-  email: ''
+  api_key: '{{api_key}}' # copy from OneOps UI->profile->authentication->API Token
+  email: '{{email}}'
   environment_name: 'env-yarn' # All the deployment in this template adds to this environment.
   ip_output: 'json'
 
@@ -55,8 +55,8 @@ platforms: # In OneOps design.
         prm-rzhan33:
           username: rzhan33
           authorized_keys: '[""]' # copy the authorized_keys into ""
- 
-scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.   
+
+scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.
     yarn: # Platform name
       scaling: # Don't change this
         compute: # Component name
@@ -75,8 +75,6 @@ environment: # Only support one environment for now.
       dpmt_order: '1'
       pct_scale: '30'
     dev-cdc003:
-      priority: '1' 
+      priority: '1'
       dpmt_order: '1'
       pct_scale: '70'
-  
-  

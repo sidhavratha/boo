@@ -21,6 +21,7 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +52,7 @@ public class BooCli {
 
 
   /** The config file. */
-  private String configFile;
+  private File configFile;
 
   /** The flow. */
   private BuildAllPlatforms flow;
@@ -85,7 +86,7 @@ public class BooCli {
         .desc("Get status of deployments specified by -f").build();
 
     Option config = Option.builder("f").longOpt("config-file").argName("FILE").hasArg()
-        .desc("Use specified configuration file").build();
+        .desc("Use specified Boo YAML file").build();
 
     Option cleanup = Option.builder("r").longOpt("remove")
         .desc("Remove all deployed configurations specified by -f").build();
@@ -125,6 +126,8 @@ public class BooCli {
         .desc("Percent of nodes to perform procedure on, default is 100.").build();
     Option comment = Option.builder("m").longOpt("message").argName("description").hasArg()
         .desc("Customize the comment for deployments").build();
+    Option view = Option.builder("v").longOpt("view").desc("View interpolated Boo YAML template").build();
+    
     options.addOption(help);
     options.addOption(config);
     options.addOption(create);
@@ -143,6 +146,7 @@ public class BooCli {
     options.addOption(instanceList);
     options.addOption(stepSize);
     options.addOption(comment);
+    options.addOption(view);
   }
 
   static {
@@ -156,7 +160,7 @@ public class BooCli {
    * @param assembly the assembly
    * @throws BfdOoException the BFDOO exception
    */
-  public void init(String template, String assembly) throws BfdOoException {
+  public void init(File template, String assembly) throws BfdOoException {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Loading {}", template);
     }
@@ -210,7 +214,7 @@ public class BooCli {
         this.help(null, Constants.BFD_TOOL);
         return exit;
       }
-
+      
       if (cmd.hasOption("quiet")) {
         BooCli.setQuiet(Boolean.TRUE);
       }
@@ -229,12 +233,22 @@ public class BooCli {
        * Get configuration dir or file.
        */
       if (cmd.hasOption("f")) {
-        this.configFile = cmd.getOptionValue("f");
-        this.configFile = bfdUtils.getAbsolutePath(configFile);
+        this.configFile = new File(bfdUtils.getAbsolutePath(cmd.getOptionValue("f")));
         System.out.printf(Constants.CONFIG_FILE, this.configFile);
         System.out.println();
       }
 
+      if (cmd.hasOption('v')) {
+        if (ClientConfig.ONEOPS_CONFIG.exists()) {
+          ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+          String yaml = interpolator.interpolate(this.configFile,
+            ClientConfig.ONEOPS_CONFIG, ClientConfig.ONEOPS_DEFAULT_PROFILE);
+          System.out.println(yaml);
+        } else {
+          System.out.format("%nYou do not have a %s file. No interpolation can be performed.%n%n", ClientConfig.ONEOPS_CONFIG);
+        }        
+        return exit;
+      }
 
       if (this.configFile == null) {
         this.help(null, "No YAML file found.");

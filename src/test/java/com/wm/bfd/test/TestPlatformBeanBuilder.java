@@ -1,5 +1,7 @@
 package com.wm.bfd.test;
 
+import static org.junit.Assert.assertEquals;
+
 import com.wm.bfd.oo.yaml.PlatformBean;
 
 import com.oo.api.exception.OneOpsClientAPIException;
