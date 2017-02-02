@@ -13,10 +13,10 @@ public class ProgressBar {
   }
 
   /**
-   * Called whenever the progress bar needs to be updated. that is whenever progress was made.
+   * Called whenever the progress bar needs to be updated.
    * 
-   * @param done an integer representing the work done so far
-   * @param total an integer representing the total work
+   * @param The work done so far.
+   * @param total The total work.
    */
   public void update(int done, int total) {
     String format = "%3d%% %s \n";

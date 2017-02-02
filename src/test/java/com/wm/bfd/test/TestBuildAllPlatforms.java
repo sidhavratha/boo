@@ -47,7 +47,7 @@ public class TestBuildAllPlatforms extends BfdOoTest {
     }
     return false;
   }
-  
+
   private boolean bfdOneOpsAvailable() {
     try (Socket s = new Socket("web.bfd.dev.cloud.wal-mart.com", 443)) {
       return true;
@@ -66,8 +66,6 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   @Test
   public void testGetAllAutoGenAssemblies() throws OneOpsClientAPIException {
     assertNotNull(config.getYaml().getAssembly().getName());
-    List<String> assemblies =
-        build.getAllAutoGenAssemblies(config.getYaml().getAssembly().getName());
   }
 
   @Test
@@ -76,61 +74,26 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   }
 
   @Test
-  public void testListActions() throws OneOpsClientAPIException {
-    List<String> actions = build.listActions("web", "apache");
-  }
-
-  @Test
-  public void testListInstances() throws OneOpsClientAPIException {
-    List<String> actions = build.listInstances("web", "apache");
-  }
-
-  @Test
-  public void testListInstancesMap() throws OneOpsClientAPIException {
-    Map<String, Integer> actions = build.listInstancesMap("web", "apache");
-  }
-
-  @Test
   public void testExecuteAction() throws OneOpsClientAPIException {
     build.executeAction("web", "apache", "status", "", null, 100);
   }
 
   @Test
-  public void testListAttachements() throws OneOpsClientAPIException {
-    List<String> attachements = build.listAttachements("yarn", "hadoop-yarn-config");
-  }
-
-  @Test
-  public void testAddAttachement() throws OneOpsClientAPIException {
-    boolean isSuc = build.addAttachement("yarn", "hadoop-yarn-config", "testa2", null);
-  }
-
-  @Test
-  public void testIsAttachementExist() throws OneOpsClientAPIException {
-    boolean isSuc = build.isAttachmentExists("yarn", "hadoop-yarn-config", "test");
-  }
-
-  @Test
   public void testUpdateAttachement() throws OneOpsClientAPIException {
-    // Map<String, String> attributes = new HashMap<String, String>();
-    // attributes.put("path", "/opt/datameer/etc/das-env.sh");
-    // attributes.put("priority", "2");
-    // attributes.put("exec_cmd", "chmod +x /opt/datameer/etc/das-env.sh");
-    // attributes.put("run_on", "{ \"after-add\":true }");
-    // attributes.put("content", "content");
     boolean isSuc = build.updateAttachement("yarn", "hadoop-yarn-config", "testa2", null);
+    assertEquals(isSuc, Boolean.TRUE);
   }
 
   @Test
   public void testListEnvs() throws OneOpsClientAPIException {
     List<String> envs = build.listEnvs();
-    // System.out.println(envs);
+    assertNotNull(envs);
   }
 
   @Test
   public void testListPlatformss() throws OneOpsClientAPIException {
     List<String> platforms = build.listPlatforms();
-    // System.out.println(platforms);
+    assertNotNull(platforms);
   }
 
   @Test

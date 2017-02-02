@@ -2,7 +2,6 @@ package com.wm.bfd.test;
 
 import static org.junit.Assert.assertNotNull;
 
-import com.wm.bfd.oo.utils.BfdUtils;
 import com.wm.bfd.oo.yaml.PlatformBean;
 import com.wm.bfd.oo.yaml.Yaml;
 
@@ -20,7 +19,6 @@ import java.util.Map;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestYaml extends BfdOoTest {
   private static final Logger LOG = LoggerFactory.getLogger(TestYaml.class);
-  private BfdUtils util = new BfdUtils();
 
   @Test
   public void testGetAssembly() throws OneOpsClientAPIException {
@@ -50,9 +48,11 @@ public class TestYaml extends BfdOoTest {
     for (PlatformBean platform : list) {
       Map<String, Object> components = platform.getComponents();
       // util.printMap(components, 5);
+      assertNotNull(components);
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testGetPlatformComponents() throws OneOpsClientAPIException {
     List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
@@ -62,7 +62,6 @@ public class TestYaml extends BfdOoTest {
         if (value instanceof Map) {
           Map<String, String> map = (Map<String, String>) value;
           for (Map.Entry<String, String> detail : map.entrySet()) {
-            // System.out.printf("Key: %s; value: %s \n", detail.getKey(), detail.getValue());
             assertNotNull(detail.getValue());
           }
         } else {

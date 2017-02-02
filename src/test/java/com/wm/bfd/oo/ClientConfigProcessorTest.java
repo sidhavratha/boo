@@ -22,8 +22,7 @@ public class ClientConfigProcessorTest {
   public void validateBooYamlProcessing() throws Exception {
     ClientConfigReader reader = new ClientConfigReader();
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-    Yaml yaml = reader.read(interpolator.interpolate(resource("boo.yaml"), 
-        resource("config"), ClientConfig.ONEOPS_DEFAULT_PROFILE));
+    Yaml yaml = reader.read(interpolator.interpolate(resource("boo.yaml"), resource("config"), ClientConfig.ONEOPS_DEFAULT_PROFILE));
     // We current append a trailing '/' to the URI
     assertEquals("https://web.bfd.dev.cloud.wal-mart.com/", yaml.getBoo().getHost());
     assertEquals("bfd", yaml.getBoo().getOrg());

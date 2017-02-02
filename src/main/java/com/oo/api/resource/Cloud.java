@@ -34,8 +34,7 @@ public class Cloud extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to get cloud with name %s due to %s", cloudName,
-            response.getStatusLine());
+        String msg = String.format("Failed to get cloud with name %s due to %s", cloudName, response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -56,8 +55,7 @@ public class Cloud extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to get list of clouds due to %s", response.getStatusLine());
+        String msg = String.format("Failed to get list of clouds due to %s", response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
