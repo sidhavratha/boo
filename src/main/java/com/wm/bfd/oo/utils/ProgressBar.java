@@ -15,7 +15,7 @@ public class ProgressBar {
   /**
    * Called whenever the progress bar needs to be updated.
    * 
-   * @param The work done so far.
+   * @param done The work done so far.
    * @param total The total work.
    */
   public void update(int done, int total) {
