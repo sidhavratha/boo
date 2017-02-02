@@ -9,6 +9,7 @@ import java.io.IOException;
 
 @Singleton
 public class ClientConfig {
+
   public static final File ONEOPS_CONFIG = new File(new File(System.getProperty("user.home"), ".oneops"), "config");
   public static final String ONEOPS_DEFAULT_PROFILE = "default";
   private Yaml yaml;

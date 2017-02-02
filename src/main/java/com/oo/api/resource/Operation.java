@@ -19,12 +19,12 @@ import com.oo.api.util.JsonUtil;
 
 public class Operation extends APIClient {
 
-  static String RESOURCE_URI = "/operations/environments/";
+  private static final String RESOURCE_URI = "/operations/environments/";
 
-  String OPERATION_ENV_URI;
-  OOInstance instance;
-  String assemblyName;
-  String environmentName;
+  private String OPERATION_ENV_URI;
+  private OOInstance instance;
+  private String assemblyName;
+  private String environmentName;
 
   public Operation(OOInstance instance, String assemblyName, String environmentName)
       throws OneOpsClientAPIException {
@@ -63,11 +63,10 @@ public class Operation extends APIClient {
     }
 
     RequestSpecification request = createRequest();
-    Response response =
-        request.queryParam("instances_state", "all").get(
-            OPERATION_ENV_URI + "/platforms/" + platformName + "/components/" + componentName
-            // + "/instances.json?instances_state=all");
-                + "/instances");
+    Response response = request.queryParam("instances_state", "all")
+        .get(OPERATION_ENV_URI + "/platforms/" + platformName + "/components/" + componentName
+    // + "/instances.json?instances_state=all");
+            + "/instances");
     if (response != null) {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
@@ -125,9 +124,8 @@ public class Operation extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to set replace marker on instance(s) due to %s",
-                response.getStatusLine());
+        String msg = String.format("Failed to set replace marker on instance(s) due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -152,9 +150,8 @@ public class Operation extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg =
-            String.format("Failed to set replace marker on instance(s) due to %s",
-                response.getStatusLine());
+        String msg = String.format("Failed to set replace marker on instance(s) due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -241,9 +238,8 @@ public class Operation extends APIClient {
     }
 
     RequestSpecification request = createRequest();
-    Response response =
-        request.get(OPERATION_ENV_URI + "/platforms/" + platformName + "/components/"
-            + componentName + "/actions/");
+    Response response = request.get(OPERATION_ENV_URI + "/platforms/" + platformName
+        + "/components/" + componentName + "/actions/");
     if (response != null) {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
@@ -368,9 +364,8 @@ public class Operation extends APIClient {
       }
     }
 
-    String msg =
-        String.format("Failed to cancel procedure with the given Id " + procedureId
-            + " due to null response");
+    String msg = String.format(
+        "Failed to cancel procedure with the given Id " + procedureId + " due to null response");
     throw new OneOpsClientAPIException(msg);
   }
 

@@ -44,12 +44,9 @@ public final class PlatformBeanHelper {
         if (platformMap.get(DEPLOY_ORDER) != null) {
           deployOrder = (Integer) platformMap.get(DEPLOY_ORDER);
         }
-        platforms.add(new PlatformBean.PlatformBeanBuilder((String) platformMap.get(PACK),
-            (String) platformMap.get(PACK_VERSION)).setName(key)
-                .setComponents((Map<String, Object>) platformMap.get(COMPONENTS))
-                .setSecureVariables((Map<String, String>) platformMap.get(ENCRYPTED_VARIABLES))
-                .setVariables((Map<String, String>) platformMap.get(VARIABLES))
-                .setDeployOrder(deployOrder).build());
+        platforms.add(
+            new PlatformBean.PlatformBeanBuilder((String) platformMap.get(PACK), (String) platformMap.get(PACK_VERSION)).setName(key).setComponents((Map<String, Object>) platformMap.get(COMPONENTS))
+                .setSecureVariables((Map<String, String>) platformMap.get(ENCRYPTED_VARIABLES)).setVariables((Map<String, String>) platformMap.get(VARIABLES)).setDeployOrder(deployOrder).build());
       }
     }
     return platforms;

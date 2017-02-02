@@ -2,7 +2,7 @@ package com.wm.bfd.oo.yaml;
 
 import java.util.Map;
 
-public class PlatformBean implements Comparable {
+public class PlatformBean implements Comparable<Object> {
 
   private int deployOrder;
   private String name;
@@ -115,7 +115,9 @@ public class PlatformBean implements Comparable {
 
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override

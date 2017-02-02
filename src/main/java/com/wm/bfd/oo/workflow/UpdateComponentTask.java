@@ -9,14 +9,13 @@ import com.oo.api.exception.OneOpsComponentExistException;
 import java.util.Map;
 
 public class UpdateComponentTask implements Runnable {
-  BuildAllPlatforms flow;
-  String platformName;
-  String componentName;
-  String uniqueName;
-  Map<String, String> att;
+  private BuildAllPlatforms flow;
+  private String platformName;
+  private String componentName;
+  private String uniqueName;
+  private Map<String, String> att;
 
-  public UpdateComponentTask(BuildAllPlatforms flow, String platformName, String componentName,
-      String uniqueName, Map<String, String> components) {
+  public UpdateComponentTask(BuildAllPlatforms flow, String platformName, String componentName, String uniqueName, Map<String, String> components) {
     this.flow = flow;
     this.platformName = platformName;
     this.componentName = componentName;

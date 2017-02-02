@@ -9,10 +9,10 @@ public final class PlatformConfigBeanHelper {
 
   /** The custom format. */
   private static String CUSTOM_FORMAT = "custom_format";
-  
+
   /** The custom split. */
   private static String CUSTOM_SPLIT = "custom_split";
-  
+
   /** The custom component. */
   private static String CUSTOM_COMPONENT = "custom_component";
 
@@ -32,9 +32,7 @@ public final class PlatformConfigBeanHelper {
       System.out.println(value.getClass());
       if (value instanceof Map) {
         Map<String, String> configMap = (Map<String, String>) value;
-        PlatformConfigBean config =
-            new PlatformConfigBean(key, configMap.get(CUSTOM_FORMAT), configMap.get(CUSTOM_SPLIT),
-                configMap.get(CUSTOM_COMPONENT));
+        PlatformConfigBean config = new PlatformConfigBean(key, configMap.get(CUSTOM_FORMAT), configMap.get(CUSTOM_SPLIT), configMap.get(CUSTOM_COMPONENT));
         platformConfigs.put(key, config);
       }
     }

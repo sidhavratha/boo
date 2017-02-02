@@ -51,10 +51,8 @@ public final class EnvironmentBeanHelper {
           String component = scale.getKey();
           Map<String, String> map2 = scale.getValue();
           // Map<String, String> map2 = ((Map<String, Map>) map.get(SCALING)).get(COMPUTE);
-          scales.add(new ScalBean.ScalBeanBuilder().setComponent(component).setPlatform(platform)
-              .setCurrent(map2.get(CURRENT)).setMax(map2.get(MAX)).setMin(map2.get(MIN))
-              .setStepDown(map2.get(STEP_DOWN)).setStepUp(map2.get(STEP_UP))
-              .setPercentDeploy(map2.get(PERCENT_DEPLOY)).build());
+          scales.add(new ScalBean.ScalBeanBuilder().setComponent(component).setPlatform(platform).setCurrent(map2.get(CURRENT)).setMax(map2.get(MAX)).setMin(map2.get(MIN))
+              .setStepDown(map2.get(STEP_DOWN)).setStepUp(map2.get(STEP_UP)).setPercentDeploy(map2.get(PERCENT_DEPLOY)).build());
         }
       }
 
@@ -79,8 +77,7 @@ public final class EnvironmentBeanHelper {
         Map<String, Object> map = (Map<String, Object>) value;
         for (Map.Entry<String, Object> entry1 : map.entrySet()) {
           Map<String, String> config = (Map<String, String>) entry1.getValue();
-          CloudBean cloud = new CloudBean(entry1.getKey(), config.get(PCT_SCALE),
-              config.get(DPMT_ORDER), config.get(PRIORITY));
+          CloudBean cloud = new CloudBean(entry1.getKey(), config.get(PCT_SCALE), config.get(DPMT_ORDER), config.get(PRIORITY));
           env.addClouds(cloud);
         }
 

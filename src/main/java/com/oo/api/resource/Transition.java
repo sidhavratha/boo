@@ -24,11 +24,11 @@ import com.oo.api.util.JsonUtil;
 
 public class Transition extends APIClient {
 
-  static String RESOURCE_URI = "/transition/environments/";
+  private static final String RESOURCE_URI = "/transition/environments/";
 
-  String TRANSITION_ENV_URI;
-  OOInstance instance;
-  String assemblyName;
+  private String TRANSITION_ENV_URI;
+  private OOInstance instance;
+  private String assemblyName;
 
   public Transition(OOInstance instance, String assemblyName) throws OneOpsClientAPIException {
     super(instance);

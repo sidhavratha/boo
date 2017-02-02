@@ -15,14 +15,15 @@ import java.util.Map;
 public class ClientConfigInterpolator {
 
   private final ClientConfigIniReader iniReader;
-  
+
   public ClientConfigInterpolator() {
     iniReader = new ClientConfigIniReader();
   }
-  
+
   /**
-   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template with them.
-   *  
+   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template
+   * with them.
+   * 
    * @param booYamlFile template to use
    * @param booConfigFile to use for key/value pairs
    * @param profile in configuration file to use for key/value pairs

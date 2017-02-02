@@ -21,11 +21,9 @@ import com.oo.api.util.JsonUtil;
 
 
 public class Design extends APIClient {
-  final private static Logger LOG = LoggerFactory.getLogger(Design.class);
-  String DESIGN_RELEASE_URI;
-  String DESIGN_URI;
-  OOInstance instance;
-  String assemblyName;
+  private static final Logger LOG = LoggerFactory.getLogger(Design.class);
+  private String DESIGN_RELEASE_URI;
+  private String DESIGN_URI;
 
   public Design(OOInstance instance, String assemblyName) throws OneOpsClientAPIException {
     super(instance);
@@ -33,8 +31,6 @@ public class Design extends APIClient {
       String msg = String.format("Missing assembly name");
       throw new OneOpsClientAPIException(msg);
     }
-    this.assemblyName = assemblyName;
-    this.instance = instance;
     DESIGN_RELEASE_URI = Assembly.ASSEMBLY_URI + assemblyName + "/design/releases/";
     DESIGN_URI = Assembly.ASSEMBLY_URI + assemblyName + "/design/";
   }
@@ -193,7 +189,7 @@ public class Design extends APIClient {
             throw new OneOpsClientAPIException(msg);
           }
         } else {
-          String msg = String.format("No open release found to perform design commit");
+          // String msg = String.format("No open release found to perform design commit");
           return response.getBody().jsonPath();
         }
 
