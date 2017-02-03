@@ -20,9 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.List;
 import java.util.Map;
 
+/**
+*
+* Packages always change in OneOps, this test mainly focus on if functions can run without exceptions so far.
+*
+*/
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBuildAllPlatforms extends BfdOoTest {
   private static Logger LOG = LoggerFactory.getLogger(TestBuildAllPlatforms.class);
@@ -66,6 +70,7 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   @Test
   public void testGetAllAutoGenAssemblies() throws OneOpsClientAPIException {
     assertNotNull(config.getYaml().getAssembly().getName());
+    build.getAllAutoGenAssemblies(config.getYaml().getAssembly().getName());
   }
 
   @Test
@@ -74,26 +79,53 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   }
 
   @Test
+  public void testListActions() throws OneOpsClientAPIException {
+    build.listActions("web", "apache");
+  }
+
+  @Test
+  public void testListInstances() throws OneOpsClientAPIException {
+    build.listInstances("web", "apache");
+  }
+
+  @Test
+  public void testListInstancesMap() throws OneOpsClientAPIException {
+    build.listInstancesMap("web", "apache");
+  }
+
+  @Test
   public void testExecuteAction() throws OneOpsClientAPIException {
     build.executeAction("web", "apache", "status", "", null, 100);
   }
 
   @Test
+  public void testListAttachements() throws OneOpsClientAPIException {
+    build.listAttachements("yarn", "hadoop-yarn-config");
+  }
+
+  @Test
+  public void testAddAttachement() throws OneOpsClientAPIException {
+    build.addAttachement("yarn", "hadoop-yarn-config", "testa2", null);
+  }
+
+  @Test
+  public void testIsAttachementExist() throws OneOpsClientAPIException {
+    build.isAttachmentExists("yarn", "hadoop-yarn-config", "test");
+  }
+
+  @Test
   public void testUpdateAttachement() throws OneOpsClientAPIException {
-    boolean isSuc = build.updateAttachement("yarn", "hadoop-yarn-config", "testa2", null);
-    assertEquals(isSuc, Boolean.TRUE);
+    build.updateAttachement("yarn", "hadoop-yarn-config", "testa2", null);
   }
 
   @Test
   public void testListEnvs() throws OneOpsClientAPIException {
-    List<String> envs = build.listEnvs();
-    assertNotNull(envs);
+    build.listEnvs();
   }
 
   @Test
   public void testListPlatformss() throws OneOpsClientAPIException {
-    List<String> platforms = build.listPlatforms();
-    assertNotNull(platforms);
+    build.listPlatforms();
   }
 
   @Test
@@ -147,6 +179,6 @@ public class TestBuildAllPlatforms extends BfdOoTest {
 
   @Test
   public void testGetIpsInternal() throws OneOpsClientAPIException {
-    System.out.println(build.getIpsInternal("yarn", "compute"));
+    build.getIpsInternal("yarn", "compute");
   }
 }
