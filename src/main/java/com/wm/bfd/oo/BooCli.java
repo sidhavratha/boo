@@ -268,7 +268,8 @@ public class BooCli {
         }
       } else if (cmd.hasOption("c")) {
         if (config.getYaml().getAssembly().getAutoGen()) {
-          this.initOo(this.config, this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(), config.getYaml().getAssembly().getName()), comment);
+          this.initOo(this.config, this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(),
+                  config.getYaml().getAssembly().getName()), comment);
           LogUtils.info(Constants.CREATING_ASSEMBLY, config.getYaml().getAssembly().getName());
         }
         this.createPacks(Boolean.FALSE, isNoDeploy);
