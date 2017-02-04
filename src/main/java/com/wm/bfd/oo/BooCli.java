@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -360,8 +361,8 @@ public class BooCli {
       System.err.println(e.getMessage());
       this.help(null, Constants.BFD_TOOL);
     } catch (Exception e) {
-      exit = Constants.EXIT_UNKOWN;
-      System.err.println(e.getMessage());
+        exit = Constants.EXIT_UNKOWN;
+        e.printStackTrace(new PrintStream(System.err));
     }
     return exit;
   }
