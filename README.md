@@ -44,7 +44,7 @@ email=jvanzyl@walmart.com
 
 [bfd]
 host=https://web.bfd.dev.cloud.wal-mart.com
-organization=bdf
+organization=bfd
 api_key=XXX
 email=jvanzyl@walmart.com
 ```
@@ -84,6 +84,17 @@ If you want to see what your Boo YAML template will look like with interpolated 
 boo -f boo.yml -v
 ```
 
+## Testing
+
+In order the the tests that require a live server you need your `default` profile to have a `host` setting for the BFD OneOps instance and you need to be in the `bfd` organization:
+
+```
+[default]
+host=https://web.bfd.dev.cloud.wal-mart.com
+organization=bfd
+api_key=XXX
+email=me@walmart.com
+```
 
 The tool is managed by BFD team.
 
