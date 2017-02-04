@@ -221,23 +221,34 @@ public class BooCli {
         System.out.println();
       }
 
-      if (cmd.hasOption('v')) {
-        if (cmd.hasOption('v')) {
-          if (ClientConfig.ONEOPS_CONFIG.exists()) {
-            ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-            String yaml = interpolator.interpolate(this.configFile,
-              ClientConfig.ONEOPS_CONFIG, this.profile);
-            System.out.println(yaml);
-          } else {
-            System.out.format("%nYou do not have a %s file. No interpolation can be performed.%n%n", ClientConfig.ONEOPS_CONFIG);
-          }
-        }
-        return exit;
-      }
-
       if (this.configFile == null) {
         this.help(null, "No YAML file found.");
         return Constants.EXIT_YAML_NOT_FOUND;
+      }
+
+      String yaml = "";
+
+      if (ClientConfig.ONEOPS_CONFIG.exists()) {
+        if (cmd.hasOption("profile")) {
+          this.profile = cmd.getOptionValue("profile");
+        }
+        ClientConfigIniReader iniReader = new ClientConfigIniReader();
+        if (iniReader.read(ClientConfig.ONEOPS_CONFIG, profile) == null) {
+          System.out.format("%n%s is not a valid profile in %s.%n%n", profile, ClientConfig.ONEOPS_CONFIG);
+          return Constants.EXIT_INVALID_PROFILE;
+        }
+
+        ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+        yaml = interpolator.interpolate(this.configFile, ClientConfig.ONEOPS_CONFIG, this.profile);
+      }
+
+      if (cmd.hasOption('v')) {
+            System.out.println(yaml);
+            if (!ClientConfig.ONEOPS_CONFIG.exists()) {
+                System.out.format("%nYou do not have a %s file. No interpolation can be performed.%n%n",
+                        ClientConfig.ONEOPS_CONFIG);
+            }
+            return exit;
       }
 
       if (cmd.hasOption("m")) {

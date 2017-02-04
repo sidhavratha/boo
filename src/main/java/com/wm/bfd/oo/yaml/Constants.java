@@ -45,6 +45,7 @@ public class Constants {
   public static final int EXIT_CLIENT = 6; // Exception from OneOps client APIs
   public static final int EXIT_UNKOWN = 7; // Unknown error
   public static final int EXIT_NOT_COMPLETE = 8; // Procedure was not completed
+  public static final int EXIT_INVALID_PROFILE = 9; // Invalid profile selected
 
   /**
    * Customize config.
