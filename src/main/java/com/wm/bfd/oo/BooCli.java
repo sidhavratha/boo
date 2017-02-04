@@ -405,7 +405,7 @@ public class BooCli {
         System.out.println(Constants.SUCCEED);
       } else {
         System.err.println(Constants.PROCEDURE_NOT_COMPLETE);
-        returnCode = Constants.Exit_NOT_COMPLETE;
+        returnCode = Constants.EXIT_NOT_COMPLETE;
       }
     }
     return returnCode;
