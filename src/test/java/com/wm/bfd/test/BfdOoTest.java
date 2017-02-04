@@ -23,7 +23,7 @@ import java.net.URL;
  */
 public abstract class BfdOoTest {
   private static final Logger LOG = LoggerFactory.getLogger(BfdOoTest.class);
-  private static final Injector injector = Guice.createInjector(new JaywayHttpModule(getConfig()));
+  private static final Injector injector = Guice.createInjector(new JaywayHttpModule(getConfig(), ClientConfig.ONEOPS_DEFAULT_PROFILE));
 
   /** The config. */
   ClientConfig config;

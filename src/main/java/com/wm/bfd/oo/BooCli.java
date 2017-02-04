@@ -69,6 +69,8 @@ public class BooCli {
   private BfdUtils bfdUtils = new BfdUtils();
 
   private String comment = null;
+  
+  private String profile = ClientConfig.ONEOPS_DEFAULT_PROFILE; 
 
   /**
    * Instantiates a new boo cli.
@@ -105,6 +107,7 @@ public class BooCli {
     Option stepSize = Option.builder().longOpt("procedure-step-size").argName("size").hasArg().desc("Percent of nodes to perform procedure on, default is 100.").build();
     Option comment = Option.builder("m").longOpt("message").argName("description").hasArg().desc("Customize the comment for deployments").build();
     Option view = Option.builder("v").longOpt("view").desc("View interpolated Boo YAML template").build();
+    Option profile = Option.builder("p").longOpt("profile").argName("PROFILE").hasArg().desc("Choose specific profile from ~/.boo/config").build();
 
     options.addOption(help);
     options.addOption(config);
@@ -125,6 +128,7 @@ public class BooCli {
     options.addOption(stepSize);
     options.addOption(comment);
     options.addOption(view);
+    options.addOption(profile);
   }
 
   static {
@@ -143,7 +147,7 @@ public class BooCli {
       LOG.debug("Loading {}", template);
     }
 
-    injector = Guice.createInjector(new JaywayHttpModule(this.configFile));
+    injector = Guice.createInjector(new JaywayHttpModule(this.configFile, this.profile));
     config = injector.getInstance(ClientConfig.class);
     bfdUtils.verifyTemplate(config);
     if (assembly != null) {
@@ -217,12 +221,15 @@ public class BooCli {
       }
 
       if (cmd.hasOption('v')) {
-        if (ClientConfig.ONEOPS_CONFIG.exists()) {
-          ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-          String yaml = interpolator.interpolate(this.configFile, ClientConfig.ONEOPS_CONFIG, ClientConfig.ONEOPS_DEFAULT_PROFILE);
-          System.out.println(yaml);
-        } else {
-          System.out.format("%nYou do not have a %s file. No interpolation can be performed.%n%n", ClientConfig.ONEOPS_CONFIG);
+        if (cmd.hasOption('v')) {
+          if (ClientConfig.ONEOPS_CONFIG.exists()) {
+            ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+            String yaml = interpolator.interpolate(this.configFile,
+              ClientConfig.ONEOPS_CONFIG, this.profile);
+            System.out.println(yaml);
+          } else {
+            System.out.format("%nYou do not have a %s file. No interpolation can be performed.%n%n", ClientConfig.ONEOPS_CONFIG);
+          }
         }
         return exit;
       }

@@ -10,7 +10,7 @@ import java.io.IOException;
 @Singleton
 public class ClientConfig {
 
-  public static final File ONEOPS_CONFIG = new File(new File(System.getProperty("user.home"), ".oneops"), "config");
+  public static final File ONEOPS_CONFIG = new File(new File(System.getProperty("user.home"), ".boo"), "config");
   public static final String ONEOPS_DEFAULT_PROFILE = "default";
   private Yaml yaml;
 
@@ -34,10 +34,10 @@ public class ClientConfig {
    * @param booYamlFile the file
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public ClientConfig(File booYamlFile) throws IOException {
+  public ClientConfig(File booYamlFile, String profile) throws IOException {
     ClientConfigReader reader = new ClientConfigReader();
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-    this.yaml = reader.read(interpolator.interpolate(booYamlFile, ONEOPS_CONFIG, ONEOPS_DEFAULT_PROFILE));
+    this.yaml = reader.read(interpolator.interpolate(booYamlFile, ONEOPS_CONFIG, profile));
   }
 
   public Yaml getYaml() {
