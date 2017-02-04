@@ -33,7 +33,7 @@ boo -h
 
 ## Configuration
 
-Boo YAML templates are processed with [Mustache][1] to allow variable interpolation when the standard `~/.oneops/config` file contains a `default` profile. If you have a `default` profile that looks like the following:
+Boo YAML templates are processed with [Mustache][1] to allow variable interpolation when the standard `~/.boo/config` file contains a `default` profile. If you have a `default` profile that looks like the following:
 
 ```
 [default]
