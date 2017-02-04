@@ -27,14 +27,18 @@ public class JaywayHttpModule extends AbstractModule {
 
   /** The yaml. */
   private File yaml;
+  
+  /** ~/.boo/config profile */
+  private String profile;
 
   /**
    * Instantiates a new jayway http module.
    *
    * @param yaml the yaml
    */
-  public JaywayHttpModule(File yaml) {
+  public JaywayHttpModule(File yaml, String profile) {
     this.yaml = yaml;
+    this.profile = profile;
     if (LOG.isDebugEnabled()) {
       LOG.debug("Using config {}", yaml);
     }
@@ -66,7 +70,7 @@ public class JaywayHttpModule extends AbstractModule {
   ClientConfig getClientConfig() throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
     // test
     if (CLIENT == null) {
-      CLIENT = new ClientConfig(this.yaml);
+      CLIENT = new ClientConfig(this.yaml, this.profile);
     }
 
     return CLIENT;
