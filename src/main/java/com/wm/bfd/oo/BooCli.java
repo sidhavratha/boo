@@ -376,7 +376,8 @@ public class BooCli {
    * @param instanceList the instance list
    * @param rollAt the roll at
    */
-  private int executeAction(String platformName, String componentName, String actionName, String arglist, List<String> instanceList, int rollAt) {
+  private int executeAction(String platformName, String componentName, String actionName, String arglist,
+                            List<String> instanceList, int rollAt) {
     int returnCode = 0;
     String procedureId = null;
     try {
@@ -390,7 +391,8 @@ public class BooCli {
     if (procedureId != null) {
       String procStatus = "active";
       try {
-        while (procStatus != null && (procStatus.equalsIgnoreCase("active") || procStatus.equalsIgnoreCase("pending"))) {
+        while (procStatus != null && (procStatus.equalsIgnoreCase("active") ||
+                procStatus.equalsIgnoreCase("pending"))) {
           procStatus = flow.getProcedureStatusForAction(procedureId);
           try {
             Thread.sleep(3000);
@@ -565,7 +567,8 @@ public class BooCli {
    */
   private String autoGenAssemblyName(boolean isAutoGen, String assemblyName) {
     if (isAutoGen) {
-      assemblyName = (assemblyName == null ? this.randomString("") : (assemblyName + Constants.DASH + this.randomString(assemblyName)));
+      assemblyName = (assemblyName == null ? this.randomString("") : (assemblyName + Constants.DASH +
+              this.randomString(assemblyName)));
     }
     return assemblyName;
   }
