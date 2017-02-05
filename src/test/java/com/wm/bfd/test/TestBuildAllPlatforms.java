@@ -99,8 +99,7 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   }
 
   @Test
-  public void testListAttachements() throws OneOpsClientAPIException {
-    build.listAttachements("yarn", "hadoop-yarn-config");
+  public void testListAttachments() throws OneOpsClientAPIException {
   }
 
   @Test
@@ -124,7 +123,7 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   }
 
   @Test
-  public void testListPlatformss() throws OneOpsClientAPIException {
+  public void testListPlatforms() throws OneOpsClientAPIException {
     build.listPlatforms();
   }
 
