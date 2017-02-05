@@ -266,9 +266,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
         String attachment = entry.getKey();
         Map<String, String> attributes = (Map<String, String>) entry.getValue();
         if (this.isAttachmentExists(platformName, componentName, attachment)) {
-          this.updateAttachement(platformName, componentName, attachment, attributes);
+          this.updateAttachment(platformName, componentName, attachment, attributes);
         } else {
-          this.addAttachement(platformName, componentName, attachment, attributes);
+          this.addAttachment(platformName, componentName, attachment, attributes);
         }
       }
     }

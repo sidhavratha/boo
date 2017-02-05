@@ -281,20 +281,20 @@ public abstract class AbstractWorkflow {
   }
 
   /**
-   * List attachements.
+   * List attachments.
    *
    * @param platformName the platform name
    * @param componentName the component name
    * @return the list
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public List<String> listAttachements(String platformName, String componentName) throws OneOpsClientAPIException {
+  public List<String> listAttachments(String platformName, String componentName) throws OneOpsClientAPIException {
     JsonPath response = design.listPlatformComponentAttachments(platformName, componentName);
     return response.getList(Constants.CINAME);
   }
 
   /**
-   * Adds the attachement.
+   * Adds the attachment.
    *
    * @param platformName the platform name
    * @param componentName the component name
@@ -303,13 +303,13 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean addAttachement(String platformName, String componentName, String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
+  public boolean addAttachment(String platformName, String componentName, String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
     design.addPlatformComponentAttachment(platformName, componentName, uniqueName, attributes);
     return true;
   }
 
   /**
-   * Update attachement.
+   * Update attachment.
    *
    * @param platformName the platform name
    * @param componentName the component name
@@ -318,7 +318,7 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean updateAttachement(String platformName, String componentName, String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
+  public boolean updateAttachment(String platformName, String componentName, String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
     design.updatePlatformComponentAttachment(platformName, componentName, uniqueName, attributes);
     return true;
   }
