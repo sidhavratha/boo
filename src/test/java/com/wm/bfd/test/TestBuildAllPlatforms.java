@@ -104,7 +104,7 @@ public class TestBuildAllPlatforms extends BfdOoTest {
 
   @Test
   public void testAddAttachement() throws OneOpsClientAPIException {
-    build.addAttachement("yarn", "hadoop-yarn-config", "testa2", null);
+    build.addAttachment("yarn", "hadoop-yarn-config", "testa2", null);
   }
 
   @Test
@@ -114,7 +114,7 @@ public class TestBuildAllPlatforms extends BfdOoTest {
 
   @Test
   public void testUpdateAttachement() throws OneOpsClientAPIException {
-    build.updateAttachement("yarn", "hadoop-yarn-config", "testa2", null);
+    build.updateAttachment("yarn", "hadoop-yarn-config", "testa2", null);
   }
 
   @Test
