@@ -20,51 +20,51 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
-*
-* Packages always change in OneOps, this test mainly focus on if functions can run without exceptions so far.
-*
-*/
+ *
+ * Packages always change in OneOps, this test mainly focus on if functions can run without exceptions so far.
+ *
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBuildAllPlatforms extends BfdOoTest {
   private static Logger LOG = LoggerFactory.getLogger(TestBuildAllPlatforms.class);
-  BuildAllPlatforms build;
+  private BuildAllPlatforms build;
 
   @Before
   public void beforeMethod() throws Exception {
-    assumeTrue(bfdOneOpsAvailable() && bfdDeveloper());
-    if (build == null) {
-      build = new BuildAllPlatforms(oo, config, null);
-    }
+    assumeTrue(oneOpsAvailable() && developerEnvironment());
+    build = new BuildAllPlatforms(oo, config, null);
   }
 
-  private boolean bfdDeveloper() throws IOException {
+  private boolean developerEnvironment() throws IOException {
     if (ONEOPS_CONFIG.exists()) {
       ClientConfigIniReader reader = new ClientConfigIniReader();
       Map<String, String> config = reader.read(ONEOPS_CONFIG, ONEOPS_DEFAULT_PROFILE);
       String organization = config.get("organization");
-      if (organization != null && organization.equals("bfd")) {
+      if (organization != null) {
         return true;
       }
     }
     return false;
   }
 
-  private boolean bfdOneOpsAvailable() {
-    try (Socket s = new Socket("web.bfd.dev.cloud.wal-mart.com", 443)) {
+  private boolean oneOpsAvailable() {
+    try (Socket s = new Socket(new java.net.URI(oo.getEndpoint()).getHost(), 443)) {
+      s.close();
       return true;
-    } catch (IOException ex) {
-      // Ignore
     }
-    return false;
-  }
-
-  @Test
-  public void testACreateAssemblyIfNotExist() throws OneOpsClientAPIException {
-    boolean isSuc = build.createAssemblyIfNotExist();
-    assertEquals(isSuc, true);
+    catch (IOException ex) {
+      System.out.format("Unable to reach %s. Skipping tests%n", oo.getEndpoint());
+      return false;
+    }
+    catch (java.net.URISyntaxException ex) {
+      System.out.format("%s is not a valid URI. Skipping tests%n", oo.getEndpoint());
+      return false;
+    }
   }
 
   @Test
@@ -74,110 +74,87 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   }
 
   @Test
-  public void testGetAssemblies() throws OneOpsClientAPIException {
-    build.getAssemblies();
-  }
+  public void testOneOpsLifeCycle() throws OneOpsClientAPIException, InterruptedException {
 
-  @Test
-  public void testListActions() throws OneOpsClientAPIException {
-    build.listActions("web", "apache");
-  }
+    cleanUp();
 
-  @Test
-  public void testListInstances() throws OneOpsClientAPIException {
-    build.listInstances("web", "apache");
-  }
+    System.out.println("Deploy");
+    boolean isSuc = build.process(false,false);
+    assertEquals(true,isSuc);
+    while (build.getStatus().equalsIgnoreCase("active"))
+    {
+      TimeUnit.SECONDS.sleep(10);
+    }
 
-  @Test
-  public void testListInstancesMap() throws OneOpsClientAPIException {
-    build.listInstancesMap("web", "apache");
-  }
+    System.out.println("Deploy Done");
 
-  @Test
-  public void testExecuteAction() throws OneOpsClientAPIException {
-    build.executeAction("web", "apache", "status", "", null, 100);
-  }
-
-  @Test
-  public void testListAttachments() throws OneOpsClientAPIException {
-  }
-
-  @Test
-  public void testAddAttachement() throws OneOpsClientAPIException {
-    build.addAttachment("yarn", "hadoop-yarn-config", "testa2", null);
-  }
-
-  @Test
-  public void testIsAttachementExist() throws OneOpsClientAPIException {
-    build.isAttachmentExists("yarn", "hadoop-yarn-config", "test");
-  }
-
-  @Test
-  public void testUpdateAttachement() throws OneOpsClientAPIException {
-    build.updateAttachment("yarn", "hadoop-yarn-config", "testa2", null);
-  }
-
-  @Test
-  public void testListEnvs() throws OneOpsClientAPIException {
-    build.listEnvs();
-  }
-
-  @Test
-  public void testListPlatforms() throws OneOpsClientAPIException {
     build.listPlatforms();
+    build.listEnvs();
+
+    System.out.println("Actions");
+    List<String> actions = build.listActions("tomcat", "compute");
+    assertEquals(true, actions.size() > 2);
+
+    String status = build.executeAction("tomcat", "compute",
+            "status", "", null, 100);
+    assertEquals(true, status.length() > 5);
+
+    System.out.println("Attachments");
+
+    assertEquals(true,isSuc);
+    isSuc = build.addAttachment("tomcat", "tomcat",
+            "testa2", null);
+    assertEquals(true,isSuc);
+
+    build.listAttachments("tomcat", "tomcat");
+
+    build.isAttachmentExists("tomcat", "tomcat",
+            "test");
+
+    build.updateAttachment("tomcat", "tomcat",
+            "testa2", null);
+
+    System.out.println("Instances");
+    build.listInstances("tomcat", "compute");
+
+    build.listInstancesMap("tomcat", "compute");
+
+    System.out.println("Platform cloud scale update");
+    isSuc = build.updatePlatformCloudScale();
+    assertEquals(true,isSuc);
+
+    System.out.println("Platform component update");
+    isSuc = build.updatePlatformComponents();
+    assertEquals(true,isSuc);
+
+    System.out.println("Get Ips");
+
+    build.getIpsInternal("tomcat", "compute");
+
+    cleanUp();
+
+    assertEquals(true, isSuc);
+    System.out.println("Done Clean up");
   }
 
-  @Test
-  public void testBCreatePlatform() throws OneOpsClientAPIException {
-    boolean isSuc = build.createPlatforms(false);
-    assertEquals(isSuc, true);
-  }
+  private void cleanUp() throws OneOpsClientAPIException, InterruptedException {
+    System.out.println("Cleanup Started");
+    BuildAllPlatforms cleanBuild = new BuildAllPlatforms(oo, config, null);
+    for (int i = 0; i < 10; i++) {
+      try {
+        cleanBuild.cleanup();
+      }
+      catch (Exception ex) {
+        // ignore
+      }
 
-  @Test
-  public void testCCreateEnv() throws OneOpsClientAPIException {
-    boolean isSuc = build.createEnv();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testDUpdateScaling() throws OneOpsClientAPIException {
-    boolean isSuc = build.updateScaling();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testECleanup() throws OneOpsClientAPIException {
-    boolean isSuc = build.cleanup();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testFGetStatus() throws OneOpsClientAPIException {
-    String status = build.getStatus();
-    LOG.info("The {} deploy {}", this.envName, status);
-  }
-
-  @Test
-  public void testEGetCloud() throws OneOpsClientAPIException {
-    String testCloud = "dev-cdc003";
-    String id = build.getCloudId(testCloud);
-    LOG.info("The {} id {}", testCloud, id);
-  }
-
-  @Test
-  public void testUpdatePlatformCloudScale() throws OneOpsClientAPIException {
-    boolean isSuc = build.updatePlatformCloudScale();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testUpdateUserComponents() throws OneOpsClientAPIException {
-    boolean isSuc = build.updatePlatformComponents();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testGetIpsInternal() throws OneOpsClientAPIException {
-    build.getIpsInternal("yarn", "compute");
+      while (cleanBuild.getStatus() != null &&
+              cleanBuild.getStatus().equalsIgnoreCase("active"))
+      {
+        TimeUnit.SECONDS.sleep(10);
+      }
+      TimeUnit.SECONDS.sleep(10);
+    }
+    System.out.println("Cleanup Finished");
   }
 }

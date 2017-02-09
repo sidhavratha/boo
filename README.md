@@ -39,14 +39,16 @@ Boo YAML templates are processed with [Mustache][1] to allow variable interpolat
 [default]
 host=https://oneops.prod.walmart.com
 organization=devtools
-api_key=XXX
+api_key=oneops_api_key # copy from OneOps UI->profile->authentication->API Token
 email=jvanzyl@walmart.com
+cloud=prod-cdc6
 
 [bfd]
 host=https://web.bfd.dev.cloud.wal-mart.com
 organization=bfd
-api_key=XXX
+api_key=oneops_api_key # copy from OneOps UI->profile->authentication->API Token
 email=jvanzyl@walmart.com
+cloud=bfd-cdd1
 ```
 
 With a Boo YAML template that looks like this:
@@ -59,6 +61,11 @@ boo:
   email: '{{email}}'
   environment_name: 'dev'
   ip_output: 'json'
+  clouds:
+    {{cloud}}:
+       priority: '1'
+       dpmt_order: '1'
+       pct_scale: '100'
 
 ...
 
@@ -70,10 +77,15 @@ It will yield the following:
 boo:
   oneops_host: 'https://oneops.prod.walmart.com'
   organization: 'devtools'
-  api_key: 'XXX'
+  api_key: 'oneops_api_key'
   email: 'jvanzyl@walmart.com'
   environment_name: 'dev'
   ip_output: 'json'
+  clouds:
+    prod-cdc6:
+       priority: '1'
+       dpmt_order: '1'
+       pct_scale: '100'
 
 ...
 
@@ -86,14 +98,15 @@ boo -f boo.yml -v
 
 ## Testing
 
-In order the the tests that require a live server you need your `default` profile to have a `host` setting for the BFD OneOps instance and you need to be in the `bfd` organization:
+In order the the tests that require a live server you need your `default` profile to have a `host` setting for a OneOps instance:
 
 ```
 [default]
-host=https://web.bfd.dev.cloud.wal-mart.com
-organization=bfd
-api_key=XXX
-email=me@walmart.com
+host=https://oneops.prod.walmart.com
+organization=oneops_org_name
+api_key=oneops_api_key
+email=me@email.com
+cloud=cloud_name_in_oneops
 ```
 
 The tool is managed by BFD team.
