@@ -518,6 +518,7 @@ public class Design extends APIClient {
     RequestSpecification request = createRequest();
 
     Response newComponentResponse = request.queryParam("template_name", componentName).get(DESIGN_URI + "platforms/" + platformName + "/components/new.json");
+    
     if (newComponentResponse != null) {
       ResourceObject ro = new ResourceObject();
       Map<String, String> properties = Maps.newHashMap();
@@ -537,7 +538,7 @@ public class Design extends APIClient {
           ownerProps = Maps.newHashMap();
         }
         for (Entry<String, String> entry : attributes.entrySet()) {
-          ownerProps.put(entry.getKey(), "");
+          ownerProps.put(entry.getKey(), "design");
         }
         ro.setOwnerProps(ownerProps);
       }
