@@ -2,8 +2,8 @@ package com.wm.bfd.test;
 
 import static com.wm.bfd.oo.ClientConfig.ONEOPS_CONFIG;
 import static com.wm.bfd.oo.ClientConfig.ONEOPS_DEFAULT_PROFILE;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import com.wm.bfd.oo.ClientConfigIniReader;
@@ -15,8 +15,6 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -31,7 +29,6 @@ import java.util.concurrent.TimeUnit;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBuildAllPlatforms extends BfdOoTest {
-  private static Logger LOG = LoggerFactory.getLogger(TestBuildAllPlatforms.class);
   private BuildAllPlatforms build;
 
   @Before
@@ -54,14 +51,11 @@ public class TestBuildAllPlatforms extends BfdOoTest {
 
   private boolean oneOpsAvailable() {
     try (Socket s = new Socket(new java.net.URI(oo.getEndpoint()).getHost(), 443)) {
-      s.close();
       return true;
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       System.out.format("Unable to reach %s. Skipping tests%n", oo.getEndpoint());
       return false;
-    }
-    catch (java.net.URISyntaxException ex) {
+    } catch (java.net.URISyntaxException ex) {
       System.out.format("%s is not a valid URI. Skipping tests%n", oo.getEndpoint());
       return false;
     }
@@ -76,85 +70,69 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   @Test
   public void testOneOpsLifeCycle() throws OneOpsClientAPIException, InterruptedException {
 
-    cleanUp();
+    // Make sure our test assembly is not present
+    removeAssembly();
 
     System.out.println("Deploy");
-    boolean isSuc = build.process(false,false);
-    assertEquals(true,isSuc);
-    while (build.getStatus().equalsIgnoreCase("active"))
-    {
+    assertTrue(build.process(false, false));
+    while (build.getStatus().equalsIgnoreCase("active")) {
       TimeUnit.SECONDS.sleep(10);
     }
-
     System.out.println("Deploy Done");
 
-    build.listPlatforms();
-    build.listEnvs();
+    // Platforms
+    assertTrue(build.listPlatforms().size() > 0);
 
+    // Environments
+    assertTrue(build.listEnvs().size() > 0);
+
+    // Actions
     System.out.println("Actions");
-    List<String> actions = build.listActions("tomcat", "compute");
-    assertEquals(true, actions.size() > 2);
+    assertTrue(build.listActions("tomcat", "compute").size() > 2);
+    assertTrue(build.executeAction("tomcat", "compute", "status", "", null, 100).length() > 5);
 
-    String status = build.executeAction("tomcat", "compute",
-            "status", "", null, 100);
-    assertEquals(true, status.length() > 5);
-
+    // Attachments
     System.out.println("Attachments");
+    assertTrue(build.addAttachment("tomcat", "tomcat", "test", null));
+    assertTrue(build.listAttachments("tomcat", "tomcat").size() > 0);
+    assertTrue(build.isAttachmentExists("tomcat", "tomcat", "test"));
+    assertTrue(build.updateAttachment("tomcat", "tomcat", "test", null));
 
-    assertEquals(true,isSuc);
-    isSuc = build.addAttachment("tomcat", "tomcat",
-            "testa2", null);
-    assertEquals(true,isSuc);
-
-    build.listAttachments("tomcat", "tomcat");
-
-    build.isAttachmentExists("tomcat", "tomcat",
-            "test");
-
-    build.updateAttachment("tomcat", "tomcat",
-            "testa2", null);
-
+    // Instances
     System.out.println("Instances");
-    build.listInstances("tomcat", "compute");
-
-    build.listInstancesMap("tomcat", "compute");
+    assertTrue(build.listInstances("tomcat", "compute").size() > 0);
+    assertTrue(build.listInstancesMap("tomcat", "compute").size() > 0);
 
     System.out.println("Platform cloud scale update");
-    isSuc = build.updatePlatformCloudScale();
-    assertEquals(true,isSuc);
+    assertTrue(build.updatePlatformCloudScale());
 
     System.out.println("Platform component update");
-    isSuc = build.updatePlatformComponents();
-    assertEquals(true,isSuc);
+    assertTrue(build.updatePlatformComponents());
 
     System.out.println("Get Ips");
+    assertTrue(build.getIpsInternal("tomcat", "compute").size() > 0);
 
-    build.getIpsInternal("tomcat", "compute");
+    removeAssembly();
 
-    cleanUp();
-
-    assertEquals(true, isSuc);
     System.out.println("Done Clean up");
   }
 
-  private void cleanUp() throws OneOpsClientAPIException, InterruptedException {
-    System.out.println("Cleanup Started");
+  // This logic should be in Boo itself it reliably remove all traces of an assembly in
+  // one pass from the users perspective
+  private void removeAssembly() throws OneOpsClientAPIException, InterruptedException {
+    System.out.println("Assembly removal started...");
     BuildAllPlatforms cleanBuild = new BuildAllPlatforms(oo, config, null);
     for (int i = 0; i < 10; i++) {
       try {
         cleanBuild.cleanup();
-      }
-      catch (Exception ex) {
+      } catch (Exception ex) {
         // ignore
       }
-
-      while (cleanBuild.getStatus() != null &&
-              cleanBuild.getStatus().equalsIgnoreCase("active"))
-      {
+      while (cleanBuild.getStatus() != null && cleanBuild.getStatus().equalsIgnoreCase("active")) {
         TimeUnit.SECONDS.sleep(10);
       }
       TimeUnit.SECONDS.sleep(10);
     }
-    System.out.println("Cleanup Finished");
+    System.out.println("Assembly removal finished.");
   }
 }
