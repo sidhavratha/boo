@@ -138,7 +138,7 @@ public class Assembly extends APIClient {
     RequestSpecification request = createRequest();
     Response response = request.delete(ASSEMBLY_URI + assemblyName);
     if (response != null) {
-      if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
+      if (response.getStatusCode() == 200 || response.getStatusCode() == 302 || response.getStatusCode() == 404) {
         return response.getBody().jsonPath();
       } else {
         String msg = String.format("Failed to delete assembly with name %s due to %s", assemblyName, response.getStatusLine());

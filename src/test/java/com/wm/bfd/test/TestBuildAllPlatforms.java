@@ -2,8 +2,8 @@ package com.wm.bfd.test;
 
 import static com.wm.bfd.oo.ClientConfig.ONEOPS_CONFIG;
 import static com.wm.bfd.oo.ClientConfig.ONEOPS_DEFAULT_PROFILE;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import com.wm.bfd.oo.ClientConfigIniReader;
@@ -15,56 +15,50 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
-*
-* Packages always change in OneOps, this test mainly focus on if functions can run without exceptions so far.
-*
-*/
+ *
+ * Packages always change in OneOps, this test mainly focus on if functions can run without exceptions so far.
+ *
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBuildAllPlatforms extends BfdOoTest {
-  private static Logger LOG = LoggerFactory.getLogger(TestBuildAllPlatforms.class);
-  BuildAllPlatforms build;
+  private BuildAllPlatforms build;
 
   @Before
   public void beforeMethod() throws Exception {
-    assumeTrue(bfdOneOpsAvailable() && bfdDeveloper());
-    if (build == null) {
-      build = new BuildAllPlatforms(oo, config, null);
-    }
+    assumeTrue(oneOpsAvailable() && developerEnvironment());
+    build = new BuildAllPlatforms(oo, config, null);
   }
 
-  private boolean bfdDeveloper() throws IOException {
+  private boolean developerEnvironment() throws IOException {
     if (ONEOPS_CONFIG.exists()) {
       ClientConfigIniReader reader = new ClientConfigIniReader();
       Map<String, String> config = reader.read(ONEOPS_CONFIG, ONEOPS_DEFAULT_PROFILE);
       String organization = config.get("organization");
-      if (organization != null && organization.equals("bfd")) {
+      if (organization != null) {
         return true;
       }
     }
     return false;
   }
 
-  private boolean bfdOneOpsAvailable() {
-    try (Socket s = new Socket("web.bfd.dev.cloud.wal-mart.com", 443)) {
+  private boolean oneOpsAvailable() {
+    try (Socket s = new Socket(new java.net.URI(oo.getEndpoint()).getHost(), 443)) {
       return true;
     } catch (IOException ex) {
-      // Ignore
+      System.out.format("Unable to reach %s. Skipping tests%n", oo.getEndpoint());
+      return false;
+    } catch (java.net.URISyntaxException ex) {
+      System.out.format("%s is not a valid URI. Skipping tests%n", oo.getEndpoint());
+      return false;
     }
-    return false;
-  }
-
-  @Test
-  public void testACreateAssemblyIfNotExist() throws OneOpsClientAPIException {
-    boolean isSuc = build.createAssemblyIfNotExist();
-    assertEquals(isSuc, true);
   }
 
   @Test
@@ -74,110 +68,71 @@ public class TestBuildAllPlatforms extends BfdOoTest {
   }
 
   @Test
-  public void testGetAssemblies() throws OneOpsClientAPIException {
-    build.getAssemblies();
+  public void testOneOpsLifeCycle() throws OneOpsClientAPIException, InterruptedException {
+
+    // Make sure our test assembly is not present
+    removeAssembly();
+
+    System.out.println("Deploy");
+    assertTrue(build.process(false, false));
+    while (build.getStatus().equalsIgnoreCase("active")) {
+      TimeUnit.SECONDS.sleep(10);
+    }
+    System.out.println("Deploy Done");
+
+    // Platforms
+    assertTrue(build.listPlatforms().size() > 0);
+
+    // Environments
+    assertTrue(build.listEnvs().size() > 0);
+
+    // Actions
+    System.out.println("Actions");
+    assertTrue(build.listActions("tomcat", "compute").size() > 2);
+    assertTrue(build.executeAction("tomcat", "compute", "status", "", null, 100).length() > 5);
+
+    // Attachments
+    System.out.println("Attachments");
+    assertTrue(build.addAttachment("tomcat", "tomcat", "test", null));
+    assertTrue(build.listAttachments("tomcat", "tomcat").size() > 0);
+    assertTrue(build.isAttachmentExists("tomcat", "tomcat", "test"));
+    assertTrue(build.updateAttachment("tomcat", "tomcat", "test", null));
+
+    // Instances
+    System.out.println("Instances");
+    assertTrue(build.listInstances("tomcat", "compute").size() > 0);
+    assertTrue(build.listInstancesMap("tomcat", "compute").size() > 0);
+
+    System.out.println("Platform cloud scale update");
+    assertTrue(build.updatePlatformCloudScale());
+
+    System.out.println("Platform component update");
+    assertTrue(build.updatePlatformComponents());
+
+    System.out.println("Get Ips");
+    assertTrue(build.getIpsInternal("tomcat", "compute").size() > 0);
+
+    removeAssembly();
+
+    System.out.println("Done Clean up");
   }
 
-  @Test
-  public void testListActions() throws OneOpsClientAPIException {
-    build.listActions("web", "apache");
-  }
-
-  @Test
-  public void testListInstances() throws OneOpsClientAPIException {
-    build.listInstances("web", "apache");
-  }
-
-  @Test
-  public void testListInstancesMap() throws OneOpsClientAPIException {
-    build.listInstancesMap("web", "apache");
-  }
-
-  @Test
-  public void testExecuteAction() throws OneOpsClientAPIException {
-    build.executeAction("web", "apache", "status", "", null, 100);
-  }
-
-  @Test
-  public void testListAttachments() throws OneOpsClientAPIException {
-  }
-
-  @Test
-  public void testAddAttachement() throws OneOpsClientAPIException {
-    build.addAttachment("yarn", "hadoop-yarn-config", "testa2", null);
-  }
-
-  @Test
-  public void testIsAttachementExist() throws OneOpsClientAPIException {
-    build.isAttachmentExists("yarn", "hadoop-yarn-config", "test");
-  }
-
-  @Test
-  public void testUpdateAttachement() throws OneOpsClientAPIException {
-    build.updateAttachment("yarn", "hadoop-yarn-config", "testa2", null);
-  }
-
-  @Test
-  public void testListEnvs() throws OneOpsClientAPIException {
-    build.listEnvs();
-  }
-
-  @Test
-  public void testListPlatforms() throws OneOpsClientAPIException {
-    build.listPlatforms();
-  }
-
-  @Test
-  public void testBCreatePlatform() throws OneOpsClientAPIException {
-    boolean isSuc = build.createPlatforms(false);
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testCCreateEnv() throws OneOpsClientAPIException {
-    boolean isSuc = build.createEnv();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testDUpdateScaling() throws OneOpsClientAPIException {
-    boolean isSuc = build.updateScaling();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testECleanup() throws OneOpsClientAPIException {
-    boolean isSuc = build.cleanup();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testFGetStatus() throws OneOpsClientAPIException {
-    String status = build.getStatus();
-    LOG.info("The {} deploy {}", this.envName, status);
-  }
-
-  @Test
-  public void testEGetCloud() throws OneOpsClientAPIException {
-    String testCloud = "dev-cdc003";
-    String id = build.getCloudId(testCloud);
-    LOG.info("The {} id {}", testCloud, id);
-  }
-
-  @Test
-  public void testUpdatePlatformCloudScale() throws OneOpsClientAPIException {
-    boolean isSuc = build.updatePlatformCloudScale();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testUpdateUserComponents() throws OneOpsClientAPIException {
-    boolean isSuc = build.updatePlatformComponents();
-    assertEquals(isSuc, true);
-  }
-
-  @Test
-  public void testGetIpsInternal() throws OneOpsClientAPIException {
-    build.getIpsInternal("yarn", "compute");
+  // This logic should be in Boo itself it reliably remove all traces of an assembly in
+  // one pass from the users perspective
+  private void removeAssembly() throws OneOpsClientAPIException, InterruptedException {
+    System.out.println("Assembly removal started...");
+    BuildAllPlatforms cleanBuild = new BuildAllPlatforms(oo, config, null);
+    for (int i = 0; i < 10; i++) {
+      try {
+        cleanBuild.cleanup();
+      } catch (Exception ex) {
+        // ignore
+      }
+      while (cleanBuild.getStatus() != null && cleanBuild.getStatus().equalsIgnoreCase("active")) {
+        TimeUnit.SECONDS.sleep(10);
+      }
+      TimeUnit.SECONDS.sleep(10);
+    }
+    System.out.println("Assembly removal finished.");
   }
 }
