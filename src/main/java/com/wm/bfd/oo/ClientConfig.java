@@ -1,11 +1,11 @@
 package com.wm.bfd.oo;
 
 import com.wm.bfd.oo.yaml.Yaml;
-
 import com.google.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Singleton
 public class ClientConfig {
@@ -39,6 +39,19 @@ public class ClientConfig {
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
     this.yaml = reader.read(interpolator.interpolate(booYamlFile, ONEOPS_CONFIG, profile));
   }
+  
+  /**
+   * Create a ClientConfig by parsing an InputStream.
+   * @param input
+   * @throws IOException
+   */
+  public ClientConfig(InputStream input, String profile) throws IOException {
+    ClientConfigReader reader = new ClientConfigReader();
+    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    this.yaml = reader.read(interpolator.interpolate(input, ONEOPS_CONFIG, profile));
+  }
+
+
 
   public Yaml getYaml() {
     return yaml;
