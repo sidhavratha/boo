@@ -92,6 +92,7 @@ public class JaywayHttpModule extends AbstractModule {
     instance.setAuthtoken(client.getYaml().getBoo().getApikey());
     instance.setOrgname(client.getYaml().getBoo().getOrg());
     instance.setEndpoint(client.getYaml().getBoo().getHost());
+    instance.setGzipEnabled(client.getYaml().getBoo().isGzipEnabled());
     return instance;
   }
 
