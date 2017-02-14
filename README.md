@@ -1,8 +1,8 @@
 # bfd-oneops-automation
 [BFD OneOps Automation Tool](https://confluence.walmart.com/pages/viewpage.action?pageId=163659806)
 
-####The precompiled executable jar under install/, skip the build steps if you don't want to compile java.
-####If you want to run mvn test, make sure have a valid test.yaml under src/test/resources.
+*The precompiled executable jar under install/, skip the build steps if you don't want to compile java.*
+*If you want to run mvn test, make sure have a valid test.yaml under src/test/resources and a local boo config (~/.boo/config).  See the Configuration section below.*
 
 ##Build to a executable command:
 Run boo as a bash script:
