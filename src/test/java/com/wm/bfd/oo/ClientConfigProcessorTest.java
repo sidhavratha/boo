@@ -2,12 +2,13 @@ package com.wm.bfd.oo;
 
 import static org.junit.Assert.assertEquals;
 
-import com.wm.bfd.oo.yaml.Yaml;
+import java.io.File;
+import java.io.FileInputStream;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
+import com.wm.bfd.oo.yaml.Yaml;
 
 public class ClientConfigProcessorTest {
 
@@ -23,6 +24,18 @@ public class ClientConfigProcessorTest {
     ClientConfigReader reader = new ClientConfigReader();
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
     Yaml yaml = reader.read(interpolator.interpolate(resource("boo.yaml"), resource("config"), ClientConfig.ONEOPS_DEFAULT_PROFILE));
+    doAssert(yaml);
+  }
+
+  @Test
+  public void validateBooYamlProcessingInputStream() throws Exception {
+    ClientConfigReader reader = new ClientConfigReader();
+    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    Yaml yaml = reader.read(interpolator.interpolate(new FileInputStream(resource("boo.yaml")), resource("config"), ClientConfig.ONEOPS_DEFAULT_PROFILE));
+    doAssert(yaml);
+  }
+  
+  private void doAssert(Yaml yaml) {
     // We current append a trailing '/' to the URI
     assertEquals("https://web.bfd.dev.cloud.wal-mart.com/", yaml.getBoo().getHost());
     assertEquals("bfd", yaml.getBoo().getOrg());
