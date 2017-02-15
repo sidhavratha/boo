@@ -3,6 +3,7 @@ package com.oo.api;
 import org.apache.commons.codec.binary.Base64;
 
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.config.DecoderConfig;
 import com.jayway.restassured.specification.RequestSpecification;
 import com.oo.api.exception.OneOpsClientAPIException;
 
@@ -25,6 +26,9 @@ public abstract class APIClient {
 
   protected RequestSpecification createRequest() {
     RequestSpecification rs = RestAssured.given();
+    if (!instance.isGzipEnabled()) {
+      rs.config(RestAssured.config().decoderConfig(DecoderConfig.decoderConfig().noContentDecoders()));
+    }
     String basicAuth = "Basic " + new String(Base64.encodeBase64(instance.getAuthtoken().getBytes()));
     rs.header("Authorization", basicAuth);
     rs.header("User-Agent", "OneOpsAPIClient");
