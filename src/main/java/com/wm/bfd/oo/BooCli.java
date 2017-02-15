@@ -164,13 +164,14 @@ public class BooCli {
    */
   public void initOo(ClientConfig config, String assembly, String comment) {
     OOInstance oo = injector.getInstance(OOInstance.class);
+    oo.setGzipEnabled(config.getYaml().getBoo().isGzipEnabled());
     try {
       if (assembly != null) {
         config.getYaml().getAssembly().setName(assembly);
       }
       flow = new BuildAllPlatforms(oo, config, comment);
     } catch (OneOpsClientAPIException e) {
-      System.err.println("Init failed! Quit!");
+      System.err.println("Init failed with " + e.getMessage());
     }
   }
 
