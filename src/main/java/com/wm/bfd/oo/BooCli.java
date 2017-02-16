@@ -222,7 +222,7 @@ public class BooCli {
         System.out.println();
       }
 
-      if (this.configFile == null) {
+      if (this.configFile == null || !this.configFile.exists()) {
         this.help(null, "No YAML file found.");
         return Constants.EXIT_YAML_NOT_FOUND;
       }
