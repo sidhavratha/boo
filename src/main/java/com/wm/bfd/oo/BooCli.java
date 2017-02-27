@@ -328,7 +328,7 @@ public class BooCli {
         this.retryDeployment();
       } else if (cmd.hasOption("procedure")) {
         if (cmd.getOptionValues("procedure").length != 3) {
-          System.err.println("Wrong prameters! --prodedure <platformName> <componentName> <actionName>");
+          System.err.println("Wrong parameters! --prodedure <platformName> <componentName> <actionName>");
           return Constants.EXIT_WRONG_PRAMETER;
         } else {
           String[] args = cmd.getOptionValues("procedure");
@@ -368,6 +368,10 @@ public class BooCli {
           }
 
         }
+      } else {
+        System.err.println("Wrong parameters!");
+        this.help(null, Constants.BFD_TOOL);
+        return Constants.EXIT_WRONG_PRAMETER;
       }
     } catch (ParseException e) {
       exit = Constants.EXIT_PARSE_ERROR;
