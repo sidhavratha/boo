@@ -70,8 +70,8 @@ public class BooCli {
   private BfdUtils bfdUtils = new BfdUtils();
 
   private String comment = null;
-  
-  private String profile = ClientConfig.ONEOPS_DEFAULT_PROFILE; 
+
+  private String profile = ClientConfig.ONEOPS_DEFAULT_PROFILE;
 
   /**
    * Instantiates a new boo cli.
@@ -244,12 +244,11 @@ public class BooCli {
       }
 
       if (cmd.hasOption('v')) {
-            System.out.println(yaml);
-            if (!ClientConfig.ONEOPS_CONFIG.exists()) {
-                System.out.format("%nYou do not have a %s file. No interpolation can be performed.%n%n",
-                        ClientConfig.ONEOPS_CONFIG);
-            }
-            return exit;
+        System.out.println(yaml);
+        if (!ClientConfig.ONEOPS_CONFIG.exists()) {
+          System.out.format("%nYou do not have a %s file. No interpolation can be performed.%n%n", ClientConfig.ONEOPS_CONFIG);
+        }
+        return exit;
       }
 
       if (cmd.hasOption("m")) {
@@ -280,8 +279,7 @@ public class BooCli {
         }
       } else if (cmd.hasOption("c")) {
         if (config.getYaml().getAssembly().getAutoGen()) {
-          this.initOo(this.config, this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(),
-                  config.getYaml().getAssembly().getName()), comment);
+          this.initOo(this.config, this.autoGenAssemblyName(config.getYaml().getAssembly().getAutoGen(), config.getYaml().getAssembly().getName()), comment);
           LogUtils.info(Constants.CREATING_ASSEMBLY, config.getYaml().getAssembly().getName());
         }
         this.createPacks(Boolean.FALSE, isNoDeploy);
@@ -369,17 +367,16 @@ public class BooCli {
 
         }
       } else {
-        System.err.println("Wrong parameters!");
         this.help(null, Constants.BFD_TOOL);
+        System.err.println("Wrong parameters!");
         return Constants.EXIT_WRONG_PRAMETER;
       }
     } catch (ParseException e) {
       exit = Constants.EXIT_PARSE_ERROR;
-      System.err.println(e.getMessage());
       this.help(null, Constants.BFD_TOOL);
     } catch (Exception e) {
-        exit = Constants.EXIT_UNKOWN;
-        e.printStackTrace(new PrintStream(System.err));
+      exit = Constants.EXIT_UNKOWN;
+      e.printStackTrace(new PrintStream(System.err));
     }
     return exit;
   }
@@ -394,8 +391,7 @@ public class BooCli {
    * @param instanceList the instance list
    * @param rollAt the roll at
    */
-  private int executeAction(String platformName, String componentName, String actionName, String arglist,
-                            List<String> instanceList, int rollAt) {
+  private int executeAction(String platformName, String componentName, String actionName, String arglist, List<String> instanceList, int rollAt) {
     int returnCode = 0;
     String procedureId = null;
     try {
@@ -409,8 +405,7 @@ public class BooCli {
     if (procedureId != null) {
       String procStatus = "active";
       try {
-        while (procStatus != null && (procStatus.equalsIgnoreCase("active") ||
-                procStatus.equalsIgnoreCase("pending"))) {
+        while (procStatus != null && (procStatus.equalsIgnoreCase("active") || procStatus.equalsIgnoreCase("pending"))) {
           procStatus = flow.getProcedureStatusForAction(procedureId);
           try {
             Thread.sleep(3000);
@@ -585,8 +580,7 @@ public class BooCli {
    */
   private String autoGenAssemblyName(boolean isAutoGen, String assemblyName) {
     if (isAutoGen) {
-      assemblyName = (assemblyName == null ? this.randomString("") : (assemblyName + Constants.DASH +
-              this.randomString(assemblyName)));
+      assemblyName = (assemblyName == null ? this.randomString("") : (assemblyName + Constants.DASH + this.randomString(assemblyName)));
     }
     return assemblyName;
   }
