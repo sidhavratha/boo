@@ -46,3 +46,4 @@ resource/yarn.yaml
 .project
 .settings/
 /BFDOneOpsAutomation.iml
+.idea

@@ -35,7 +35,7 @@ platforms: # In OneOps design.
       secgroup:
         inbound: '[
                     "22 22 tcp 0.0.0.0/0",
-                    "-1 -1 icmp 0.0.0.0/0",
+                    "null null 4 0.0.0.0/0",
                     "60000 61000 udp 0.0.0.0/0",
                     "8080 8080 tcp 0.0.0.0/0"
                 ]'
