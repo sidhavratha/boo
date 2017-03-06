@@ -1121,7 +1121,7 @@ public class Transition extends APIClient {
     redundant.put("current", "manifest");
     redundant.put("step_up", "manifest");
     JSONObject owner = new JSONObject();
-    rconfig.put("owner", owner);
+    owner.put("owner", redundant);
 
     rconfig.put("relationAttrProps", owner);
 
