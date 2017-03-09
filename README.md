@@ -16,7 +16,7 @@ Run boo as a bash script:
 
 ##Build to a RPM:
 
-1. Run: mvn clean package -DskipTests -Pbuild-rpms
+1. Run: mvn clean package -Pbuild-rpms
 2. Then install the BFDOneOpsAutomation-\<version\>.noarch.rpm to your server
 3. After that, you can run boo command
 
@@ -130,6 +130,8 @@ user:
     description: "JvZ"
     authorized_keys: '["ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7g6cjv8yxH0pbo..."]'
 ```
+
+Again, you can see what the result will be using `boo -f your.yml -v`.
 
 ## Testing
 

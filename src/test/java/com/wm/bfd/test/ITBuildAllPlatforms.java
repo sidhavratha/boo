@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBuildAllPlatforms extends BfdOoTest {
+public class ITBuildAllPlatforms extends BfdOoTest {
   private BuildAllPlatforms build;
 
   @Before
