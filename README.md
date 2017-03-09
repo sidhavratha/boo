@@ -97,6 +97,40 @@ If you want to see what your Boo YAML template will look like with interpolated 
 boo -f boo.yml -v
 ```
 
+## Inlining File Content
+
+You can use the `file` directive to inline content into a Boo template. The following are examples of how you can inline the content of files:
+
+```
+{{file(./id_rsa.pub)}}
+{{file(~/.ssh/id_rsa.pub)}}
+{{file(/Users/jvanzyl/id_rsa.pub)}}
+```
+
+So, for example, if you wanted to inline the content of your public SSH key into your Boo template before execution you can do the following:
+
+```
+user:
+  user-jvanzyl:
+    system_account: true
+    sudoer: true
+    username: 'jvanzyl'
+    description: "JvZ"
+    authorized_keys: '["{{file(~/.ssh/id_rsa.pub}})"]'
+```
+
+The result will look something like:
+
+```
+user:
+  user-jvanzyl:
+    system_account: true
+    sudoer: true
+    username: 'jvanzyl'
+    description: "JvZ"
+    authorized_keys: '["ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7g6cjv8yxH0pbo..."]'
+```
+
 ## Testing
 
 In order the the tests that require a live server you need your `default` profile to have a `host` setting for a OneOps instance:

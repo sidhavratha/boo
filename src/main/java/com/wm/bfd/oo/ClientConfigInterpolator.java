@@ -2,8 +2,13 @@ package com.wm.bfd.oo;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
+import com.github.mustachejava.MustacheException;
+import com.github.mustachejava.reflect.ReflectionObjectHandler;
+import com.github.mustachejava.util.GuardException;
+import com.github.mustachejava.util.Wrapper;
 import com.google.common.io.ByteStreams;
+
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,10 +17,13 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 
 public class ClientConfigInterpolator {
 
+  private final static String HOME = System.getProperty("user.home");
+  private final static String WORK = System.getProperty("user.dir");
   private final ClientConfigIniReader iniReader;
 
   public ClientConfigInterpolator() {
@@ -36,7 +44,7 @@ public class ClientConfigInterpolator {
     String booYaml = new String(Files.readAllBytes(booYamlFile.toPath()));
     return interpolate(booYaml, booConfigFile, profile);
   }
-  
+
   /**
    * @see ClientConfigInterpolator#interpolate(File, File, String)
    * @param booYamlIn  InputStream containing the Boo Yaml configuration.
@@ -49,7 +57,18 @@ public class ClientConfigInterpolator {
     String booYaml = new String(ByteStreams.toByteArray(booYamlIn));
     return interpolate(booYaml, booConfigFile, profile);
   }
-  
+
+  public String interpolate(String booYaml, File booConfigFile, String profile) throws IOException {
+    if (booConfigFile.exists()) {
+      // Extract the requested config profile
+      Map<String, String> config = iniReader.read(booConfigFile, profile);
+      // Interpolate the Boo YAML with the values from the profile
+      return interpolate(booYaml, config);
+    } else {
+      return booYaml;
+    }
+  }
+
   /**
    * @see ClientConfigInterpolator#interpolate(File, File, String)
    * @param booYaml
@@ -58,19 +77,67 @@ public class ClientConfigInterpolator {
    * @return
    * @throws IOException
    */
-  public String interpolate(String booYaml, File booConfigFile, String profile) throws IOException {
-    if (booConfigFile.exists()) {
-      // Extract the requested config profile
-      Map<String, String> config = iniReader.read(booConfigFile, profile);
-      // Interpolate the Boo YAML with the values from the profile
-      Writer writer = new StringWriter();
-      MustacheFactory mf = new DefaultMustacheFactory();
-      Mustache mustache = mf.compile(new StringReader(booYaml), "boo");
-      mustache.execute(writer, config).flush();
-      return writer.toString();
-    } else {
-      return booYaml;
-    }  
+  public String interpolate(String booYaml, Map<String, String> config) throws IOException {
+    Writer writer = new StringWriter();
+    NoEncodingMustacheFactory mustacheFactory = new NoEncodingMustacheFactory();
+    mustacheFactory.setObjectHandler(new BooReflectionObjectHandler());
+    Mustache mustache = mustacheFactory.compile(new StringReader(booYaml), "boo");
+    mustache.execute(writer, config).flush();
+    return writer.toString();
   }
-  
+
+  // Prevents doing standard Mustache XHTML encoding
+  private static class NoEncodingMustacheFactory extends DefaultMustacheFactory {
+    @Override
+    public void encode(String value, Writer writer) {
+      try {
+        writer.write(value);
+      } catch (IOException e) {
+        throw new MustacheException(e);
+      }
+    }
+  }
+
+  // This whole mechanism should be replaced by creating bindings in Guice and injecting
+  // a Map<String,BooFunction> but we only have one function right now so this is
+  // sufficient or we can just use Sisu and it will be easier than creating
+  // manual Guice bindings. JvZ
+
+  // Perform special Boo lookups and then fall back to normal processing
+  private class BooReflectionObjectHandler extends ReflectionObjectHandler {
+    @Override
+    public Wrapper find(String name, List<Object> scopes) {
+      if (name.startsWith("file(") && name.endsWith(")")) {
+        return new Wrapper() {
+          @Override
+          public Object call(List<Object> scopes) throws GuardException {
+            return file(defunction(name));
+          }
+        };
+      }
+      return super.find(name, scopes);
+    }
+  }
+
+  private String defunction(String s) {
+    return s.substring(s.indexOf('(') + 1, s.length() - 1);
+  }
+
+  private String file(String path) {
+    if (path.startsWith("~")) {
+      path = path.replace("~", HOME);
+    } else if (path.startsWith("@")) {
+      path = path.substring(1);
+    } else if (path.startsWith("./")) {
+      path = path.replace("./", String.format("%s%s", WORK, File.separator));
+    }
+    try {
+      return FileUtils.readFileToString(new File(path));
+    } catch (IOException e) {
+      // Content that might be required for the compute to function may be ommitted so just fail fast.
+      // If it's an ssh public key that is meant to be injected and it doesn't work it will result
+      // in a compute you can't log in to.
+      throw new RuntimeException(String.format("%s cannot be found or cannot be read.", path));
+    }
+  }
 }
