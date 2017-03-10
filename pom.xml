@@ -8,7 +8,7 @@
   </parent>
   <groupId>com.oneops.boo</groupId>
   <artifactId>boo</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <name>boo</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,7 +42,7 @@
     <connection>scm:git:git@gecgithub01.walmart.com:LabsBFD/bfd-oneops-automation.git</connection>
     <developerConnection>scm:git:git@gecgithub01.walmart.com:LabsBFD/bfd-oneops-automation.git</developerConnection>
     <url>https://gecgithub01.walmart.com/LabsBFD/bfd-oneops-automation</url>
-    <tag>boo-1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
   <dependencies>
     <dependency>
