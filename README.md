@@ -2,6 +2,27 @@
 
 The purpose of Boo is to provide a fast and repeatable way to run tests against complex OneOps packs. For example: Allow a pack developer to use a short, one-line Bash command to verify parameter or code changes in the BFD Photon Hadoop YARN pack by attempting to instantiate the updated pack and executing tests on the resulting functional cluster.
 
+## Usage
+
+To use Boo you download the JAR and place the JAR in your `$PATH`.
+
+```
+curl -O http://gec-maven-nexus.walmart.com/nexus/content/repositories/devtools/com/oneops/boo/boo/1.0.0/boo-1.0.0-executable.jar
+
+chmod +x boo-1.0.0-executable.jar
+
+mv boo-1.0.0-executable.jar boo
+
+boo <options>
+
+```
+
+To see what options are available use: 
+
+```
+boo -h
+```
+
 ##Build to a executable command:
 Run boo as a bash script:
 
@@ -21,13 +42,6 @@ Run boo as a bash script:
 
 1. On Linux: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm```
 2. On Mac: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm --nodeps``` (Ignore errors if any)
-
-
-## Usage:
-
-```
-boo -h
-```
 
 ## Configuration
 
