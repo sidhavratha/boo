@@ -39,6 +39,12 @@
   <organization>
     <name>Walmart Labs</name>
   </organization>
+  <scm>
+    <connection>scm:git:git@gecgithub01.walmart.com:LabsBFD/bfd-oneops-automation.git</connection>
+    <developerConnection>scm:git:git@gecgithub01.walmart.com:LabsBFD/bfd-oneops-automation.git</developerConnection>
+    <url>https://gecgithub01.walmart.com/LabsBFD/bfd-oneops-automation</url>
+    <tag>HEAD</tag>
+  </scm>
   <dependencies>
     <dependency>
       <groupId>commons-cli</groupId>
