@@ -18,7 +18,7 @@ public class AssemblyBean {
   }
 
   public Boolean getAutoGen() {
-    return autoGen;
+    return autoGen == null ? Boolean.FALSE : autoGen;
   }
 
   public void setAutoGen(Boolean autoGen) {
