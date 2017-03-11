@@ -355,7 +355,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       List<String> servVarList = response.getList(Constants.CINAME);
       for (String servVar : servVarList) {
         if (!yamlVarSet.contains(servVar)) {
-          design.deletePlatformVar(platform.getName(), servVar);
+          //design.deletePlatformVar(platform.getName(), servVar);
         }
       }
     }
