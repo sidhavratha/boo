@@ -259,6 +259,42 @@ public class Design extends APIClient {
   }
 
   /**
+   * Deletes the platform variables
+   * 
+   * @param platformName
+   * @param variableName
+   * @return
+   * @throws OneOpsClientAPIException
+   */
+  public JsonPath deletePlatformVariable(String platformName, String variableName) throws OneOpsClientAPIException {
+    if (platformName == null || platformName.length() == 0) {
+      String msg = String.format("Missing platform name to use");
+      throw new OneOpsClientAPIException(msg);
+    }
+    if (variableName == null || variableName.length() == 0) {
+      String msg = String.format("Missing variable name to delete");
+      throw new OneOpsClientAPIException(msg);
+    }
+    JsonPath variableDetails = getPlatformComponent(platformName, variableName);
+    if (variableDetails != null) {
+      String ciId = variableDetails.getString("ciId");
+      RequestSpecification request = createRequest();
+      Response response = request.delete(DESIGN_URI + "platforms/" + platformName + "/variables/" + ciId);
+      if (response != null) {
+        if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
+          return response.getBody().jsonPath();
+        } else {
+          String msg = String.format("Failed to delete component with name %s", variableName);
+          throw new OneOpsClientAPIException(msg);
+        }
+      }
+    }
+    String msg = String.format("Failed to delete component with name %s due to null response", variableName);
+    throw new OneOpsClientAPIException(msg);
+  }
+
+  
+  /**
    * List platform components for a given assembly/design/platform
    * 
    * @param environmentName
