@@ -331,16 +331,33 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  private boolean updatePlatformVariables(boolean isUpdate) throws OneOpsClientAPIException {
+  public boolean updatePlatformVariables(boolean isUpdate) throws OneOpsClientAPIException {
     List<PlatformBean> platforms = this.config.getYaml().getPlatformsList();
     for (PlatformBean platform : platforms) {
       Map<String, String> secureVariables = platform.getSecureVariables();
+      Set<String> yamlVarSet = new HashSet<String>();
       if (secureVariables != null && secureVariables.size() > 0) {
         this.updateOrAddPlatformVariables(platform.getName(), secureVariables, true, isUpdate);
+        // collect all variables (secvar or var) in yaml
+        for (Map.Entry<String, String> entry : secureVariables.entrySet()) {
+          yamlVarSet.add(entry.getKey());
+        }
       }
-      Map<String, String> variables = platform.getVariables();
+      Map<String, String> variables = platform.getVariables(); 
       if (variables != null && variables.size() > 0) {
         this.updateOrAddPlatformVariables(platform.getName(), variables, false, isUpdate);
+        // collect all variables (secvar or var) in yaml
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+          yamlVarSet.add(entry.getKey());
+        }
+      }   
+      
+      JsonPath response = design.listPlatformVariables(platform.getName());
+      List<String> servVarList = response.getList(Constants.CINAME);
+      for (String servVar : servVarList) {
+        if (!yamlVarSet.contains(servVar)) {
+          design.deletePlatformVariable(platform.getName(), servVar);
+        }
       }
     }
     if (platforms.size() > 0) {
