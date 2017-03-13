@@ -106,9 +106,12 @@ public class ITBuildAllPlatforms extends BfdOoTest {
 
     System.out.println("Platform cloud scale update");
     assertTrue(build.updatePlatformCloudScale());
-
+    
     System.out.println("Platform component update");
     assertTrue(build.updatePlatformComponents());
+
+    System.out.println("Platform variable update");
+    assertTrue(build.updatePlatformVariables(true));
 
     System.out.println("Get Ips");
     assertTrue(build.getIpsInternal("tomcat", "compute").size() > 0);
