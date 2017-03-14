@@ -284,12 +284,12 @@ public class Design extends APIClient {
         if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
           return response.getBody().jsonPath();
         } else {
-          String msg = String.format("Failed to delete component with name %s", variableName);
+          String msg = String.format("Failed to delete variable with name %s", variableName);
           throw new OneOpsClientAPIException(msg);
         }
       }
     }
-    String msg = String.format("Failed to delete component with name %s due to null response", variableName);
+    String msg = String.format("Failed to delete variable with name %s due to null response", variableName);
     throw new OneOpsClientAPIException(msg);
   }
 
