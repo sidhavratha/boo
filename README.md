@@ -1,9 +1,27 @@
-# bfd-oneops-automation
-[BFD OneOps Automation Tool](https://confluence.walmart.com/pages/viewpage.action?pageId=163659806)
+# Boo
 
-*The precompiled executable jar under install/, skip the build steps if you don't want to compile java.*
+The purpose of Boo is to provide a fast and repeatable way to run tests against complex OneOps packs. For example: Allow a pack developer to use a short, one-line Bash command to verify parameter or code changes in the BFD Photon Hadoop YARN pack by attempting to instantiate the updated pack and executing tests on the resulting functional cluster.
 
-*If you want to run mvn test, make sure have a valid test.yaml under src/test/resources and a local boo config (~/.boo/config).  See the Configuration section below.*
+## Usage
+
+To use Boo you download the JAR and place the JAR in your `$PATH`.
+
+```
+curl -O http://gec-maven-nexus.walmart.com/nexus/content/repositories/devtools/com/oneops/boo/boo/1.0.0/boo-1.0.0-executable.jar
+
+chmod +x boo-1.0.0-executable.jar
+
+mv boo-1.0.0-executable.jar boo
+
+boo <options>
+
+```
+
+To see what options are available use: 
+
+```
+boo -h
+```
 
 ##Build to a executable command:
 Run boo as a bash script:
@@ -24,13 +42,6 @@ Run boo as a bash script:
 
 1. On Linux: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm```
 2. On Mac: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm --nodeps``` (Ignore errors if any)
-
-
-## Usage:
-
-```
-boo -h
-```
 
 ## Configuration
 
@@ -133,10 +144,19 @@ user:
 
 Again, you can see what the result will be using `boo -f your.yml -v`.
 
-## Testing
+# Development
 
-In order the the tests that require a live server you need your `default` profile to have a `host` setting for a OneOps instance:
+## Running integration tests
 
+The integration tests take some time to run as they spin up real assemblies, validate them and spin them down. To run the integration tests along with the tests use the following:
+
+```
+mvn clean verify -Pits
+```
+
+Note that you also need a `bfd` profile in your `~/.boo/config` that looks like the following:
+
+```
 ```
 [default]
 host=https://oneops.prod.walmart.com
@@ -145,6 +165,12 @@ api_key=oneops_api_key
 email=me@email.com
 cloud=cloud_name_in_oneops
 ```
+
+## Code style
+
+Boo uses the Google code style. The formatter for Eclipse you can find here:
+
+https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml
 
 The tool is managed by BFD team.
 
