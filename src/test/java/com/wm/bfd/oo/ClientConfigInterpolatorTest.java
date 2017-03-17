@@ -2,12 +2,11 @@ package com.wm.bfd.oo;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.Maps;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class ClientConfigInterpolatorTest {
 
@@ -22,7 +21,7 @@ public class ClientConfigInterpolatorTest {
   public void validateInliningFiles() throws Exception {
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
     File f0 = resource("f0.txt");
-    assertEquals("f0", interpolator.interpolate(String.format("{{file(%s)}}", f0.getAbsolutePath()), Maps.newHashMap()));    
+    assertEquals("f0", interpolator.interpolate(String.format("{{file(%s)}}", f0.getAbsolutePath()), new HashMap<String, String>()));    
   }
   
   protected File resource(String name) {

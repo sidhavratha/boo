@@ -2,13 +2,13 @@ package com.wm.bfd.oo;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.io.FileInputStream;
+import com.wm.bfd.oo.yaml.Yaml;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.wm.bfd.oo.yaml.Yaml;
+import java.io.File;
+import java.io.FileInputStream;
 
 public class ClientConfigProcessorTest {
 

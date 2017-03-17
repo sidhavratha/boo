@@ -195,7 +195,6 @@ public class BooCli {
        * Handle command without configuration file dependency first.
        */
       if (cmd.hasOption("h")) {
-        this.help(null, Constants.BFD_TOOL);
         return exit;
       }
 
@@ -367,13 +366,11 @@ public class BooCli {
 
         }
       } else {
-        this.help(null, Constants.BFD_TOOL);
         System.err.println("Wrong parameters!");
         return Constants.EXIT_WRONG_PRAMETER;
       }
     } catch (ParseException e) {
       exit = Constants.EXIT_PARSE_ERROR;
-      this.help(null, Constants.BFD_TOOL);
     } catch (Exception e) {
       exit = Constants.EXIT_UNKOWN;
       e.printStackTrace(new PrintStream(System.err));

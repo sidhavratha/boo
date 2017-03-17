@@ -22,8 +22,8 @@ import java.util.Map;
 
 public class ClientConfigInterpolator {
 
-  private final static String HOME = System.getProperty("user.home");
-  private final static String WORK = System.getProperty("user.dir");
+  private static final String HOME = System.getProperty("user.home");
+  private static final String WORK = System.getProperty("user.dir");
   private final ClientConfigIniReader iniReader;
 
   public ClientConfigInterpolator() {
@@ -45,19 +45,25 @@ public class ClientConfigInterpolator {
     return interpolate(booYaml, booConfigFile, profile);
   }
 
-  /**
+  /** 
+   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template in InputStream
+   * with them.
+   * 
    * @see ClientConfigInterpolator#interpolate(File, File, String)
-   * @param booYamlIn  InputStream containing the Boo Yaml configuration.
-   * @param booConfigFile
-   * @param profile
-   * @return
-   * @throws IOException
+   * @param booYamlIn InputStream containing the Boo Yaml configuration.
    */
   public String interpolate(InputStream booYamlIn, File booConfigFile, String profile) throws IOException {
     String booYaml = new String(ByteStreams.toByteArray(booYamlIn));
     return interpolate(booYaml, booConfigFile, profile);
   }
 
+  /** 
+   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template in string format
+   * with them.
+   * 
+   * @see ClientConfigInterpolator#interpolate(File, File, String)
+   * @param booYaml the template string
+   */
   public String interpolate(String booYaml, File booConfigFile, String profile) throws IOException {
     if (booConfigFile.exists()) {
       // Extract the requested config profile
@@ -69,13 +75,13 @@ public class ClientConfigInterpolator {
     }
   }
 
-  /**
+  /** 
+   * Take key/value pairs of configuration and interpolate a Boo YAML template in straing format
+   * with them.
+   * 
    * @see ClientConfigInterpolator#interpolate(File, File, String)
-   * @param booYaml
-   * @param booConfigFile
-   * @param profile
-   * @return
-   * @throws IOException
+   * @param booYaml the template string
+   * @param config the key/value pairs
    */
   public String interpolate(String booYaml, Map<String, String> config) throws IOException {
     Writer writer = new StringWriter();
@@ -106,7 +112,7 @@ public class ClientConfigInterpolator {
   // Perform special Boo lookups and then fall back to normal processing
   private class BooReflectionObjectHandler extends ReflectionObjectHandler {
     @Override
-    public Wrapper find(String name, List<Object> scopes) {
+    public Wrapper find(final String name, List<Object> scopes) {
       if (name.startsWith("file(") && name.endsWith(")")) {
         return new Wrapper() {
           @Override
@@ -119,8 +125,8 @@ public class ClientConfigInterpolator {
     }
   }
 
-  private String defunction(String s) {
-    return s.substring(s.indexOf('(') + 1, s.length() - 1);
+  private String defunction(String str) {
+    return str.substring(str.indexOf('(') + 1, str.length() - 1);
   }
 
   private String file(String path) {

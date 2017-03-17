@@ -1,4 +1,0 @@
-#!/bin/bash
-
-BFD_ONEOPS_TOOL_CLI_JAR=/usr/local/boo/${rpmversion}/boo-${project.version}.jar
-exec $BFD_ONEOPS_TOOL_CLI_JAR "$@"
