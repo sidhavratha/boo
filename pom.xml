@@ -252,6 +252,69 @@
           <arguments>--batch-mode</arguments>
         </configuration>
       </plugin>
+      <!--
+      See 'license-check' and 'license-format' profiles.
+      -->
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <strictCheck>true</strictCheck>
+          <useDefaultExcludes>false</useDefaultExcludes>
+          <header>${project.basedir}/header.txt</header>
+          <aggregate>true</aggregate>
+          <includes>
+            <include>**/pom.xml</include>
+            <include>**/*.xml</include>
+            <include>**/*.xsd</include>
+            <include>**/*.xjb</include>
+            <include>**/*.properties</include>
+            <include>**/*.ini</include>
+            <include>**/*.java</include>
+            <include>**/*.groovy</include>
+            <include>**/*.scala</include>
+            <include>**/*.aj</include>
+            <include>**/*.js</include>
+            <include>**/*.css</include>
+            <include>**/*.help</include>
+            <include>**/*.proto</include>
+            <include>**/*.sm</include>
+            <include>**/*.bat</include>
+            <include>**/*.xsl</include>
+            <include>**/*.html</include>
+            <include>**/*.vm</include>
+            <include>**/*.md</include>
+            <include>**/*.sh</include>
+            <include>**/*.bash</include>
+            <include>**/*.rb</include>
+          </includes>
+          <excludes>
+            <exclude>**/target/**</exclude>
+            <exclude>**/.*/**</exclude>
+            <exclude>**/dependency-reduced-pom.xml</exclude>
+            <exclude>**/nbactions*.xml</exclude>
+            <exclude>**/nb-configuration.xml</exclude>
+            <exclude>**/atlassian-ide-plugin.xml</exclude>
+            <exclude>**/release.properties</exclude>
+            <exclude>**/META-INF/services/**</exclude>
+          </excludes>
+          <mapping>
+            <aj>JAVADOC_STYLE</aj>
+            <groovy>SLASHSTAR_STYLE</groovy>
+            <help>SCRIPT_STYLE</help>
+            <ini>SCRIPT_STYLE</ini>
+            <java>SLASHSTAR_STYLE</java>
+            <md>XML_STYLE</md>
+            <proto>DOUBLESLASH_STYLE</proto>
+            <scala>SLASHSTAR_STYLE</scala>
+            <sm>DOUBLESLASH_STYLE</sm>
+            <vm>VELOCITY_STYLE</vm>
+            <xjb>XML_STYLE</xjb>
+          </mapping>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <profiles>
