@@ -15,14 +15,12 @@ chmod +x boo-1.0.0-executable.jar
 mv boo-1.0.0-executable.jar boo
 
 boo <options>
-
 ```
 
 To see what options are available for use: 
 
 ```
 boo -h
-
 ```
 
 ## Configuration
@@ -36,7 +34,6 @@ organization=devtools
 api_key=oneops_api_key # copy from OneOps UI->profile->authentication->API Token
 email=jvanzyl@walmart.com
 cloud=prod-cdc6
-
 ```
 
 With a Boo YAML template that looks like this:
@@ -56,7 +53,6 @@ boo:
        pct_scale: '100'
 
 ...
-
 ```
 
 It will yield the following:
@@ -76,7 +72,6 @@ boo:
        pct_scale: '100'
 
 ...
-
 ```
 If you want to see what your Boo YAML template will look like with interpolated values you can use the following command:
 
@@ -132,6 +127,7 @@ chmod +x ./target/boo-1.0.1-SNAPSHOT-executable.jar
 mv ./target/boo-1.0.1-SNAPSHOT-executable.jar boo
 
 boo <options>
+```
 
 ## Build to an RPM
 
@@ -146,7 +142,6 @@ Find the rpm at .//target/rpm/boo/RPMS/noarch/boo-1.0.1-SNAPSHOT*.noarch.rpm
 ```
 On Linux: sudo rpm -ivh boo-1.0.1-SNAPSHOT*.noarch.rpm
 On Mac: sudo rpm -ivh boo-1.0.1-SNAPSHOT*.noarch.rpm --nodeps
-
 ```
 
 ## Running integration tests
@@ -155,10 +150,9 @@ The integration tests take some time to run as they spin up real assemblies, val
 
 ```
 mvn clean verify -Pits
-
 ```
 
-Note that you also need a `default` profile in your `~/.boo/config` that looks like the following:
+Note that in order to run the integration tests you also need a `default` profile in your `~/.boo/config` that looks like the following:
 
 ```
 [default]
