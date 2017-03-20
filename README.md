@@ -22,6 +22,7 @@ To see what options are available for use:
 
 ```
 boo -h
+
 ```
 
 ## Configuration
@@ -36,12 +37,6 @@ api_key=oneops_api_key # copy from OneOps UI->profile->authentication->API Token
 email=jvanzyl@walmart.com
 cloud=prod-cdc6
 
-[bfd]
-host=https://web.bfd.dev.cloud.wal-mart.com
-organization=bfd
-api_key=oneops_api_key # copy from OneOps UI->profile->authentication->API Token
-email=jvanzyl@walmart.com
-cloud=dev-cdc004
 ```
 
 With a Boo YAML template that looks like this:
@@ -163,7 +158,7 @@ mvn clean verify -Pits
 
 ```
 
-Note that you also need a `bfd` profile in your `~/.boo/config` that looks like the following:
+Note that you also need a `default` profile in your `~/.boo/config` that looks like the following:
 
 ```
 [default]
