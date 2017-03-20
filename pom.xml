@@ -15,7 +15,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <main-class>com.wm.bfd.oo.Main</main-class>
     <scm.field>scm:git:git@gecgithub01.walmart.com:platform/platform-archetypes.git</scm.field>
-    <java.version>1.7</java.version>
+    <java.version>1.8</java.version>
     <!-- Distribution Management Properties -->
     <public.serverId>walmart-gec</public.serverId>
     <public.nexusUrl>http://gec-nexus.prod.glb.prod.walmart.com/nexus</public.nexusUrl>
