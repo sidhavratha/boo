@@ -1,6 +1,7 @@
 package com.wm.bfd.oo;
 
 import com.wm.bfd.oo.yaml.Yaml;
+
 import com.google.inject.Singleton;
 
 import java.io.File;
@@ -19,9 +20,6 @@ public class ClientConfig {
   public static final String USER_NAME = "username";
   public static final String USER = "user";
 
-  // Platform yarn variables
-  public static final String ZK_HOST = "zk_hosts";
-
   // Compute size
   public static final String SIZE = "size";
 
@@ -32,6 +30,7 @@ public class ClientConfig {
    * Instantiates a new client config.
    *
    * @param booYamlFile the file
+   * @param profile the profile
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public ClientConfig(File booYamlFile, String profile) throws IOException {
@@ -42,16 +41,15 @@ public class ClientConfig {
   
   /**
    * Create a ClientConfig by parsing an InputStream.
-   * @param input
-   * @throws IOException
+   * @param input the inputstream
+   * @param profile the profile
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public ClientConfig(InputStream input, String profile) throws IOException {
     ClientConfigReader reader = new ClientConfigReader();
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
     this.yaml = reader.read(interpolator.interpolate(input, ONEOPS_CONFIG, profile));
   }
-
-
 
   public Yaml getYaml() {
     return yaml;

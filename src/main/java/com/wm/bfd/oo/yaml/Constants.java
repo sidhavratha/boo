@@ -62,7 +62,6 @@ public class Constants {
   public static final String DOUBLE_PERIOD = "..";
   public static final String ATTACHMENTS = "attachments";
 
-  public static final String BFD_TOOL = "The tool is managed by BFD team.";
   public static final String NO_AVAILABILITY = "You don't set the availability, please check your yaml config.";
   public static final String ASSEMBLY_PREFIX_ERROR = "The prefix of assembly cannot be empty!";
   // Components

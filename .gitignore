@@ -36,14 +36,8 @@ target
 ehthumbs.db
 Thumbs.db
 
-# Some test code #
-######################
-src/test/java/com/wm/bfd/test/Test.java
-resource/yarn.yaml
-
 # Eclipse
 .classpath
 .project
 .settings/
-/BFDOneOpsAutomation.iml
 .idea

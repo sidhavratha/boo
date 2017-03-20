@@ -67,11 +67,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Process.
    * 
    * @see com.wm.bfd.oo.workflow.AbstractWorkflow#process(boolean, boolean)
-   */
+   **/
   public boolean process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
     boolean isAssemblyExist = this.isAssemblyExist();
     if (isUpdate && !isAssemblyExist) {

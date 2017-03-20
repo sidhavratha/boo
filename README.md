@@ -1,6 +1,7 @@
 # Boo
 
-The purpose of Boo is to provide a fast and repeatable way to run tests against complex OneOps packs. For example: Allow a pack developer to use a short, one-line Bash command to verify parameter or code changes in the BFD Photon Hadoop YARN pack by attempting to instantiate the updated pack and executing tests on the resulting functional cluster.
+The purpose of Boo is to provide a simple command-line tool for the OneOps developers and OneOps users to deploy, update, destroy and operate their OneOps assemblies. For the OneOps pack developers, it provides a fast and repeatable way to run tests against complex OneOps packs. For example: it allows a pack developer to use a short, one-line bash command to verify a parameter or code changes in an OneOps pack by attemping to instantiate the updated pack and executing tests on the resulting functional cluster. For an OneOps user, it provides an command-line tool to deploy, update, destroy and operator their OneOps assemblies. The boo tool is an addition to the OneOps UI interfaces.
+
 
 ## Usage
 
@@ -17,31 +18,11 @@ boo <options>
 
 ```
 
-To see what options are available use: 
+To see what options are available for use: 
 
 ```
 boo -h
 ```
-
-##Build to a executable command:
-Run boo as a bash script:
-
-1. Run: mvn clean package
-
-2. Move the ./target/BFDOneOpsAutomation-1.0-executable.jar to your target server, and rename to boo.
-
-3. Run boo: ./boo
-
-##Build to a RPM:
-
-1. Run: mvn clean package -Pbuild-rpms
-2. Then install the BFDOneOpsAutomation-\<version\>.noarch.rpm to your server
-3. After that, you can run boo command
-
-##Install RPM:
-
-1. On Linux: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm```
-2. On Mac: ```sudo rpm -ivh BFDOneOpsAutomation-1.0-1.noarch.rpm --nodeps``` (Ignore errors if any)
 
 ## Configuration
 
@@ -60,7 +41,7 @@ host=https://web.bfd.dev.cloud.wal-mart.com
 organization=bfd
 api_key=oneops_api_key # copy from OneOps UI->profile->authentication->API Token
 email=jvanzyl@walmart.com
-cloud=bfd-cdd1
+cloud=dev-cdc004
 ```
 
 With a Boo YAML template that looks like this:
@@ -146,17 +127,44 @@ Again, you can see what the result will be using `boo -f your.yml -v`.
 
 # Development
 
+## Build the source code to an executable command:
+
+```
+mvn clean package
+
+chmod +x ./target/boo-1.0.1-SNAPSHOT-executable.jar
+
+mv ./target/boo-1.0.1-SNAPSHOT-executable.jar boo
+
+boo <options>
+
+## Build to an RPM
+
+```
+mvn clean package -Pbuild-rpms
+
+Find the rpm at .//target/rpm/boo/RPMS/noarch/boo-1.0.1-SNAPSHOT*.noarch.rpm
+```
+
+## Install the RPM
+
+```
+On Linux: sudo rpm -ivh boo-1.0.1-SNAPSHOT*.noarch.rpm
+On Mac: sudo rpm -ivh boo-1.0.1-SNAPSHOT*.noarch.rpm --nodeps
+
+```
+
 ## Running integration tests
 
 The integration tests take some time to run as they spin up real assemblies, validate them and spin them down. To run the integration tests along with the tests use the following:
 
 ```
 mvn clean verify -Pits
+
 ```
 
 Note that you also need a `bfd` profile in your `~/.boo/config` that looks like the following:
 
-```
 ```
 [default]
 host=https://oneops.prod.walmart.com
@@ -172,6 +180,5 @@ Boo uses the Google code style. The formatter for Eclipse you can find here:
 
 https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml
 
-The tool is managed by BFD team.
 
 [1]: https://github.com/spullara/mustache.java

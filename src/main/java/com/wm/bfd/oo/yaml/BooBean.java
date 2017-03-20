@@ -26,7 +26,7 @@ public class BooBean {
   @JsonProperty("description")
   private String description;
   
-  @JsonProperty(value="gzip_enabled", defaultValue = "true")
+  @JsonProperty(value = "gzip_enabled", defaultValue = "true")
   private boolean gzipEnabled = true;
 
   public boolean isEnable() {
@@ -59,6 +59,10 @@ public class BooBean {
     this.ipOutput = ipOutput;
   }
 
+  /**
+   * Get the host string and if it does not end with a slash concatenate it with one.
+   * 
+   */
   public String getHost() {
     if (host != null && !host.endsWith("/")) {
       return host.concat("/");

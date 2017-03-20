@@ -15,10 +15,10 @@ public class TestPlatformBeanBuilder extends BfdOoTest {
 
   @Test
   public void testGetAssembly() throws OneOpsClientAPIException {
-    PlatformBean platform = new PlatformBean.PlatformBeanBuilder("oneops/hadoop_yarn_vrc3", "1").build();
+    PlatformBean platform = new PlatformBean.PlatformBeanBuilder("oneops/hadoop-yarn-v1", "1").build();
     assertEquals(platform.getPackSource(), "oneops");
     assertEquals(platform.getPackVersion(), "1");
-    assertEquals(platform.getPack(), "hadoop_yarn_vrc3");
+    assertEquals(platform.getPack(), "hadoop-yarn-v1");
   }
 
 }

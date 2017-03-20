@@ -190,6 +190,12 @@ public class BfdUtils {
     }
   }
 
+  /**
+   * Parses the double period path.
+   * 
+   * @param template the template
+   * @return the absolute path
+   */
   public String parseDoublePeriodPath(String template) {
     String userDir = System.getProperty("user.dir");
     while (template.length() > 2 && template.substring(0, 2).equals(Constants.DOUBLE_PERIOD)) {

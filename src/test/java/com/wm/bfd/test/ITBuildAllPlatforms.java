@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * Packages always change in OneOps, this test mainly focus on if functions can run without exceptions so far.
  *
  */
