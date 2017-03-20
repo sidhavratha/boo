@@ -162,9 +162,8 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     if (!retry) { // If no error for deployment.
       LogUtils.info(Constants.DEPLOYMENT_RUNNING);
     } else {
-      System.out.println();
       if (deployError.contains(Constants.NO_DEPLOYMENT)) {
-        System.out.println(Constants.NO_NEED_DEPLOY);
+        System.out.printf(Constants.NO_NEED_DEPLOY);
       } else {
         System.err.printf(Constants.DEPLOYMENT_FAILED, deployError);
       }

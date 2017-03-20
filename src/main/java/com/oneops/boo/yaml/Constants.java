@@ -105,7 +105,7 @@ public class Constants {
   public static final String CREATE_WITHOUT_DEPLOYMENT = "Created/updated assembly without deployments.";
   public static final String DEPLOYMENT_RUNNING = "Deployment is running ...";
   public static final String DEPLOYMENT_FAILED = "Deploy failed! %s";
-  public static final String NO_NEED_DEPLOY = "NO deployment needed!";
+  public static final String NO_NEED_DEPLOY = "No deployment needed!";
   public static final String ACTIVE_DEPLOYMENT_EXISTING = "An active deployment has been running in the same environment, quit!";
   public static final String FAIL_DEPLOYMENT_EXISTING = "A failed deployment has been running in the same environment, quit!";
   public static final String CREATE_ENV = "Creating the environment %s.";
