@@ -210,6 +210,7 @@ public class BooCli {
        * Handle command without configuration file dependency first.
        */
       if (cmd.hasOption("h")) {
+        this.help(null, "");
         return exit;
       }
 
