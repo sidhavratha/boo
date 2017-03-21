@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
@@ -153,7 +154,7 @@ public class ClientConfigInterpolator {
       path = path.replace("./", String.format("%s%s", WORK, File.separator));
     }
     try {
-      return FileUtils.readFileToString(new File(path));
+      return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
     } catch (IOException e) {
       // Content that might be required for the compute to function may be ommitted so just fail
       // fast.
