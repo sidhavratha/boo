@@ -20,7 +20,7 @@ import java.util.Map;
 
 import com.oneops.boo.yaml.CloudBean;
 import com.oneops.boo.yaml.EnvironmentBean;
-import com.oneops.boo.yaml.ScalBean;
+import com.oneops.boo.yaml.ScaleBean;
 
 public final class EnvironmentBeanHelper {
   /**
@@ -49,11 +49,11 @@ public final class EnvironmentBeanHelper {
    * @return the scales
    */
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public static List<ScalBean> getScales(Map<String, Object> scaleMap) {
+  public static List<ScaleBean> getScales(Map<String, Object> scaleMap) {
     if (scaleMap == null) {
       return null;
     }
-    List<ScalBean> scales = new ArrayList<ScalBean>();
+    List<ScaleBean> scales = new ArrayList<ScaleBean>();
     for (Map.Entry<String, Object> entry : scaleMap.entrySet()) {
       String platform = entry.getKey();
       Object value = entry.getValue();
@@ -64,7 +64,7 @@ public final class EnvironmentBeanHelper {
           String component = scale.getKey();
           Map<String, String> map2 = scale.getValue();
           // Map<String, String> map2 = ((Map<String, Map>) map.get(SCALING)).get(COMPUTE);
-          scales.add(new ScalBean.ScalBeanBuilder().setComponent(component).setPlatform(platform).setCurrent(map2.get(CURRENT)).setMax(map2.get(MAX)).setMin(map2.get(MIN))
+          scales.add(new ScaleBean.ScalBeanBuilder().setComponent(component).setPlatform(platform).setCurrent(map2.get(CURRENT)).setMax(map2.get(MAX)).setMin(map2.get(MIN))
               .setStepDown(map2.get(STEP_DOWN)).setStepUp(map2.get(STEP_UP)).setPercentDeploy(map2.get(PERCENT_DEPLOY)).build());
         }
       }

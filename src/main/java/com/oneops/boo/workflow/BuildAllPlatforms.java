@@ -21,7 +21,7 @@ import com.oneops.boo.LogUtils;
 import com.oneops.boo.utils.BooUtils;
 import com.oneops.boo.yaml.Constants;
 import com.oneops.boo.yaml.PlatformBean;
-import com.oneops.boo.yaml.ScalBean;
+import com.oneops.boo.yaml.ScaleBean;
 import com.oneops.client.api.OOInstance;
 import com.oneops.client.api.exception.OneOpsClientAPIException;
 import com.oneops.client.api.exception.OneOpsComponentExistException;
@@ -542,11 +542,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @throws OneOpsClientAPIException the one ops client API exception
    */
   public boolean updateScaling() throws OneOpsClientAPIException {
-    List<ScalBean> scales = this.config.getYaml().getScales();
+    List<ScaleBean> scales = this.config.getYaml().getScales();
     if (scales == null) {
       return false;
     }
-    for (ScalBean scale : scales) {
+    for (ScaleBean scale : scales) {
       RedundancyConfig config = new RedundancyConfig();
       config.setCurrent(scale.getCurrent());
       config.setMin(scale.getMin());

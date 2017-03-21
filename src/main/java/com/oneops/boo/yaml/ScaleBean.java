@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Scale options in OneOps.
  */
-public class ScalBean {
+public class ScaleBean {
 
   /** The current. */
   @JsonProperty("current")
@@ -81,7 +81,7 @@ public class ScalBean {
    *
    * @param builder the builder
    */
-  public ScalBean(ScalBeanBuilder builder) {
+  public ScaleBean(ScalBeanBuilder builder) {
     this.component = builder.component;
     this.platform = builder.platform;
     this.current = builder.current;
@@ -179,8 +179,8 @@ public class ScalBean {
      *
      * @return the scal bean
      */
-    public ScalBean build() {
-      return new ScalBean(this);
+    public ScaleBean build() {
+      return new ScaleBean(this);
     }
 
     /**

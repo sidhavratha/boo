@@ -39,7 +39,7 @@ public class Yaml {
   private List<PlatformBean> platformsList;
 
   @JsonIgnore
-  private List<ScalBean> envList;
+  private List<ScaleBean> envList;
 
   @JsonIgnore
   private EnvironmentBean environmentBean;
@@ -95,7 +95,7 @@ public class Yaml {
    * @return the scales
    */
   @JsonIgnore
-  public List<ScalBean> getScales() {
+  public List<ScaleBean> getScales() {
     if (envList == null) {
       envList = EnvironmentBeanHelper.getScales(this.getScale());
     }
