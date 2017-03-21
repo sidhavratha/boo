@@ -40,7 +40,7 @@ public class BooBean {
 
   @JsonProperty("description")
   private String description;
-  
+
   @JsonProperty(value = "gzip_enabled", defaultValue = "true")
   private boolean gzipEnabled = true;
 
@@ -128,7 +128,7 @@ public class BooBean {
   public void setCustom(Map<String, String> custom) {
     this.custom = custom;
   }
-  
+
   public boolean isGzipEnabled() {
     return gzipEnabled;
   }

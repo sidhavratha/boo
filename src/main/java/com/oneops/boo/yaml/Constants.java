@@ -46,7 +46,8 @@ public class Constants {
   public static final String CIATTRPROPS = "ciAttrProps";
   public static final String OWNER = "owner";
   // public static final String ASSEMBLY_PREFIX = "CUBEBOO-"; // Magic string.
-  public static final String ASSEMBLY_NAME_TOO_LONG = "Assembly name cannot be more than 32 characters long. Please fix your assembly name in YAML.";
+  public static final String ASSEMBLY_NAME_TOO_LONG =
+      "Assembly name cannot be more than 32 characters long. Please fix your assembly name in YAML.";
 
   /**
    * Exit code.
@@ -77,7 +78,8 @@ public class Constants {
   public static final String DOUBLE_PERIOD = "..";
   public static final String ATTACHMENTS = "attachments";
 
-  public static final String NO_AVAILABILITY = "You don't set the availability, please check your yaml config.";
+  public static final String NO_AVAILABILITY =
+      "You don't set the availability, please check your yaml config.";
   public static final String ASSEMBLY_PREFIX_ERROR = "The prefix of assembly cannot be empty!";
   // Components
   public static final String USER = "user";
@@ -89,7 +91,8 @@ public class Constants {
   // Output during deployment
   public static final String DESTROY_ASSEMBLY = "Destroyed assembly %s!";
   public static final String PLATFORM_EXISTING = "Platform exist, skip create platform %s.";
-  public static final String CREATING_ASSEMBLY = "Auto generate assembly name turned on. Creating assembly %s ...";
+  public static final String CREATING_ASSEMBLY =
+      "Auto generate assembly name turned on. Creating assembly %s ...";
   public static final String CREATING_PLATFORM = "Creating platform %s ...";
   public static final String DESTROY_PLATFORM = "Destroying platform %s ...";
   public static final String CONFIG_FILE = "Configuration file: %s";
@@ -102,12 +105,15 @@ public class Constants {
 
   public static final String CREATING_PLATFORM_SUCCEED = "Created platform %s.";
   public static final String START_DEPLOYMENT = "Starting the deployment now.";
-  public static final String CREATE_WITHOUT_DEPLOYMENT = "Created/updated assembly without deployments.";
+  public static final String CREATE_WITHOUT_DEPLOYMENT =
+      "Created/updated assembly without deployments.";
   public static final String DEPLOYMENT_RUNNING = "Deployment is running ...";
   public static final String DEPLOYMENT_FAILED = "Deploy failed! %s";
   public static final String NO_NEED_DEPLOY = "No deployment needed!";
-  public static final String ACTIVE_DEPLOYMENT_EXISTING = "An active deployment has been running in the same environment, quit!";
-  public static final String FAIL_DEPLOYMENT_EXISTING = "A failed deployment has been running in the same environment, quit!";
+  public static final String ACTIVE_DEPLOYMENT_EXISTING =
+      "An active deployment has been running in the same environment, quit!";
+  public static final String FAIL_DEPLOYMENT_EXISTING =
+      "A failed deployment has been running in the same environment, quit!";
   public static final String CREATE_ENV = "Creating the environment %s.";
   public static final String UPDATE_ENV = "Updating the environment %s.";
   public static final String ENV_EXISTING = "Environment exist, skip create environment %s.";

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oneops.boo.config;
+package com.oneops.boo;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,9 +38,10 @@ public class ClientConfigInterpolatorTest {
   public void validateInliningFiles() throws Exception {
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
     File f0 = resource("f0.txt");
-    assertEquals("f0", interpolator.interpolate(String.format("{{file(%s)}}", f0.getAbsolutePath()), new HashMap<String, String>()));    
+    assertEquals("f0", interpolator.interpolate(String.format("{{file(%s)}}", f0.getAbsolutePath()),
+        new HashMap<String, String>()));
   }
-  
+
   protected File resource(String name) {
     return new File(basedir, String.format("src/test/files/%s", name));
   }

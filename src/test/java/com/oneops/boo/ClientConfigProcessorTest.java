@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oneops.boo.config;
+package com.oneops.boo;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,7 +41,8 @@ public class ClientConfigProcessorTest {
   public void validateBooYamlProcessing() throws Exception {
     ClientConfigReader reader = new ClientConfigReader();
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-    Yaml yaml = reader.read(interpolator.interpolate(resource("boo.yaml"), resource("config"), ClientConfig.ONEOPS_DEFAULT_PROFILE));
+    Yaml yaml = reader.read(interpolator.interpolate(resource("boo.yaml"), resource("config"),
+        ClientConfig.ONEOPS_DEFAULT_PROFILE));
     doAssert(yaml);
   }
 
@@ -49,10 +50,11 @@ public class ClientConfigProcessorTest {
   public void validateBooYamlProcessingInputStream() throws Exception {
     ClientConfigReader reader = new ClientConfigReader();
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-    Yaml yaml = reader.read(interpolator.interpolate(new FileInputStream(resource("boo.yaml")), resource("config"), ClientConfig.ONEOPS_DEFAULT_PROFILE));
+    Yaml yaml = reader.read(interpolator.interpolate(new FileInputStream(resource("boo.yaml")),
+        resource("config"), ClientConfig.ONEOPS_DEFAULT_PROFILE));
     doAssert(yaml);
   }
-  
+
   private void doAssert(Yaml yaml) {
     // We current append a trailing '/' to the URI
     assertEquals("https://oneops.prod.walmart.com/", yaml.getBoo().getHost());

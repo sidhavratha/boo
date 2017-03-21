@@ -33,7 +33,8 @@ public class UpdateComponentTask implements Runnable {
    * Update the components.
    * 
    */
-  public UpdateComponentTask(BuildAllPlatforms flow, String platformName, String componentName, String uniqueName, Map<String, String> components) {
+  public UpdateComponentTask(BuildAllPlatforms flow, String platformName, String componentName,
+      String uniqueName, Map<String, String> components) {
     this.flow = flow;
     this.platformName = platformName;
     this.componentName = componentName;

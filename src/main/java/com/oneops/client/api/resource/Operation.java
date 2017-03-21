@@ -41,7 +41,8 @@ public class Operation extends APIClient {
   private String assemblyName;
   private String environmentName;
 
-  public Operation(OOInstance instance, String assemblyName, String environmentName) throws OneOpsClientAPIException {
+  public Operation(OOInstance instance, String assemblyName, String environmentName)
+      throws OneOpsClientAPIException {
     super(instance);
     if (assemblyName == null || assemblyName.length() == 0) {
       String msg = String.format("Missing assembly name");
@@ -65,7 +66,8 @@ public class Operation extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath listInstances(String platformName, String componentName) throws OneOpsClientAPIException {
+  public JsonPath listInstances(String platformName, String componentName)
+      throws OneOpsClientAPIException {
     if (platformName == null || platformName.length() == 0) {
       String msg = String.format("Missing platform name to fetch details");
       throw new OneOpsClientAPIException(msg);
@@ -76,9 +78,10 @@ public class Operation extends APIClient {
     }
 
     RequestSpecification request = createRequest();
-    Response response = request.queryParam("instances_state", "all").get(OPERATION_ENV_URI + "/platforms/" + platformName + "/components/" + componentName
+    Response response = request.queryParam("instances_state", "all")
+        .get(OPERATION_ENV_URI + "/platforms/" + platformName + "/components/" + componentName
     // + "/instances.json?instances_state=all");
-        + "/instances");
+            + "/instances");
     if (response != null) {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
@@ -98,7 +101,8 @@ public class Operation extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath markInstancesForReplacement(String platformName, String componentName) throws OneOpsClientAPIException {
+  public JsonPath markInstancesForReplacement(String platformName, String componentName)
+      throws OneOpsClientAPIException {
     List<Integer> instanceIds = listInstances(platformName, componentName).getList("ciId");
     return markInstancesForReplacement(platformName, componentName, instanceIds);
   }
@@ -109,7 +113,8 @@ public class Operation extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath markInstanceForReplacement(String platformName, String componentName, Integer instanceId) throws OneOpsClientAPIException {
+  public JsonPath markInstanceForReplacement(String platformName, String componentName,
+      Integer instanceId) throws OneOpsClientAPIException {
     List<Integer> instanceIds = Lists.newArrayList();
     instanceIds.add(instanceId);
     return markInstancesForReplacement(platformName, componentName, instanceIds);
@@ -121,7 +126,8 @@ public class Operation extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  JsonPath markInstancesForReplacement(String platformName, String componentName, List<Integer> instanceIds) throws OneOpsClientAPIException {
+  JsonPath markInstancesForReplacement(String platformName, String componentName,
+      List<Integer> instanceIds) throws OneOpsClientAPIException {
     RequestSpecification request = createRequest();
     JSONObject jo = new JSONObject();
     jo.put("ids", instanceIds);
@@ -133,7 +139,8 @@ public class Operation extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to set replace marker on instance(s) due to %s", response.getStatusLine());
+        String msg = String.format("Failed to set replace marker on instance(s) due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -141,7 +148,8 @@ public class Operation extends APIClient {
     throw new OneOpsClientAPIException(msg);
   }
 
-  public JsonPath getLogData(String procedureId, List<String> actionIds) throws OneOpsClientAPIException {
+  public JsonPath getLogData(String procedureId, List<String> actionIds)
+      throws OneOpsClientAPIException {
     RequestSpecification request = createRequest();
     String uri = "/operations/procedures/log_data";
     request.queryParam("procedure_id", procedureId);
@@ -157,7 +165,8 @@ public class Operation extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to set replace marker on instance(s) due to %s", response.getStatusLine());
+        String msg = String.format("Failed to set replace marker on instance(s) due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -177,7 +186,8 @@ public class Operation extends APIClient {
       throw new OneOpsClientAPIException(msg);
     }
     RequestSpecification request = createRequest();
-    Response response = request.get(OPERATION_ENV_URI + "/platforms/" + platformName + "/procedures");
+    Response response =
+        request.get(OPERATION_ENV_URI + "/platforms/" + platformName + "/procedures");
     if (response != null) {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
@@ -197,7 +207,8 @@ public class Operation extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public Integer getProcedureId(String platformName, String procedureName) throws OneOpsClientAPIException {
+  public Integer getProcedureId(String platformName, String procedureName)
+      throws OneOpsClientAPIException {
     if (platformName == null || platformName.length() == 0) {
       String msg = String.format("Missing platform name to fetch details");
       throw new OneOpsClientAPIException(msg);
@@ -230,7 +241,8 @@ public class Operation extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath listActions(String platformName, String componentName) throws OneOpsClientAPIException {
+  public JsonPath listActions(String platformName, String componentName)
+      throws OneOpsClientAPIException {
     if (platformName == null || platformName.length() == 0) {
       String msg = String.format("Missing platform name to fetch details");
       throw new OneOpsClientAPIException(msg);
@@ -241,7 +253,8 @@ public class Operation extends APIClient {
     }
 
     RequestSpecification request = createRequest();
-    Response response = request.get(OPERATION_ENV_URI + "/platforms/" + platformName + "/components/" + componentName + "/actions/");
+    Response response = request.get(OPERATION_ENV_URI + "/platforms/" + platformName
+        + "/components/" + componentName + "/actions/");
     if (response != null) {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
@@ -261,7 +274,8 @@ public class Operation extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath executeProcedure(String platformName, String procedureName, String arglist) throws OneOpsClientAPIException {
+  public JsonPath executeProcedure(String platformName, String procedureName, String arglist)
+      throws OneOpsClientAPIException {
     if (platformName == null || platformName.length() == 0) {
       String msg = String.format("Missing platform name to fetch details");
       throw new OneOpsClientAPIException(msg);
@@ -291,7 +305,8 @@ public class Operation extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to execute procedures due to %s", response.getStatusLine());
+        String msg =
+            String.format("Failed to execute procedures due to %s", response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -317,7 +332,8 @@ public class Operation extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to get procedure status due to %s", response.getStatusLine());
+        String msg =
+            String.format("Failed to get procedure status due to %s", response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -350,18 +366,21 @@ public class Operation extends APIClient {
     ro.setProperties(properties);
 
     JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_procedure");
-    Response response = request.body(jsonObject.toString()).put("/operations/procedures/" + procedureId);
+    Response response =
+        request.body(jsonObject.toString()).put("/operations/procedures/" + procedureId);
 
     if (response != null) {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to cancel procedure due to %s", response.getStatusLine());
+        String msg =
+            String.format("Failed to cancel procedure due to %s", response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
 
-    String msg = String.format("Failed to cancel procedure with the given Id " + procedureId + " due to null response");
+    String msg = String.format(
+        "Failed to cancel procedure with the given Id " + procedureId + " due to null response");
     throw new OneOpsClientAPIException(msg);
   }
 
@@ -371,7 +390,8 @@ public class Operation extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath executeAction(String platformName, String componentName, String actionName, List<String> instanceList, String arglist, int rollAt) throws OneOpsClientAPIException {
+  public JsonPath executeAction(String platformName, String componentName, String actionName,
+      List<String> instanceList, String arglist, int rollAt) throws OneOpsClientAPIException {
     if (platformName == null || platformName.length() == 0) {
       String msg = String.format("Missing platform name to fetch details");
       throw new OneOpsClientAPIException(msg);
@@ -394,7 +414,8 @@ public class Operation extends APIClient {
     Map<String, String> properties = new HashMap<String, String>();
 
     Transition transition = new Transition(instance, this.assemblyName);
-    JsonPath component = transition.getPlatformComponent(this.environmentName, platformName, componentName);
+    JsonPath component =
+        transition.getPlatformComponent(this.environmentName, platformName, componentName);
     Integer componentId = component.getInt("ciId");
     properties.put("procedureState", "active");
     properties.put("arglist", arglist);
@@ -437,7 +458,8 @@ public class Operation extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to execute procedures due to %s", response.getStatusLine());
+        String msg =
+            String.format("Failed to execute procedures due to %s", response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }

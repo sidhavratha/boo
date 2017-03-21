@@ -101,8 +101,7 @@ public class ITBuildAllPlatforms extends BooTest {
     // Actions
     System.out.println("Actions");
     assertTrue(build.listActions("tomcat", "compute").size() > 2);
-    assertTrue(build.executeAction("tomcat", "compute", "status",
-            "", null, 100).length() > 5);
+    assertTrue(build.executeAction("tomcat", "compute", "status", "", null, 100).length() > 5);
 
     // Attachments
     System.out.println("Attachments");

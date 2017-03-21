@@ -55,26 +55,28 @@ public class ClientConfigInterpolator {
    * @return Interpolate Boo YAML template
    * @throws IOException throw if there are errors interpolating the template
    */
-  public String interpolate(File booYamlFile, File booConfigFile, String profile) throws IOException {
+  public String interpolate(File booYamlFile, File booConfigFile, String profile)
+      throws IOException {
     String booYaml = new String(Files.readAllBytes(booYamlFile.toPath()));
     return interpolate(booYaml, booConfigFile, profile);
   }
 
-  /** 
-   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template in InputStream
-   * with them.
+  /**
+   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template in
+   * InputStream with them.
    * 
    * @see ClientConfigInterpolator#interpolate(File, File, String)
    * @param booYamlIn InputStream containing the Boo Yaml configuration.
    */
-  public String interpolate(InputStream booYamlIn, File booConfigFile, String profile) throws IOException {
+  public String interpolate(InputStream booYamlIn, File booConfigFile, String profile)
+      throws IOException {
     String booYaml = new String(ByteStreams.toByteArray(booYamlIn));
     return interpolate(booYaml, booConfigFile, profile);
   }
 
-  /** 
-   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template in string format
-   * with them.
+  /**
+   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template in
+   * string format with them.
    * 
    * @see ClientConfigInterpolator#interpolate(File, File, String)
    * @param booYaml the template string
@@ -90,7 +92,7 @@ public class ClientConfigInterpolator {
     }
   }
 
-  /** 
+  /**
    * Take key/value pairs of configuration and interpolate a Boo YAML template in straing format
    * with them.
    * 
@@ -155,7 +157,8 @@ public class ClientConfigInterpolator {
     try {
       return FileUtils.readFileToString(new File(path));
     } catch (IOException e) {
-      // Content that might be required for the compute to function may be ommitted so just fail fast.
+      // Content that might be required for the compute to function may be ommitted so just fail
+      // fast.
       // If it's an ssh public key that is meant to be injected and it doesn't work it will result
       // in a compute you can't log in to.
       throw new RuntimeException(String.format("%s cannot be found or cannot be read.", path));

@@ -48,7 +48,8 @@ public class BooUtils {
    * @throws BooException the boo exception
    */
   public boolean verifyTemplate(ClientConfig config) throws BooException {
-    if (config == null || config.getYaml() == null || config.getYaml().getAssembly() == null || config.getYaml().getPlatforms() == null) {
+    if (config == null || config.getYaml() == null || config.getYaml().getAssembly() == null
+        || config.getYaml().getPlatforms() == null) {
       throw new BooException(Constants.YAML_ERROR);
     }
     return false;
@@ -64,7 +65,8 @@ public class BooUtils {
    * @throws OneOpsClientAPIException the one ops client API exception
    */
 
-  public String getIps(String platformName, String componentName, AbstractWorkflow workFlow) throws OneOpsClientAPIException {
+  public String getIps(String platformName, String componentName, AbstractWorkflow workFlow)
+      throws OneOpsClientAPIException {
     String result = null;
     StringBuilder str = new StringBuilder();
     Yaml yaml = workFlow.getConfig().getYaml();
@@ -193,7 +195,8 @@ public class BooUtils {
       return template;
     } else if (template.length() > 2 && template.substring(0, 2).equals(Constants.DOUBLE_PERIOD)) {
       return parseDoublePeriodPath(template);
-    } else if (template.charAt(0) == Constants.DOT && template.length() > 1 && template.charAt(1) == Constants.DOT) {
+    } else if (template.charAt(0) == Constants.DOT && template.length() > 1
+        && template.charAt(1) == Constants.DOT) {
       return getAbsolutePath(template.substring(2));
     } else {
       StringBuilder sb = new StringBuilder();
@@ -230,7 +233,8 @@ public class BooUtils {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean createPlatforms(ClientConfig config, BuildAllPlatforms workflow) throws OneOpsClientAPIException {
+  public boolean createPlatforms(ClientConfig config, BuildAllPlatforms workflow)
+      throws OneOpsClientAPIException {
     List<PlatformBean> platforms = config.getYaml().getPlatformsList();
     Collections.sort(platforms);
     Queue<Integer> queue = new LinkedList<Integer>();
@@ -307,7 +311,8 @@ public class BooUtils {
     for (Map.Entry<String, Object> entry : map.entrySet()) {
       String key = entry.getKey();
       Object value = entry.getValue();
-      System.out.printf("%s %s: key: %s; value:%s: %n", str.toString(), log, key, value == null ? "" : value.getClass());
+      System.out.printf("%s %s: key: %s; value:%s: %n", str.toString(), log, key,
+          value == null ? "" : value.getClass());
       if (value instanceof Map) {
         printMap((Map<String, Object>) value, ++depth);
       }

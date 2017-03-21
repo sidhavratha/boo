@@ -37,7 +37,8 @@ import java.net.URL;
  */
 public abstract class BooTest {
   private static final Logger LOG = LoggerFactory.getLogger(BooTest.class);
-  private static final Injector injector = Guice.createInjector(new JaywayHttpModule(getConfig(), ClientConfig.ONEOPS_DEFAULT_PROFILE));
+  private static final Injector injector =
+      Guice.createInjector(new JaywayHttpModule(getConfig(), ClientConfig.ONEOPS_DEFAULT_PROFILE));
 
   /** The config. */
   ClientConfig config;

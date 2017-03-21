@@ -40,7 +40,8 @@ public class PlatformConfigBean {
    * @param customSplit the custom split
    * @param customComponent the custom component
    */
-  public PlatformConfigBean(String platformName, String customFormat, String customSplit, String customComponent) {
+  public PlatformConfigBean(String platformName, String customFormat, String customSplit,
+      String customComponent) {
     this.platformName = platformName;
     this.customFormat = customFormat;
     this.customSplit = customSplit;

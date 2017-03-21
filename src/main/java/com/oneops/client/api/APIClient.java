@@ -29,10 +29,12 @@ public abstract class APIClient {
   public APIClient(OOInstance instance) throws OneOpsClientAPIException {
     this.instance = instance;
     if (instance == null) {
-      throw new OneOpsClientAPIException("Missing OneOps instance information to perform API invocation");
+      throw new OneOpsClientAPIException(
+          "Missing OneOps instance information to perform API invocation");
     }
     if (instance.getAuthtoken() == null) {
-      throw new OneOpsClientAPIException("Missing OneOps authentication API key to perform API invocation");
+      throw new OneOpsClientAPIException(
+          "Missing OneOps authentication API key to perform API invocation");
     }
     if (instance.getEndpoint() == null) {
       throw new OneOpsClientAPIException("Missing OneOps endpoint to perform API invocation");
@@ -42,9 +44,11 @@ public abstract class APIClient {
   protected RequestSpecification createRequest() {
     RequestSpecification rs = RestAssured.given();
     if (!instance.isGzipEnabled()) {
-      rs.config(RestAssured.config().decoderConfig(DecoderConfig.decoderConfig().noContentDecoders()));
+      rs.config(
+          RestAssured.config().decoderConfig(DecoderConfig.decoderConfig().noContentDecoders()));
     }
-    String basicAuth = "Basic " + new String(Base64.encodeBase64(instance.getAuthtoken().getBytes()));
+    String basicAuth =
+        "Basic " + new String(Base64.encodeBase64(instance.getAuthtoken().getBytes()));
     rs.header("Authorization", basicAuth);
     rs.header("User-Agent", "OneOpsAPIClient");
     rs.header("Accept", "application/json");

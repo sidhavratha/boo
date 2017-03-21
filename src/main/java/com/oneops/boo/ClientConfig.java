@@ -25,7 +25,8 @@ import java.io.InputStream;
 @Singleton
 public class ClientConfig {
 
-  public static final File ONEOPS_CONFIG = new File(new File(System.getProperty("user.home"), ".boo"), "config");
+  public static final File ONEOPS_CONFIG =
+      new File(new File(System.getProperty("user.home"), ".boo"), "config");
   public static final String ONEOPS_DEFAULT_PROFILE = "default";
   private Yaml yaml;
 
@@ -52,9 +53,10 @@ public class ClientConfig {
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
     this.yaml = reader.read(interpolator.interpolate(booYamlFile, ONEOPS_CONFIG, profile));
   }
-  
+
   /**
    * Create a ClientConfig by parsing an InputStream.
+   * 
    * @param input the inputstream
    * @param profile the profile
    * @throws IOException Signals that an I/O exception has occurred.

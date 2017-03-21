@@ -44,7 +44,8 @@ public class Account extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to get list of Environment Profiles due to %s", response.getStatusLine());
+        String msg = String.format("Failed to get list of Environment Profiles due to %s",
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }

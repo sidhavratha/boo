@@ -56,11 +56,13 @@ public class Assembly extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to get assembly with name %s due to %s", assemblyName, response.getStatusLine());
+        String msg = String.format("Failed to get assembly with name %s due to %s", assemblyName,
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
-    String msg = String.format("Failed to get assembly with name %s due to null response", assemblyName);
+    String msg =
+        String.format("Failed to get assembly with name %s due to null response", assemblyName);
     throw new OneOpsClientAPIException(msg);
   }
 
@@ -77,7 +79,8 @@ public class Assembly extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to get list of assemblies due to %s", response.getStatusLine());
+        String msg =
+            String.format("Failed to get list of assemblies due to %s", response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
@@ -96,7 +99,8 @@ public class Assembly extends APIClient {
    * @return
    * @throws OneOpsClientAPIException
    */
-  public JsonPath createAssembly(String assemblyName, String ownerEmail, String comments, String description) throws OneOpsClientAPIException {
+  public JsonPath createAssembly(String assemblyName, String ownerEmail, String comments,
+      String description) throws OneOpsClientAPIException {
     ResourceObject ro = new ResourceObject();
     Map<String, String> attributes = new HashMap<String, String>();
     Map<String, String> properties = new HashMap<String, String>();
@@ -129,11 +133,13 @@ public class Assembly extends APIClient {
       if (response.getStatusCode() == 200 || response.getStatusCode() == 302) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to create assembly with name %s due to %s", assemblyName, response.getStatusLine());
+        String msg = String.format("Failed to create assembly with name %s due to %s", assemblyName,
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
-    String msg = String.format("Failed to create assembly with name %s due to null response", assemblyName);
+    String msg =
+        String.format("Failed to create assembly with name %s due to null response", assemblyName);
     throw new OneOpsClientAPIException(msg);
   }
 
@@ -153,14 +159,17 @@ public class Assembly extends APIClient {
     RequestSpecification request = createRequest();
     Response response = request.delete(ASSEMBLY_URI + assemblyName);
     if (response != null) {
-      if (response.getStatusCode() == 200 || response.getStatusCode() == 302 || response.getStatusCode() == 404) {
+      if (response.getStatusCode() == 200 || response.getStatusCode() == 302
+          || response.getStatusCode() == 404) {
         return response.getBody().jsonPath();
       } else {
-        String msg = String.format("Failed to delete assembly with name %s due to %s", assemblyName, response.getStatusLine());
+        String msg = String.format("Failed to delete assembly with name %s due to %s", assemblyName,
+            response.getStatusLine());
         throw new OneOpsClientAPIException(msg);
       }
     }
-    String msg = String.format("Failed to delete assembly with name %s due to null response", assemblyName);
+    String msg =
+        String.format("Failed to delete assembly with name %s due to null response", assemblyName);
     throw new OneOpsClientAPIException(msg);
   }
 }
