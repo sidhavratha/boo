@@ -1,5 +1,5 @@
 [default]
-host = https://web.bfd.dev.cloud.wal-mart.com
+host = https://oneops.prod.walmart.com
 organization = bfd
 api_key = BOO!!
 email = boo@walmart.com
