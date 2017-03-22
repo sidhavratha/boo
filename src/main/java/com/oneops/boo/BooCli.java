@@ -179,17 +179,23 @@ public class BooCli {
    * @param assembly the assembly
    * @throws BooException the Boo exception
    */
-  public void init(File template, String assembly) throws BooException {
+  public void init(File template, String assembly, Map<String, String> variables, String comment) throws BooException {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Loading {}", template);
     }
 
-    injector = Guice.createInjector(new JaywayHttpModule(this.configFile, this.profile));
+    this.configFile = template;
+    if (variables != null) {
+      injector = Guice.createInjector(new JaywayHttpModule(this.configFile, variables));
+    } else {
+      injector = Guice.createInjector(new JaywayHttpModule(this.configFile, this.profile));
+    }
     config = injector.getInstance(ClientConfig.class);
     booUtils.verifyTemplate(config);
     if (assembly != null) {
       config.getYaml().getAssembly().setName(assembly);
     }
+    this.initOo(config, null, comment);
   }
 
   /**
@@ -293,9 +299,7 @@ public class BooCli {
         this.comment = cmd.getOptionValue("m");
       }
 
-      this.init(this.configFile, assembly);
-      this.initOo(config, null, comment);
-
+      this.init(this.configFile, assembly, null, comment);
       if (cmd.hasOption("l")) {
         String prefix = cmd.getOptionValue("l");
         if (prefix == null) {

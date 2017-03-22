@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * The Class JaywayHttpModule.
@@ -40,6 +41,9 @@ public class JaywayHttpModule extends AbstractModule {
 
   /** The yaml. */
   private File yaml;
+
+  /** The boo template subsitution variables values **/
+  private Map<String, String> variables;
 
   /** ~/.boo/config profile */
   private String profile;
@@ -56,6 +60,19 @@ public class JaywayHttpModule extends AbstractModule {
       LOG.debug("Using config {}", yaml);
     }
 
+  }
+
+  /**
+   *
+   * @param yaml
+   * @param booTemplateVariables
+   */
+  public JaywayHttpModule(File yaml, Map<String, String> booTemplateVariables) {
+    this.yaml = yaml;
+    this.variables = booTemplateVariables;
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Using config {}", yaml);
+    }
   }
 
   /*
@@ -84,7 +101,11 @@ public class JaywayHttpModule extends AbstractModule {
       throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
     // test
     if (CLIENT == null) {
-      CLIENT = new ClientConfig(this.yaml, this.profile);
+      if (variables != null) {
+        CLIENT = new ClientConfig(this.yaml, variables);
+      } else {
+        CLIENT = new ClientConfig(this.yaml, this.profile);
+      }
     }
 
     return CLIENT;
