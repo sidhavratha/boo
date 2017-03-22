@@ -19,6 +19,8 @@ import com.oneops.boo.yaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.Map;
 
 @Singleton
 public class ClientConfig {
@@ -50,6 +52,18 @@ public class ClientConfig {
     ClientConfigReader reader = new ClientConfigReader();
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
     this.yaml = reader.read(interpolator.interpolate(booYamlFile, ONEOPS_CONFIG, profile));
+  }
+
+  /**
+   *
+   * @param booYamlFile the file
+   * @param config the boo template config file which contains variables
+   * @throws IOException
+   */
+  public ClientConfig(File booYamlFile, Map<String, String> config) throws IOException {
+    ClientConfigReader reader = new ClientConfigReader();
+    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    this.yaml = reader.read(interpolator.interpolate(new String(Files.readAllBytes(booYamlFile.toPath())), config));
   }
 
   /**
