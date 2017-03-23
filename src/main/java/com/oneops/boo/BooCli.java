@@ -621,6 +621,20 @@ public class BooCli {
   }
 
   /**
+   *  Creates platforms if the assembly does exist. Updates the platform/components if assembly already exists
+   * @throws BooException
+   * @throws OneOpsClientAPIException
+   */
+  public void createOrUpdatePlatforms()
+          throws BooException, OneOpsClientAPIException {
+    if (flow.isAssemblyExist()) {
+      flow.process(Boolean.TRUE, Boolean.FALSE);
+    } else {
+      flow.process(Boolean.FALSE, Boolean.FALSE);
+    }
+  }
+
+  /**
    * Limit to 32 characters long.
    *
    * @param isAutoGen the is auto gen
