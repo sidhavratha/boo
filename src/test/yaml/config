@@ -1,5 +1,5 @@
 [default]
-host = https://oneops.prod.walmart.com
+host = https://localhost:9090
 organization = bfd
 api_key = BOO!!
 email = boo@walmart.com

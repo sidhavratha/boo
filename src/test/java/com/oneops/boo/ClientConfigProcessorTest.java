@@ -55,7 +55,7 @@ public class ClientConfigProcessorTest {
 
   private void doAssert(Yaml yaml) {
     // We current append a trailing '/' to the URI
-    assertEquals("https://oneops.prod.walmart.com/", yaml.getBoo().getHost());
+    assertEquals("https://localhost:9090/", yaml.getBoo().getHost());
     assertEquals("bfd", yaml.getBoo().getOrg());
     assertEquals("BOO!!", yaml.getBoo().getApikey());
     assertEquals("boo@walmart.com", yaml.getBoo().getEmail());

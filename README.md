@@ -8,11 +8,11 @@ The purpose of Boo is to provide a simple command-line tool for the OneOps devel
 To use Boo you download the JAR and place the JAR in your `$PATH`.
 
 ```
-curl -O http://gec-maven-nexus.walmart.com/nexus/content/repositories/devtools/com/oneops/boo/boo/1.0.0/boo-1.0.0-executable.jar
+curl -O http://gec-maven-nexus.walmart.com/nexus/content/repositories/devtools/com/oneops/boo/boo/1.0.1/boo-1.0.1-executable.jar
 
-chmod +x boo-1.0.0-executable.jar
+chmod +x boo-1.0.1-executable.jar
 
-mv boo-1.0.0-executable.jar boo
+mv boo-1.0.1-executable.jar boo
 
 boo <options>
 ```
@@ -29,7 +29,7 @@ Boo YAML templates are processed with [Mustache][1] to allow variable interpolat
 
 ```
 [default]
-host=https://oneops.prod.walmart.com
+host=https://localhost:9090
 organization=devtools
 api_key=oneops_api_key # copy from OneOps UI->profile->authentication->API Token
 email=jvanzyl@walmart.com
@@ -59,7 +59,7 @@ It will yield the following:
 
 ```
 boo:
-  oneops_host: 'https://oneops.prod.walmart.com'
+  oneops_host: 'https://localhost:9090'
   organization: 'devtools'
   api_key: 'oneops_api_key'
   email: 'jvanzyl@walmart.com'
@@ -122,9 +122,9 @@ Again, you can see what the result will be using `boo -f your.yml -v`.
 ```
 mvn clean package
 
-chmod +x ./target/boo-1.0.1-SNAPSHOT-executable.jar
+chmod +x ./target/boo-1.0.2-SNAPSHOT-executable.jar
 
-mv ./target/boo-1.0.1-SNAPSHOT-executable.jar boo
+mv ./target/boo-1.0.2-SNAPSHOT-executable.jar boo
 
 boo <options>
 ```
@@ -134,14 +134,14 @@ boo <options>
 ```
 mvn clean package -Pbuild-rpms
 
-Find the rpm at .//target/rpm/boo/RPMS/noarch/boo-1.0.1-SNAPSHOT*.noarch.rpm
+Find the rpm at .//target/rpm/boo/RPMS/noarch/boo-1.0.2-SNAPSHOT*.noarch.rpm
 ```
 
 ## Install the RPM
 
 ```
-On Linux: sudo rpm -ivh boo-1.0.1-SNAPSHOT*.noarch.rpm
-On Mac: sudo rpm -ivh boo-1.0.1-SNAPSHOT*.noarch.rpm --nodeps
+On Linux: sudo rpm -ivh boo-1.0.2-SNAPSHOT*.noarch.rpm
+On Mac: sudo rpm -ivh boo-1.0.2-SNAPSHOT*.noarch.rpm --nodeps
 ```
 
 ## Running integration tests
@@ -156,7 +156,7 @@ Note that in order to run the integration tests you also need a `default` profil
 
 ```
 [default]
-host=https://oneops.prod.walmart.com
+host=https://localhost:9090
 organization=oneops_org_name
 api_key=oneops_api_key
 email=me@email.com
