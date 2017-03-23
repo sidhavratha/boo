@@ -29,7 +29,7 @@ Boo YAML templates are processed with [Mustache][1] to allow variable interpolat
 
 ```
 [default]
-host=https://oneops.prod.walmart.com
+host=https://localhost:9090
 organization=devtools
 api_key=oneops_api_key # copy from OneOps UI->profile->authentication->API Token
 email=jvanzyl@walmart.com
@@ -59,7 +59,7 @@ It will yield the following:
 
 ```
 boo:
-  oneops_host: 'https://oneops.prod.walmart.com'
+  oneops_host: 'https://localhost:9090'
   organization: 'devtools'
   api_key: 'oneops_api_key'
   email: 'jvanzyl@walmart.com'
@@ -156,7 +156,7 @@ Note that in order to run the integration tests you also need a `default` profil
 
 ```
 [default]
-host=https://oneops.prod.walmart.com
+host=https://localhost:9090
 organization=oneops_org_name
 api_key=oneops_api_key
 email=me@email.com
