@@ -20,7 +20,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.oneops.boo</groupId>
   <artifactId>boo</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <name>boo</name>
   <description>An automation command-line tool for OneOps users and developers.</description>
   <url>http://github.com/oneops/boo</url>
@@ -60,7 +60,7 @@
     <connection>scm:git:git@gecgithub01.walmart.com:LabsBFD/bfd-oneops-automation.git</connection>
     <developerConnection>scm:git:git@gecgithub01.walmart.com:LabsBFD/bfd-oneops-automation.git</developerConnection>
     <url>https://gecgithub01.walmart.com/LabsBFD/bfd-oneops-automation</url>
-    <tag>HEAD</tag>
+    <tag>boo-1.0.2</tag>
   </scm>
   <distributionManagement>
     <repository>
