@@ -164,7 +164,9 @@
         <executions>
           <execution>
             <id>enforce-maven</id>
+            <phase>validate</phase>
             <goals>
+              <goal>display-info</goal>
               <goal>enforce</goal>
             </goals>
             <configuration>
@@ -173,6 +175,9 @@
                   <message>Maven 3.3.9 or higher required.</message>
                   <version>[3.3.9,)</version>
                 </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>${java.version}</version>
+                </requireJavaVersion>
               </rules>
             </configuration>
           </execution>
