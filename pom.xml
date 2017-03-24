@@ -27,6 +27,26 @@
   <artifactId>boo</artifactId>
   <version>1.0.2-SNAPSHOT</version>
   <name>boo</name>
+  <description>An automation command-line tool for OneOps users and developers.</description>
+  <url>http://github.com/oneops/boo</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>The Boo Team</name>
+      <organization>Boo</organization>
+      <organizationUrl>http://github.com/boo/graphs/contributors</organizationUrl>
+    </developer>
+    <developer>
+      <name>The OneOps Team</name>
+      <organization>OneOps</organization>
+      <organizationUrl>https://github.com/orgs/oneops/people</organizationUrl>
+    </developer>
+  </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -47,6 +67,16 @@
     <url>https://gecgithub01.walmart.com/LabsBFD/bfd-oneops-automation</url>
     <tag>HEAD</tag>
   </scm>
+  <distributionManagement>
+    <repository>
+      <id>${public-release.serverId}</id>
+      <url>${public-release.url}</url>
+    </repository>
+    <snapshotRepository>
+      <id>${public-snapshot.serverId}</id>
+      <url>${public-snapshot.url}</url>
+    </snapshotRepository>
+  </distributionManagement>
   <dependencies>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -377,18 +407,4 @@
       </plugin>
     </plugins>
   </reporting>
-
-  <!-- Where to Deploy -->
-  <distributionManagement>
-    <repository>
-      <id>${public-release.serverId}</id>
-      <url>${public-release.url}</url>
-    </repository>
-
-    <snapshotRepository>
-      <id>${public-snapshot.serverId}</id>
-      <url>${public-snapshot.url}</url>
-    </snapshotRepository>
-  </distributionManagement>
-
 </project>
