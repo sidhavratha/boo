@@ -1,18 +1,25 @@
 # Boo
 
-The purpose of Boo is to provide a simple command-line tool for the OneOps developers and OneOps users to deploy, update, destroy and operate their OneOps assemblies. For the OneOps pack developers, it provides a fast and repeatable way to run tests against complex OneOps packs. For example: it allows a pack developer to use a short, one-line bash command to verify a parameter or code changes in an OneOps pack by attemping to instantiate the updated pack and executing tests on the resulting functional cluster. For an OneOps user, it provides an command-line tool to deploy, update, destroy and operator their OneOps assemblies. The boo tool is an addition to the OneOps UI interfaces.
+The purpose of Boo is to provide a simple command-line tool for the OneOps developers and OneOps users to deploy,
+update, destroy and operate their OneOps assemblies.
 
+For the OneOps pack developers, it provides a fast and repeatable way to run tests against complex OneOps packs. For
+example, it allows a pack developer to use a short, one-line bash command to verify a parameter or code changes in an
+OneOps pack by attemping to instantiate the updated pack and executing tests on the resulting functional cluster. For an
+OneOps user, it provides an command-line tool to deploy, update, destroy and operator their OneOps assemblies. The boo
+tool is an addition to the OneOps UI interfaces.
 
 ## Usage
 
-To use Boo you download the JAR and place the JAR in your `$PATH`.
+To use Boo you download the executable JAR and place it in your `$PATH`. Use the latest version available from
+[http://repo1.maven.org/maven2/com/oneops/boo/boo](http://repo1.maven.org/maven2/com/oneops/boo/boo) e.g.:
 
 ```
-curl -O http://gec-maven-nexus.walmart.com/nexus/content/repositories/devtools/com/oneops/boo/boo/1.0.1/boo-1.0.1-executable.jar
+curl -O http://repo1.maven.org/maven2/com/oneops/boo/boo/1.0.2/boo-1.0.2-executable.jar
 
-chmod +x boo-1.0.1-executable.jar
+chmod +x boo-1.0.2-executable.jar
 
-mv boo-1.0.1-executable.jar boo
+mv boo-1.0.2-executable.jar boo
 
 boo <options>
 ```
@@ -25,7 +32,8 @@ boo -h
 
 ## Configuration
 
-Boo YAML templates are processed with [Mustache][1] to allow variable interpolation when the standard `~/.boo/config` file contains a `default` profile. If you have a `default` profile that looks like the following:
+Boo YAML templates are processed with [Mustache][1] to allow variable interpolation when the standard `~/.boo/config` file
+contains a `default` profile. If you have a `default` profile that looks like the following:
 
 ```
 [default]
@@ -81,7 +89,8 @@ boo -f boo.yml -v
 
 ## Inlining File Content
 
-You can use the `file` directive to inline content into a Boo template. The following are examples of how you can inline the content of files:
+You can use the `file` directive to inline content into a Boo template. The following are examples of how you can inline
+the content of files:
 
 ```
 {{file(./id_rsa.pub)}}
@@ -89,7 +98,8 @@ You can use the `file` directive to inline content into a Boo template. The foll
 {{file(/Users/jvanzyl/id_rsa.pub)}}
 ```
 
-So, for example, if you wanted to inline the content of your public SSH key into your Boo template before execution you can do the following:
+So, for example, if you wanted to inline the content of your public SSH key into your Boo template before execution you
+can do the following:
 
 ```
 user:
@@ -162,6 +172,25 @@ api_key=oneops_api_key
 email=me@email.com
 cloud=cloud_name_in_oneops
 ```
+
+## Deploying SNAPSHOT
+
+```
+mvn clean deploy -P release
+```
+
+## Releasing
+
+Provided you have permissions to deploy to OSSRH with a serverId `ossrh` in your settings and the needed gpg setup you
+can build and deploy a release with
+ 
+```
+mvn release:prepare
+mvn release:perform
+```
+
+And then just check and release the staging repo on [https://oss.sonatype.org](https://oss.sonatype.org)
+
 
 ## Code style
 
