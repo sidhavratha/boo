@@ -34,12 +34,12 @@
     <scm.field>scm:git:git@gecgithub01.walmart.com:platform/platform-archetypes.git</scm.field>
     <java.version>1.8</java.version>
     <!-- Distribution Management Properties -->
-    <public.serverId>walmart-gec</public.serverId>
-    <public.nexusUrl>http://gec-nexus.prod.glb.prod.walmart.com/nexus</public.nexusUrl>
+    <public.serverId>ossrh</public.serverId>
+    <public.nexusUrl>https://oss.sonatype.org</public.nexusUrl>
     <public-release.serverId>${public.serverId}</public-release.serverId>
-    <public-release.url>${public.nexusUrl}/content/repositories/devtools</public-release.url>
+    <public-release.url>${public.nexusUrl}/service/local/staging/deploy/maven2</public-release.url>
     <public-snapshot.serverId>${public.serverId}</public-snapshot.serverId>
-    <public-snapshot.url>${public.nexusUrl}/content/repositories/devtools-snapshots</public-snapshot.url>
+    <public-snapshot.url>${public.nexusUrl}/content/repositories/snapshots</public-snapshot.url>
   </properties>
   <scm>
     <connection>scm:git:git@gecgithub01.walmart.com:LabsBFD/bfd-oneops-automation.git</connection>
