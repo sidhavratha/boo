@@ -746,8 +746,142 @@ public class Design extends APIClient {
   }
 
   /**
+   *
+   * @param platformName
+   * @param variables
+   * @param isSecure
+   * @return
+   * @throws OneOpsClientAPIException
+   */
+  public boolean updateOrAddPlatformVariables(String platformName, Map<String, String> variables,
+                                     boolean isSecure) throws OneOpsClientAPIException {
+
+    if (platformName == null || platformName.length() == 0) {
+      String msg = String.format("Missing platform name to update variables");
+      throw new OneOpsClientAPIException(msg);
+    }
+    if (variables == null || variables.size() == 0) {
+      String msg = String.format("Missing variables list to be updated");
+      throw new OneOpsClientAPIException(msg);
+    }
+
+    Boolean success = false;
+    RequestSpecification request = createRequest();
+
+    for (Entry<String, String> entry : variables.entrySet()) {
+      Response variable =
+              request.get(DESIGN_URI + "platforms/" + platformName + "/variables/" + entry.getKey());
+      JsonPath variableDetails = variable.getBody().jsonPath();
+      String ciId = variableDetails.getString("ciId");
+
+      if (variable == null || variable.getBody() == null || ciId == null) {
+        LOG.info("Local variable " + entry.getKey() + " for platform " + platformName + " not found. Going to add one");
+        addPlatformVariable(platformName, entry.getKey(), entry.getValue(), isSecure);
+        continue;
+      }
+      LOG.info("variable " + entry.getKey() + " already present. Details: " + variable.getBody());
+      Map<String, String> attr = variableDetails.getMap("ciAttributes");
+
+      updatePlatformVariable(platformName, ciId, attr, entry.getKey(), entry.getValue(), isSecure);
+    }
+
+    return success;
+  }
+
+  /**
+   *
+   * @param platformName
+   * @param variableCiId
+   * @param attributes
+   * @param key
+   * @param value
+   * @param isSecure
+   * @throws OneOpsClientAPIException
+   */
+  private void updatePlatformVariable(String platformName, String variableCiId, Map<String, String> attributes,
+                                      String key, String value, boolean isSecure) throws OneOpsClientAPIException {
+    if (attributes == null) {
+      attributes = new HashMap<String, String>();
+    }
+
+    if (isSecure) {
+      attributes.put("secure", "true");
+      attributes.put("encrypted_value", value);
+    } else {
+      attributes.put("secure", "false");
+      attributes.put("value", value);
+    }
+
+    ResourceObject ro = new ResourceObject();
+    ro.setAttributes(attributes);
+
+    JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_dj_ci");
+
+    RequestSpecification request = createRequest();
+
+    LOG.info("Updating variable id " + variableCiId + " with key " + key);
+    Response response = request.body(jsonObject.toString())
+            .put(DESIGN_URI + "platforms/" + platformName + "/variables/" + variableCiId);
+    if (response != null) {
+      if (response.getStatusCode() != 200 && response.getStatusCode() != 302) {
+        String msg = String.format("Failed to get update variables %s due to %s", key,
+                response.getStatusLine());
+        throw new OneOpsClientAPIException(msg);
+      }
+    }
+  }
+
+  /**
+   *
+   * @param platformName
+   * @param key
+   * @param value
+   * @param isSecure
+   * @throws OneOpsClientAPIException
+   */
+  private void addPlatformVariable(String platformName, String key, String value, boolean isSecure) throws OneOpsClientAPIException {
+    RequestSpecification request = createRequest();
+    ResourceObject ro = new ResourceObject();
+    Response newVarResponse =
+            request.get(DESIGN_URI + "platforms/" + platformName + "/variables/new.json");
+    if (newVarResponse != null) {
+      JsonPath newVarJsonPath = newVarResponse.getBody().jsonPath();
+      if (newVarJsonPath != null) {
+        Map<String, String> attr = newVarJsonPath.getMap("ciAttributes");
+        Map<String, String> properties = Maps.newHashMap();
+        if (attr == null) {
+          attr = Maps.newHashMap();
+        }
+        if (isSecure) {
+          attr.put("secure", "true");
+          attr.put("encrypted_value", value);
+        } else {
+          attr.put("secure", "false");
+          attr.put("value", value);
+        }
+
+        properties.put("ciName", key);
+        ro.setProperties(properties);
+        ro.setAttributes(attr);
+      }
+    }
+
+    JSONObject jsonObject = JsonUtil.createJsonObject(ro, "cms_dj_ci");
+
+    Response response = request.body(jsonObject.toString())
+            .post(DESIGN_URI + "platforms/" + platformName + "/variables");
+    if (response != null) {
+      if (response.getStatusCode() != 200 && response.getStatusCode() != 302) {
+        String msg = String.format("Failed to add platform variable %s due to %s", key,
+                response.getStatusLine());
+        throw new OneOpsClientAPIException(msg);
+      }
+    }
+  }
+
+  /**
    * Add platform variables for a given assembly/design
-   * 
+   *
    * @param environmentName
    * @param variables
    * @return
@@ -771,7 +905,7 @@ public class Design extends APIClient {
           request.get(DESIGN_URI + "platforms/" + platformName + "/variables/" + entry.getKey());
       if (variable != null && variable.getBody() != null
           && variable.getBody().jsonPath().getString("ciId") != null) {
-        String msg = String.format("Global variables %s already exists", entry.getKey());
+        String msg = String.format("Platform variable %s already exists", entry.getKey());
         throw new OneOpsClientAPIException(msg);
       }
       ResourceObject ro = new ResourceObject();

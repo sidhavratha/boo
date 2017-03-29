@@ -621,7 +621,7 @@ public class BooCli {
   }
 
   /**
-   *  Creates platforms if the assembly does exist. Updates the platform/components if assembly already exists
+   *  Creates platforms if the assembly does not exist. Updates the platform/components if assembly already exists
    * @throws BooException
    * @throws OneOpsClientAPIException
    */

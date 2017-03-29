@@ -420,15 +420,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    */
   private void updateOrAddPlatformVariablesIntl(String platformName, Map<String, String> variables,
       boolean isSecure, boolean isUpdate) throws OneOpsClientAPIException {
-    if (!isUpdate) {
-      design.addPlatformVariable(platformName, variables, isSecure);
-    } else {
-      try {
-        design.updatePlatformVariable(platformName, variables, isSecure);
-      } catch (OneOpsClientAPIException e) {
-        design.addPlatformVariable(platformName, variables, isSecure);
-      }
-    }
+    design.updateOrAddPlatformVariables(platformName, variables, isSecure);
   }
 
   /**
