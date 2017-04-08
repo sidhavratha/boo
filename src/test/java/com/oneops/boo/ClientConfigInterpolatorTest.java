@@ -53,7 +53,7 @@ public class ClientConfigInterpolatorTest {
   public void validateBooConfigWithStringLiterals() throws Exception {
     ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
     Map<String,String> config = ImmutableMap.of("cloud", "\"foo, bar, baz\"");
-    assertEquals("\"foo, bar, baz\"", interpolator.interpolate("{{cloud}}", config));
+    assertEquals("foo, bar, baz", interpolator.interpolate("{{cloud}}", config));
   }
   
   protected File resource(String name) {

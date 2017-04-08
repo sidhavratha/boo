@@ -109,7 +109,7 @@ public class ClientConfigInterpolator {
       String value = e.getValue();
       Object mustacheValue;
       if (value.startsWith("\"") && value.endsWith("\"")) {
-        mustacheValue = value;
+        mustacheValue = deliteral(value);
       } else if (value.contains(",")) {
         mustacheValue = splitter.split(value);
       } else {
@@ -158,6 +158,10 @@ public class ClientConfigInterpolator {
     }
   }
 
+  private String deliteral(String str) {
+    return str.substring(1, str.length() - 1);
+  }  
+  
   private String defunction(String str) {
     return str.substring(str.indexOf('(') + 1, str.length() - 1);
   }
