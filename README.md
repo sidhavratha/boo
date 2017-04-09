@@ -15,16 +15,16 @@ To use Boo you download the executable JAR and place it in your `$PATH`. Use the
 [http://repo1.maven.org/maven2/com/oneops/boo/boo](http://repo1.maven.org/maven2/com/oneops/boo/boo) e.g.:
 
 ```
-curl -O http://repo1.maven.org/maven2/com/oneops/boo/boo/1.0.2/boo-1.0.2-executable.jar
+curl -O http://repo1.maven.org/maven2/com/oneops/boo/boo/1.0.4/boo-1.0.4-executable.jar
 
-chmod +x boo-1.0.2-executable.jar
+chmod +x boo-1.0.4-executable.jar
 
-mv boo-1.0.2-executable.jar boo
+mv boo-1.0.4-executable.jar boo
 
 boo <options>
 ```
 
-To see what options are available for use: 
+To see what options are available for use:
 
 ```
 boo -h
@@ -183,7 +183,7 @@ mvn clean deploy -P release
 
 Provided you have permissions to deploy to OSSRH with a serverId `ossrh` in your settings and the needed gpg setup you
 can build and deploy a release with
- 
+
 ```
 mvn release:prepare
 mvn release:perform
