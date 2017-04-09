@@ -15,11 +15,11 @@ To use Boo you download the executable JAR and place it in your `$PATH`. Use the
 [http://repo1.maven.org/maven2/com/oneops/boo/boo](http://repo1.maven.org/maven2/com/oneops/boo/boo) e.g.:
 
 ```
-curl -O http://repo1.maven.org/maven2/com/oneops/boo/boo/1.0.4/boo-1.0.4-executable.jar
+curl -O http://repo1.maven.org/maven2/com/oneops/boo/boo/1.0.5/boo-1.0.5-executable.jar
 
-chmod +x boo-1.0.4-executable.jar
+chmod +x boo-1.0.5-executable.jar
 
-mv boo-1.0.4-executable.jar boo
+mv boo-1.0.5-executable.jar boo
 
 boo <options>
 ```
@@ -132,9 +132,9 @@ Again, you can see what the result will be using `boo -f your.yml -v`.
 ```
 mvn clean package
 
-chmod +x ./target/boo-1.0.2-SNAPSHOT-executable.jar
+chmod +x ./target/boo-1.0.5-executable.jar
 
-mv ./target/boo-1.0.2-SNAPSHOT-executable.jar boo
+mv ./target/boo-1.0.5-executable.jar boo
 
 boo <options>
 ```
@@ -144,14 +144,14 @@ boo <options>
 ```
 mvn clean package -Pbuild-rpms
 
-Find the rpm at .//target/rpm/boo/RPMS/noarch/boo-1.0.2-SNAPSHOT*.noarch.rpm
+Find the rpm at .//target/rpm/boo/RPMS/noarch/boo-1.0.5*.noarch.rpm
 ```
 
 ## Install the RPM
 
 ```
-On Linux: sudo rpm -ivh boo-1.0.2-SNAPSHOT*.noarch.rpm
-On Mac: sudo rpm -ivh boo-1.0.2-SNAPSHOT*.noarch.rpm --nodeps
+On Linux: sudo rpm -ivh boo-1.0.5*.noarch.rpm
+On Mac: sudo rpm -ivh boo-1.0.5*.noarch.rpm --nodeps
 ```
 
 ## Running integration tests
