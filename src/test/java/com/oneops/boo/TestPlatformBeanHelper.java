@@ -13,9 +13,7 @@
  */
 package com.oneops.boo;
 
-import com.oneops.boo.yaml.PlatformBean;
-import com.oneops.boo.yaml.helper.PlatformBeanHelper;
-import com.oneops.client.api.exception.OneOpsClientAPIException;
+import java.util.List;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -23,7 +21,9 @@ import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import com.oneops.api.exception.OneOpsClientAPIException;
+import com.oneops.boo.yaml.PlatformBean;
+import com.oneops.boo.yaml.helper.PlatformBeanHelper;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestPlatformBeanHelper extends BooTest {

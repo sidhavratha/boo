@@ -13,15 +13,14 @@
  */
 package com.oneops.boo;
 
-import com.oneops.boo.utils.BooUtils;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.jayway.restassured.RestAssured;
-import com.oneops.boo.exception.BooException;
-import com.oneops.boo.workflow.BuildAllPlatforms;
-import com.oneops.boo.yaml.Constants;
-import com.oneops.client.api.OOInstance;
-import com.oneops.client.api.exception.OneOpsClientAPIException;
+import java.io.File;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -33,14 +32,15 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.UUID;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.jayway.restassured.RestAssured;
+import com.oneops.api.OOInstance;
+import com.oneops.api.exception.OneOpsClientAPIException;
+import com.oneops.boo.exception.BooException;
+import com.oneops.boo.utils.BooUtils;
+import com.oneops.boo.workflow.BuildAllPlatforms;
+import com.oneops.boo.yaml.Constants;
 
 /**
  * The Class BooCli.
@@ -438,7 +438,7 @@ public class BooCli {
   private int executeAction(String platformName, String componentName, String actionName,
       String arglist, List<String> instanceList, int rollAt) {
     int returnCode = 0;
-    String procedureId = null;
+    Long procedureId = null;
     try {
       System.out.println(Constants.PROCEDURE_RUNNING);
       procedureId = flow.executeAction(platformName, componentName, actionName, arglist,
@@ -453,7 +453,7 @@ public class BooCli {
       try {
         while (procStatus != null
             && (procStatus.equalsIgnoreCase("active") || procStatus.equalsIgnoreCase("pending"))) {
-          procStatus = flow.getProcedureStatusForAction(procedureId);
+          procStatus = flow.getProcedureStatus(procedureId);
           try {
             Thread.sleep(3000);
           } catch (InterruptedException e) {

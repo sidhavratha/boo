@@ -19,19 +19,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-import com.oneops.boo.ClientConfigIniReader;
-import com.oneops.client.api.exception.OneOpsClientAPIException;
-import com.oneops.boo.workflow.BuildAllPlatforms;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.oneops.api.exception.OneOpsClientAPIException;
+import com.oneops.boo.workflow.BuildAllPlatforms;
 
 /**
  * Packages always change in OneOps, this test mainly focus on if functions can run without
@@ -76,6 +76,7 @@ public class ITBuildAllPlatforms extends BooTest {
   public void testGetAllAutoGenAssemblies() throws OneOpsClientAPIException {
     assertNotNull(config.getYaml().getAssembly().getName());
     build.getAllAutoGenAssemblies(config.getYaml().getAssembly().getName());
+    build.createPlatforms(true);
   }
 
   @Test
@@ -100,14 +101,16 @@ public class ITBuildAllPlatforms extends BooTest {
     // Actions
     System.out.println("Actions");
     assertTrue(build.listActions("tomcat", "compute").size() > 2);
-    assertTrue(build.executeAction("tomcat", "compute", "status", "", null, 100).length() > 5);
+    assertTrue(build.executeAction("tomcat", "compute", "status", "", null, 100) > 0);
 
     // Attachments
     System.out.println("Attachments");
     assertTrue(build.addAttachment("tomcat", "tomcat", "test", null));
     assertTrue(build.listAttachments("tomcat", "tomcat").size() > 0);
     assertTrue(build.isAttachmentExists("tomcat", "tomcat", "test"));
-    assertTrue(build.updateAttachment("tomcat", "tomcat", "test", null));
+    Map<String, String> attr = new HashMap<String, String>();
+    attr.put("content", "echo 'TEST PASSED'");
+	assertTrue(build.updateAttachment("tomcat", "tomcat", "test", attr));
 
     // Instances
     System.out.println("Instances");
