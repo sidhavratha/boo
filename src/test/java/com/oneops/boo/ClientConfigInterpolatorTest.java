@@ -18,10 +18,12 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
 import com.oneops.boo.ClientConfigInterpolator;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ClientConfigInterpolatorTest {
 
@@ -40,7 +42,25 @@ public class ClientConfigInterpolatorTest {
         new HashMap<String, String>()));
   }
 
+  @Test
+  public void validateBooConfigWithArrays() throws Exception {
+    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    Map<String,String> config = ImmutableMap.of("clouds", "foo, bar, baz");
+    assertEquals("foobarbaz", interpolator.interpolate("{{#clouds}}{{.}}{{/clouds}}", config));
+  }
+  
+  @Test
+  public void validateBooConfigWithStringLiterals() throws Exception {
+    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    Map<String,String> config = ImmutableMap.of("cloud", "\"foo, bar, baz\"");
+    assertEquals("foo, bar, baz", interpolator.interpolate("{{cloud}}", config));
+  }
+  
   protected File resource(String name) {
     return new File(basedir, String.format("src/test/files/%s", name));
+  }
+
+  protected File yaml(String name) {
+    return new File(basedir, String.format("src/test/yaml/%s", name));
   }
 }

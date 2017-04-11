@@ -19,6 +19,8 @@ import com.github.mustachejava.MustacheException;
 import com.github.mustachejava.reflect.ReflectionObjectHandler;
 import com.github.mustachejava.util.GuardException;
 import com.github.mustachejava.util.Wrapper;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 
 import org.apache.commons.io.FileUtils;
@@ -38,6 +40,7 @@ public class ClientConfigInterpolator {
 
   private static final String HOME = System.getProperty("user.home");
   private static final String WORK = System.getProperty("user.dir");
+  private final static Splitter splitter = Splitter.on(",").omitEmptyStrings().trimResults();
   private final ClientConfigIniReader iniReader;
 
   public ClientConfigInterpolator() {
@@ -90,7 +93,7 @@ public class ClientConfigInterpolator {
       return booYaml;
     }
   }
-
+  
   /**
    * Take key/value pairs of configuration and interpolate a Boo YAML template in straing format
    * with them.
@@ -99,12 +102,26 @@ public class ClientConfigInterpolator {
    * @param booYaml the template string
    * @param config the key/value pairs
    */
-  public String interpolate(String booYaml, Map<String, String> config) throws IOException {
+  public String interpolate(String booYaml, Map<String, String> config) throws IOException {    
+    Map<String, Object> mustacheMap = Maps.newHashMap();
+    for (Map.Entry<String, String> e : config.entrySet()) {
+      String key = e.getKey();
+      String value = e.getValue();
+      Object mustacheValue;
+      if (value.startsWith("\"") && value.endsWith("\"")) {
+        mustacheValue = deliteral(value);
+      } else if (value.contains(",")) {
+        mustacheValue = splitter.split(value);
+      } else {
+        mustacheValue = value;
+      }
+      mustacheMap.put(key, mustacheValue);
+    }
     Writer writer = new StringWriter();
     NoEncodingMustacheFactory mustacheFactory = new NoEncodingMustacheFactory();
     mustacheFactory.setObjectHandler(new BooReflectionObjectHandler());
     Mustache mustache = mustacheFactory.compile(new StringReader(booYaml), "boo");
-    mustache.execute(writer, config).flush();
+    mustache.execute(writer, mustacheMap).flush();
     return writer.toString();
   }
 
@@ -141,6 +158,10 @@ public class ClientConfigInterpolator {
     }
   }
 
+  private String deliteral(String str) {
+    return str.substring(1, str.length() - 1);
+  }  
+  
   private String defunction(String str) {
     return str.substring(str.indexOf('(') + 1, str.length() - 1);
   }
