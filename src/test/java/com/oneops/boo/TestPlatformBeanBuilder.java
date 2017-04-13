@@ -15,12 +15,12 @@ package com.oneops.boo;
 
 import static org.junit.Assert.assertEquals;
 
-import com.oneops.boo.yaml.PlatformBean;
-import com.oneops.client.api.exception.OneOpsClientAPIException;
-
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import com.oneops.api.exception.OneOpsClientAPIException;
+import com.oneops.boo.yaml.PlatformBean;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestPlatformBeanBuilder extends BooTest {

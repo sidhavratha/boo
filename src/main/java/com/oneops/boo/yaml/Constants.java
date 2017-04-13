@@ -31,6 +31,7 @@ public class Constants {
   public static final String DESCRIPTIONS = "description";
   public static final String YAML_ERROR = "The template file not found or has wrong format!";
   public static final String AVAILABILITY = "availability";
+  public static final String ENV_PROFILE = "profile";
   public static final String GLOBAL_DNS = "global_dns";
   public static final String SUBDOMAIN = "subdomain";
   public static final String ENV_NAME = "environment_name";

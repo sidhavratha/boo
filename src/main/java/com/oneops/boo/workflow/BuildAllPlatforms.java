@@ -13,8 +13,26 @@
  */
 package com.oneops.boo.workflow;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.jayway.restassured.path.json.JsonPath;
+import com.oneops.api.OOInstance;
+import com.oneops.api.exception.OneOpsClientAPIException;
+import com.oneops.api.resource.model.CiResource;
+import com.oneops.api.resource.model.RedundancyConfig;
 import com.oneops.boo.BooCli;
 import com.oneops.boo.ClientConfig;
 import com.oneops.boo.LogUtils;
@@ -22,24 +40,7 @@ import com.oneops.boo.utils.BooUtils;
 import com.oneops.boo.yaml.Constants;
 import com.oneops.boo.yaml.PlatformBean;
 import com.oneops.boo.yaml.ScaleBean;
-import com.oneops.client.api.OOInstance;
-import com.oneops.client.api.exception.OneOpsClientAPIException;
 import com.oneops.client.api.exception.OneOpsComponentExistException;
-import com.oneops.client.api.resource.model.RedundancyConfig;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 
 public class BuildAllPlatforms extends AbstractWorkflow {
@@ -199,7 +200,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    */
   public boolean isPlatformExist(String platformName)
       throws OneOpsClientAPIException, OneOpsComponentExistException {
-    JsonPath response = null;
+    CiResource response = null;
     try {
       response = design.getPlatform(platformName);
     } catch (OneOpsClientAPIException e) {
@@ -305,7 +306,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       // Ignore
     }
     if (!isExist) {
-      JsonPath response =
+      CiResource response =
           design.createPlatform(platform.getName(), platform.getPack(), platform.getPackVersion(),
               platform.getPackSource(), Constants.DESCRIPTION, Constants.DESCRIPTION);
       if (response != null) {
@@ -370,11 +371,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
         }
       }
 
-      JsonPath response = design.listPlatformVariables(platform.getName());
-      List<String> servVarList = response.getList(Constants.CINAME);
-      for (String servVar : servVarList) {
-        if (!yamlVarSet.contains(servVar)) {
-          design.deletePlatformVariable(platform.getName(), servVar);
+      List<CiResource> response = design.listPlatformVariables(platform.getName());
+//      List<String> servVarList = response.getList(Constants.CINAME);
+      for (CiResource resource : response) {
+        if (!yamlVarSet.contains(resource.getCiName())) {
+          design.deletePlatformVariable(platform.getName(), resource.getCiName());
         }
       }
     }
@@ -420,7 +421,10 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    */
   private void updateOrAddPlatformVariablesIntl(String platformName, Map<String, String> variables,
       boolean isSecure, boolean isUpdate) throws OneOpsClientAPIException {
-    design.updateOrAddPlatformVariables(platformName, variables, isSecure);
+	  for (Entry<String, String> entry : variables.entrySet()) {
+		  design.updateOrAddPlatformVariables(platformName, entry.getKey(), entry.getValue(), isSecure);
+	}
+   
   }
 
   /**
@@ -518,9 +522,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    */
   public String printIps(String platformName, String componentName)
       throws OneOpsClientAPIException {
-    List<Map<String, String>> ips = this.getIpsInternal(platformName, componentName);
+    List<Map<String, Object>> ips = this.getIpsInternal(platformName, componentName);
     StringBuilder str = new StringBuilder();
-    for (Map<String, String> ip : ips) {
+    for (Map<String, Object> ip : ips) {
       str.append(ip.get(Constants.PRIVATE_IP));
       str.append(NEWLINE);
     }
@@ -545,8 +549,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       config.setMax(scale.getMax());
       config.setPercentDeploy(scale.getPercentDeploy());
       LogUtils.info(Constants.COMPUTE_SIZE, envName, scale.getPlatform());
-      transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(),
-          config);
+      transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), config);
     }
     if (StringUtils.isBlank(this.comments)) {
       transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
@@ -579,12 +582,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
           yamlCompSet.addAll(target.keySet());
         }
       }
-      JsonPath response = design.listPlatformComponents(platform.getName());
-      List<String> servCompList = response.getList(Constants.CINAME);
-      for (String servComp : servCompList) {
-        if (this.isUserCustomizedComponent(platform.getName(), servComp)
-            && !yamlCompSet.contains(servComp)) {
-          design.deletePlatformComponent(platform.getName(), servComp);
+      List<CiResource> response = design.listPlatformComponents(platform.getName());
+      for (CiResource resource : response) {
+        if (this.isUserCustomizedComponent(platform.getName(), resource.getCiName())
+            && !yamlCompSet.contains(resource.getCiName())) {
+          design.deletePlatformComponent(platform.getName(), resource.getCiName());
         }
       }
     }

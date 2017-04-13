@@ -13,12 +13,12 @@
  */
 package com.oneops.boo.workflow;
 
+import java.util.Map;
+
+import com.oneops.api.exception.OneOpsClientAPIException;
 import com.oneops.boo.LogUtils;
 import com.oneops.boo.yaml.Constants;
-import com.oneops.client.api.exception.OneOpsClientAPIException;
 import com.oneops.client.api.exception.OneOpsComponentExistException;
-
-import java.util.Map;
 
 public class UpdateComponentTask implements Runnable {
   private BuildAllPlatforms flow;

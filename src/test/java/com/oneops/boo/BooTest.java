@@ -13,22 +13,20 @@
  */
 package com.oneops.boo;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.ProvisionException;
-import com.jayway.restassured.RestAssured;
-import com.oneops.boo.ClientConfig;
-import com.oneops.boo.JaywayHttpModule;
-import com.oneops.boo.exception.BooException;
-import com.oneops.boo.utils.BooUtils;
-import com.oneops.boo.yaml.Constants;
-import com.oneops.client.api.OOInstance;
+import java.io.File;
+import java.net.URL;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.net.URL;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.ProvisionException;
+import com.jayway.restassured.RestAssured;
+import com.oneops.api.OOInstance;
+import com.oneops.boo.exception.BooException;
+import com.oneops.boo.utils.BooUtils;
+import com.oneops.boo.yaml.Constants;
 
 /**
  * Parent class of all unit testing.

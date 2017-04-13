@@ -15,9 +15,8 @@ package com.oneops.boo;
 
 import static org.junit.Assert.assertNotNull;
 
-import com.oneops.boo.yaml.PlatformBean;
-import com.oneops.boo.yaml.Yaml;
-import com.oneops.client.api.exception.OneOpsClientAPIException;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -25,8 +24,9 @@ import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
+import com.oneops.api.exception.OneOpsClientAPIException;
+import com.oneops.boo.yaml.PlatformBean;
+import com.oneops.boo.yaml.Yaml;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestYaml extends BooTest {

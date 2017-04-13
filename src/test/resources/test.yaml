@@ -47,7 +47,7 @@ platforms: # In OneOps design.
         tlsv1_protocol_enabled: 'false'
         mirrors: '["http://gec-maven-nexus.walmart.com/nexus/content/repositories/apache-dist/"]'
         version: '7.0'
-        build_version: '72'
+        build_version: '75'
       java:
         flavor: oracle
         jrejdk: server-jre
@@ -72,8 +72,6 @@ scale: # Because OneOps is not standard design to update the Scaling and other c
 environment: # Only support one environment for now.
   global_dns: 'true'
   availability: 'redundant'
-  subdomain: 'dev.sample.{{organization}}' # environment-name.assembly-name.org-name
-  profile: 'DEV'
   platforms:
     tomcat:
       components:
