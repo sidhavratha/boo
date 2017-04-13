@@ -13,7 +13,16 @@
  */
 package com.oneops.boo.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.TimeUnit;
+
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.oneops.api.exception.OneOpsClientAPIException;
 import com.oneops.boo.ClientConfig;
 import com.oneops.boo.exception.BooException;
 import com.oneops.boo.workflow.AbstractWorkflow;
@@ -22,15 +31,6 @@ import com.oneops.boo.yaml.Constants;
 import com.oneops.boo.yaml.PlatformBean;
 import com.oneops.boo.yaml.PlatformConfigBean;
 import com.oneops.boo.yaml.Yaml;
-import com.oneops.client.api.exception.OneOpsClientAPIException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Common uses methods.
@@ -69,7 +69,7 @@ public class BooUtils {
     StringBuilder str = new StringBuilder();
     Yaml yaml = workFlow.getConfig().getYaml();
     Map<String, PlatformConfigBean> platformConfigs = yaml.getExtractBean();
-    List<Map<String, String>> ips = workFlow.getIpsInternal(platformName, componentName);
+    List<Map<String, Object>> ips = workFlow.getIpsInternal(platformName, componentName);
     // for (PlatformConfigBean pfConfig : platformConfigs) {
     for (Map.Entry<String, PlatformConfigBean> pfConfig : platformConfigs.entrySet()) {
       PlatformConfigBean config = pfConfig.getValue();
@@ -115,14 +115,14 @@ public class BooUtils {
    * @param ips the ips
    * @return the string
    */
-  public String parseIps(String split, String format, List<Map<String, String>> ips) {
+  public String parseIps(String split, String format, List<Map<String, Object>> ips) {
     String result = null;
     StringBuilder str = new StringBuilder();
     int num = (null == format) ? Integer.MAX_VALUE : parseNumOfIp(format);
     String ipExtra = null == format ? "" : parseIpExtra(format);
     String ipSplit = null == split ? Constants.DEDAULT_IPSPLIT : split;
     String itemName = null == format ? "" : parseItemName(format);
-    for (Map<String, String> ip : ips) {
+    for (Map<String, Object> ip : ips) {
       if (num-- <= 0) {
         break;
       }

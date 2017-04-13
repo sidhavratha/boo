@@ -13,11 +13,11 @@
  */
 package com.oneops.boo;
 
+import org.apache.commons.cli.ParseException;
+
+import com.oneops.api.exception.OneOpsClientAPIException;
 import com.oneops.boo.exception.BooException;
 import com.oneops.boo.yaml.Constants;
-import com.oneops.client.api.exception.OneOpsClientAPIException;
-
-import org.apache.commons.cli.ParseException;
 
 public class Main {
 
