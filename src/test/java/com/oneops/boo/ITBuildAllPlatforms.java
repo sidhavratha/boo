@@ -76,7 +76,6 @@ public class ITBuildAllPlatforms extends BooTest {
   public void testGetAllAutoGenAssemblies() throws OneOpsClientAPIException {
     assertNotNull(config.getYaml().getAssembly().getName());
     build.getAllAutoGenAssemblies(config.getYaml().getAssembly().getName());
-    build.createPlatforms(true);
   }
 
   @Test
