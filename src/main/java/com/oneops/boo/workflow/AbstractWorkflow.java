@@ -388,9 +388,12 @@ public abstract class AbstractWorkflow {
   public boolean isUserCustomizedComponent(String platformName, String componentName)
       throws OneOpsClientAPIException {
     CiResource componentDetails = design.getPlatformComponent(platformName, componentName);
-    if(componentDetails != null && componentDetails.getAttrProps() != null && componentDetails.getAttrProps().getAdditionalProperties() != null 
-    		&& componentDetails.getAttrProps().getAdditionalProperties().containsKey(Constants.OWNER)) {
-    	return true;
+    if(componentDetails != null && componentDetails.getAttrProps() != null 
+    		&& componentDetails.getAttrProps().getAdditionalProperties() != null 
+    		&& componentDetails.getAttrProps().getAdditionalProperties().get(Constants.OWNER) != null) {
+    	Map<String, String> ownersMap = (Map<String, String>) componentDetails.getAttrProps().getAdditionalProperties().get(Constants.OWNER);
+    	if(ownersMap != null && ownersMap.size() > 0)
+    		return true;
     }
       return false;
   }
