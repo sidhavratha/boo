@@ -808,17 +808,9 @@ public abstract class AbstractWorkflow {
         cloudMaps.put(String.valueOf(getCloudId(cloud.getCloudName())), cloudMap);
       }
 
-
-      // config.getYaml().getBoo().getCloud();
-
-      // boolean isGlobalDns = Constants.TRUE.equalsIgnoreCase(cloudMap.get(Constants.GLOBAL_DNS));
-      // String availability = cloudMap.get(Constants.AVAILABILITY);
-      // if (StringUtils.isEmpty(availability))
-      // throw new OneOpsClientAPIException(Constants.NO_AVAILABILITY);
       response = transition.createEnvironment(envName,
     		  config.getYaml().getEnvironmentBean().getOthers().get(Constants.ENV_PROFILE),
-          config.getYaml().getEnvironmentBean().getOthers().get(Constants.AVAILABILITY), 
-          config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps, false,
+          config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps,
           Constants.DESCRIPTION);
       
       response = transition.getEnvironment(envName);
