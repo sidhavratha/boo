@@ -127,7 +127,7 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public abstract boolean process(boolean isUpdate, boolean isAssemblyOnly)
+  public abstract Deployment process(boolean isUpdate, boolean isAssemblyOnly)
       throws OneOpsClientAPIException;
 
   /**
@@ -921,7 +921,7 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean deploy(boolean isUpdate) throws OneOpsClientAPIException {
+  public Deployment deploy(boolean isUpdate) throws OneOpsClientAPIException {
     Deployment response;
     if (StringUtils.isBlank(this.comments)) {
       if (isUpdate) {
@@ -932,7 +932,7 @@ public abstract class AbstractWorkflow {
     } else {
       response = transition.deploy(envName, comments);
     }
-    return response == null ? false : true;
+    return response;
   }
 
 

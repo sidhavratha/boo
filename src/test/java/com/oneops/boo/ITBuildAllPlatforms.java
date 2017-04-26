@@ -85,7 +85,7 @@ public class ITBuildAllPlatforms extends BooTest {
     removeAssembly();
 
     System.out.println("Deploy");
-    assertTrue(build.process(false, false));
+    assertNotNull(build.process(false, false));
     while (build.getStatus().equalsIgnoreCase("active")) {
       TimeUnit.SECONDS.sleep(10);
     }
