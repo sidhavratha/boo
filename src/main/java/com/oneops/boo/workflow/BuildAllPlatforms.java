@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.oneops.api.resource.model.Deployment;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,11 +83,14 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 
 
   /**
-   * Process.
-   * 
-   * @see com.oneops.boo.config.workflow.AbstractWorkflow#process(boolean, boolean)
-   **/
-  public boolean process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
+   *
+   * @param isUpdate the is update
+   * @param isAssemblyOnly the is assembly only
+   * @return
+   * @throws OneOpsClientAPIException
+   */
+  @Override
+  public Deployment process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
     boolean isAssemblyExist = this.isAssemblyExist();
     if (isUpdate && !isAssemblyExist) {
       throw new OneOpsClientAPIException(this.assemblyName + " not exists!");
@@ -126,12 +130,12 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     String status = this.getStatus();
     if (ACTIVE.equalsIgnoreCase(status)) {
       LogUtils.info(Constants.ACTIVE_DEPLOYMENT_EXISTING);
-      return false;
+      return null;
     }
 
     if (FAILED.equalsIgnoreCase(status)) {
       LogUtils.info(Constants.FAIL_DEPLOYMENT_EXISTING);
-      return false;
+      return null;
     }
     this.updateScaling();
     this.bar.update(70, 100);
@@ -145,13 +149,14 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     if (BooCli.isNoDeploy()) {
       this.bar.update(100, 100);
       LogUtils.info(Constants.CREATE_WITHOUT_DEPLOYMENT);
-      return true;
+      return null;
     }
     LogUtils.info(Constants.START_DEPLOYMENT);
+    Deployment deployment = null;
     while (retry && retries > 0) {
       utils.waitTimeout(2);
       try {
-        this.deploy(isUpdate);
+        deployment = this.deploy(isUpdate);
         retry = false;
       } catch (Exception e) {
         deployError = e.getMessage();
@@ -161,8 +166,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     this.bar.update(100, 100);
     if (!retry) { // If no error for deployment.
       LogUtils.info(Constants.DEPLOYMENT_RUNNING);
+      return deployment;
     } else {
-      if (deployError.contains(Constants.NO_DEPLOYMENT)) {
+      if (deployError != null && deployError.contains(Constants.NO_DEPLOYMENT)) {
         System.out.printf(Constants.NO_NEED_DEPLOY);
       } else {
         System.err.printf(Constants.DEPLOYMENT_FAILED, deployError);
@@ -170,7 +176,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 
       System.out.println();
     }
-    return true;
+    return null;
   }
 
 
@@ -593,4 +599,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return true;
   }
 
+  public Deployment getDeployment(Long deploymentId) throws OneOpsClientAPIException {
+    return transition.getDeploymentStatus(envName, deploymentId);
+  }
 }

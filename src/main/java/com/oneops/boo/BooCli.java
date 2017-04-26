@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
+import com.oneops.api.resource.model.Deployment;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -63,6 +64,7 @@ public class BooCli {
   private static final String YES_NO =
       "WARNING! There are %s instances using the %s configuration. Do you want to destroy all of them? (y/n)";
 
+  private static int DEPLOYMENT_TIMEOUT_SECONDS = 90 * 60; //90 minutes
 
   /** The config file. */
   private File configFile;
@@ -183,7 +185,7 @@ public class BooCli {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Loading {}", template);
     }
-
+    LOG.info("Boo variables : " + variables);
     this.configFile = template;
     if (variables != null) {
       injector = Guice.createInjector(new JaywayHttpModule(this.configFile, variables));
@@ -625,13 +627,33 @@ public class BooCli {
    * @throws BooException
    * @throws OneOpsClientAPIException
    */
-  public void createOrUpdatePlatforms()
-          throws BooException, OneOpsClientAPIException {
+  public Deployment createOrUpdatePlatforms()
+          throws BooException, OneOpsClientAPIException, InterruptedException {
+    Deployment deployment = null;
     if (flow.isAssemblyExist()) {
-      flow.process(Boolean.TRUE, Boolean.FALSE);
+      deployment = flow.process(Boolean.TRUE, Boolean.FALSE);
     } else {
-      flow.process(Boolean.FALSE, Boolean.FALSE);
+      deployment = flow.process(Boolean.FALSE, Boolean.FALSE);
     }
+
+    if (deployment != null) {
+      int sleepDurationSeconds = 5;
+      int maxChecks = DEPLOYMENT_TIMEOUT_SECONDS/sleepDurationSeconds;
+
+      for (int i=0 ; i < maxChecks; i++) {
+        deployment = flow.getDeployment(deployment.getDeploymentId());
+        if (deployment.getDeploymentState().equals("active")) {
+          LogUtils.info(" .");
+          Thread.sleep(sleepDurationSeconds * 1000L);
+          continue;
+        } else {
+          LogUtils.info("Deployment State is: " + deployment.getDeploymentState());
+          return deployment;
+        }
+      }
+      LogUtils.info("Deployment running too long, Please check in OneOps");
+    }
+    return deployment;
   }
 
   /**
