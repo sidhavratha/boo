@@ -93,11 +93,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   public Deployment process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
     boolean isAssemblyExist = this.isAssemblyExist();
     if (isUpdate && !isAssemblyExist) {
-      throw new OneOpsClientAPIException(this.assemblyName + " not exists!");
+      throw new OneOpsClientAPIException(this.assemblyBean.getName() + " not exists!");
     }
     if (!config.getYaml().getAssembly().getAutoGen()) {
       if (!isUpdate && isAssemblyExist) {
-        throw new OneOpsClientAPIException(this.assemblyName + " already exists!");
+        throw new OneOpsClientAPIException(this.assemblyBean.getName() + " already exists!");
       }
     }
     this.bar.update(1, 100);
