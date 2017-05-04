@@ -13,28 +13,52 @@
  */
 package com.oneops.boo.yaml;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AssemblyBean {
-  @JsonProperty("name")
-  private String name;
+	@JsonProperty("name")
+	private String name;
 
-  @JsonProperty("auto_gen")
-  private Boolean autoGen;
+	@JsonProperty("auto_gen")
+	private Boolean autoGen;
+	
+	@JsonProperty("description")
+	private String description;
 
-  public String getName() {
-    return name;
-  }
+	@JsonProperty("tags")
+	private Map<String, String> tags;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+	public String getName() {
+		return name;
+	}
 
-  public Boolean getAutoGen() {
-    return autoGen == null ? Boolean.FALSE : autoGen;
-  }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-  public void setAutoGen(Boolean autoGen) {
-    this.autoGen = autoGen;
-  }
+	public Boolean getAutoGen() {
+		return autoGen == null ? Boolean.FALSE : autoGen;
+	}
+
+	public void setAutoGen(Boolean autoGen) {
+		this.autoGen = autoGen;
+	}
+
+	public final Map<String, String> getTags() {
+		return tags;
+	}
+
+	public final void setTags(Map<String, String> tags) {
+		this.tags = tags;
+	}
+
+	public final String getDescription() {
+		return description;
+	}
+
+	public final void setDescription(String description) {
+		this.description = description;
+	}
 }

@@ -13,6 +13,8 @@ boo:
 assembly:
   name: 'unit-test' # Underscores are not allowed
   auto_gen: false # If turn on, then this tool will generate random assembly name for you.
+  tags: {"tag-key1":"tag-value1", "tag-key2":"tag-value2", "tag-key3":"tag-value3", "tag-key4":"tag-value4"}
+  description: 'some good description of the assembly'
 variables: # Optional, global variables.
 
 platforms: # In OneOps design.
