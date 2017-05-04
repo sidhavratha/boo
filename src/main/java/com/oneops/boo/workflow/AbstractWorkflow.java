@@ -42,6 +42,7 @@ import com.oneops.api.resource.model.Release;
 import com.oneops.boo.ClientConfig;
 import com.oneops.boo.LogUtils;
 import com.oneops.boo.utils.ProgressBar;
+import com.oneops.boo.yaml.AssemblyBean;
 import com.oneops.boo.yaml.CloudBean;
 import com.oneops.boo.yaml.Constants;
 import com.oneops.boo.yaml.PlatformBean;
@@ -58,9 +59,9 @@ public abstract class AbstractWorkflow {
   /** The pattern. */
   private static Pattern pattern = Pattern.compile("^-[0-9a-zA-Z]{2,9}$");
 
-  /** The assembly name. */
-  String assemblyName;
-
+  /** The Assembly Bean */
+  AssemblyBean assemblyBean;
+  
   /** The env name. */
   String envName;
 
@@ -103,9 +104,11 @@ public abstract class AbstractWorkflow {
 
     this.instance = instance;
     this.config = config;
-    this.assemblyName = config.getYaml().getAssembly().getName();
+    this.assemblyBean = config.getYaml().getAssembly();
     this.envName = config.getYaml().getBoo().getEnvName();
     this.cloud = new Cloud(instance);
+    
+    String assemblyName = assemblyBean.getName();
 
     assembly = new Assembly(instance);
     design = new Design(instance, assemblyName);
@@ -278,7 +281,7 @@ public abstract class AbstractWorkflow {
    * @throws OneOpsClientAPIException the one ops client API exception
    */
   private boolean deleteAssembly() throws OneOpsClientAPIException {
-    return this.deleteAssembly(this.assemblyName);
+    return this.deleteAssembly(this.assemblyBean.getName());
   }
 
   /**
@@ -523,7 +526,7 @@ public abstract class AbstractWorkflow {
    * @return true, if is assembly exist
    */
   public boolean isAssemblyExist() {
-    return this.isAssemblyExist(this.assemblyName);
+    return this.isAssemblyExist(this.assemblyBean.getName());
   }
 
   /**
@@ -699,7 +702,8 @@ public abstract class AbstractWorkflow {
     boolean isExist = this.isAssemblyExist();
     if (!isExist) {
       this.checkAssemblyName();
-      assembly.createAssembly(assemblyName, config.getYaml().getBoo().getEmail(), "", "");
+      LOG.debug("creating assembly {} with tags: {}", assemblyBean.getName(), assemblyBean.getTags());
+      assembly.createAssembly(assemblyBean.getName(), config.getYaml().getBoo().getEmail(), "", assemblyBean.getDescription(), assemblyBean.getTags());
     }
     return true;
   }
@@ -708,7 +712,7 @@ public abstract class AbstractWorkflow {
    * Check assembly name.
    */
   void checkAssemblyName() {
-    if (this.assemblyName.length() > 32) {
+    if (this.assemblyBean.getName().length() > 32) {
       System.err.println();
       System.err.println(Constants.ASSEMBLY_NAME_TOO_LONG);
       System.exit(3);

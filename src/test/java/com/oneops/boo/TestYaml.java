@@ -36,6 +36,12 @@ public class TestYaml extends BooTest {
   public void testGetAssembly() throws OneOpsClientAPIException {
     assertNotNull(config.getYaml().getAssembly());
   }
+  
+  @Test
+  public void testGetAssemblyTags() throws OneOpsClientAPIException {
+    assertNotNull(config.getYaml().getAssembly());
+    assertNotNull(config.getYaml().getAssembly().getTags());
+  }
 
   @Test
   public void testGetBoo() throws OneOpsClientAPIException {

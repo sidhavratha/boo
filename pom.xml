@@ -146,7 +146,7 @@
     <dependency>
       <groupId>com.oneops</groupId>
       <artifactId>oneops-client</artifactId>
-      <version>5.0.6</version>
+      <version>5.0.7</version>
     </dependency>
   </dependencies>
   <build>
