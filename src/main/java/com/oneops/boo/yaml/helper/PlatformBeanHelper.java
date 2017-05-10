@@ -38,6 +38,9 @@ public final class PlatformBeanHelper {
 
   /** The Constant COMPONENTS. */
   private static final String COMPONENTS = "components";
+  
+  /** The Constant LINKS. */
+  private static final String LINKS = "links";
 
   /**
    * Gets the platforms.
@@ -62,7 +65,8 @@ public final class PlatformBeanHelper {
                 .setComponents((Map<String, Object>) platformMap.get(COMPONENTS))
                 .setSecureVariables((Map<String, String>) platformMap.get(ENCRYPTED_VARIABLES))
                 .setVariables((Map<String, String>) platformMap.get(VARIABLES))
-                .setDeployOrder(deployOrder).build());
+                .setDeployOrder(deployOrder)
+                .setLinks((List<String>) platformMap.get(LINKS)).build());
       }
     }
     return platforms;
