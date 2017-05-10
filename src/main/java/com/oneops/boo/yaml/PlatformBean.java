@@ -13,6 +13,7 @@
  */
 package com.oneops.boo.yaml;
 
+import java.util.List;
 import java.util.Map;
 
 public class PlatformBean implements Comparable<Object> {
@@ -25,6 +26,7 @@ public class PlatformBean implements Comparable<Object> {
   private Map<String, String> variables;
   private Map<String, String> secureVariables;
   private Map<String, Object> components;
+  private List<String> links;
 
   /**
    * Instantiates a new platform bean.
@@ -39,6 +41,7 @@ public class PlatformBean implements Comparable<Object> {
     this.secureVariables = builder.secureVariables;
     this.components = builder.components;
     this.deployOrder = builder.deployOrder;
+    this.links = builder.links;
     if (pack != null) {
       this.packs = pack.split("[\\/\\s]");
     }
@@ -80,7 +83,11 @@ public class PlatformBean implements Comparable<Object> {
     return components;
   }
 
-  public static class PlatformBeanBuilder {
+  public List<String> getLinks() {
+	return links;
+}
+
+public static class PlatformBeanBuilder {
     private String name;
     private String pack;
     private String packVersion;
@@ -89,6 +96,7 @@ public class PlatformBean implements Comparable<Object> {
     private int deployOrder;
     private Map<String, String> variables;
     private Map<String, String> secureVariables;
+    private List<String> links;
 
     public PlatformBeanBuilder setVariables(Map<String, String> variables) {
       this.variables = variables;
@@ -125,6 +133,11 @@ public class PlatformBean implements Comparable<Object> {
       this.name = name;
       return this;
     }
+
+	public PlatformBeanBuilder setLinks(List<String> links) {
+		this.links = links;
+		return this;
+	}
 
   }
 
