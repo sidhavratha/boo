@@ -247,6 +247,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
           }
         }
       }
+      if(platform.getLinks() != null && platform.getLinks().size() > 0) {
+    	  design.updatePlatformLinks(platform.getName(), platform.getLinks());
+      }
     }
     return true;
   }
