@@ -573,8 +573,12 @@ public class BooCli {
    *
    * @return true, if successful
    */
-  private boolean retryDeployment() {
+  public Deployment retryDeployment() {
     return flow.retryDeployment();
+  }
+
+  public Deployment getDeployment(long deploymentId) throws OneOpsClientAPIException {
+    return flow.getDeployment(deploymentId);
   }
 
   /**
@@ -636,23 +640,6 @@ public class BooCli {
       deployment = flow.process(Boolean.FALSE, Boolean.FALSE);
     }
 
-    if (deployment != null) {
-      int sleepDurationSeconds = 5;
-      int maxChecks = DEPLOYMENT_TIMEOUT_SECONDS/sleepDurationSeconds;
-
-      for (int i=0 ; i < maxChecks; i++) {
-        deployment = flow.getDeployment(deployment.getDeploymentId());
-        if (deployment.getDeploymentState().equals("active")) {
-          LogUtils.info(" .");
-          Thread.sleep(sleepDurationSeconds * 1000L);
-          continue;
-        } else {
-          LogUtils.info("Deployment State is: " + deployment.getDeploymentState());
-          return deployment;
-        }
-      }
-      LogUtils.info("Deployment running too long, Please check in OneOps");
-    }
     return deployment;
   }
 
