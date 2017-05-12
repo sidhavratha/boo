@@ -447,11 +447,12 @@ public abstract class AbstractWorkflow {
    *
    * @return true, if successful
    */
-	public boolean retryDeployment() {
+	public Deployment retryDeployment() {
 		boolean isSuc = false;
+        long deploymentId = 0;
 		try {
 			Deployment response = transition.getLatestDeployment(envName);
-			Long deploymentId = response.getDeploymentId();
+			deploymentId = response.getDeploymentId();
 			Release release = transition.getLatestRelease(envName);
 			Long releaseId = release.getReleaseId();
 			if (LOG.isDebugEnabled()) {
@@ -463,13 +464,12 @@ public abstract class AbstractWorkflow {
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Retry deployment: " + (response == null ? "" : response.getComments()));
 			}
-			isSuc = true;
+			return response;
 		} catch (Exception e) {
-			// Ignore
+          LOG.warn("Error while submitting a retry deployment with id: " + deploymentId);
 		}
 
-		return isSuc;
-
+		return null;
 	}
 
   /**
