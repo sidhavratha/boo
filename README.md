@@ -22,6 +22,12 @@ chmod +x boo
 boo <options>
 ```
 
+For debug use:
+```
+java -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -jar boo <options>
+```
+
+
 To see what options are available for use:
 
 ```
