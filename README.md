@@ -15,11 +15,9 @@ To use Boo you download the executable JAR and place it in your `$PATH`. Use the
 [http://repo1.maven.org/maven2/com/oneops/boo/boo](http://repo1.maven.org/maven2/com/oneops/boo/boo) e.g.:
 
 ```
-curl -O http://repo1.maven.org/maven2/com/oneops/boo/boo/1.0.10/boo-1.0.10-executable.jar
+curl -o boo http://repo1.maven.org/maven2/com/oneops/boo/boo/1.0.10/boo-1.0.10-executable.jar
 
-chmod +x boo-1.0.10-executable.jar
-
-mv boo-1.0.10-executable.jar boo
+chmod +x boo
 
 boo <options>
 ```
