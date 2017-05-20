@@ -230,6 +230,24 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.oneops.maven.plugins</groupId>
+        <artifactId>really-executable-jar-maven-plugin</artifactId>
+        <version>1.4.2</version>
+        <configuration>
+          <flags>-Xmx1G</flags>
+          <classifier>uber</classifier>
+          <outputClassifier>executable</outputClassifier>
+        </configuration>
+        <executions>
+          <execution>
+             <phase>package</phase>
+             <goals>
+               <goal>really-executable-jar</goal>
+             </goals>
+           </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <profiles>
