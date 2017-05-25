@@ -156,20 +156,24 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean removeAllEnvs() throws OneOpsClientAPIException {
+  public List<Deployment> removeAllEnvs() throws OneOpsClientAPIException {
     if (design == null) {
-      return true;
+      return null;
     }
+    List<Deployment> deployments = new ArrayList<>();
     for (String env : this.listEnvs()) {
       this.cancelDeployment(env);
-      this.disableAllPlatforms(env);
+      Deployment deployment = this.disableAllPlatforms(env);
+      if (deployment != null) {
+        deployments.add(deployment);
+      }
       try {
         transition.deleteEnvironment(env);
       } catch (Exception e) {
         // Do nothing
       }
     }
-    return true;
+    return deployments;
   }
 
   /**
@@ -475,8 +479,8 @@ public abstract class AbstractWorkflow {
   /**
    * Disable all platforms.
    */
-  void disableAllPlatforms() {
-    this.disableAllPlatforms(this.envName);
+  Deployment disableAllPlatforms() {
+    return this.disableAllPlatforms(this.envName);
   }
 
   /**
@@ -484,18 +488,19 @@ public abstract class AbstractWorkflow {
    *
    * @param envName the env name
    */
-  void disableAllPlatforms(String envName) {
+  Deployment disableAllPlatforms(String envName) {
     try {
       transition.disableAllPlatforms(envName);
       transition.commitEnvironment(envName, null, "Clean up " + envName);
       if (StringUtils.isBlank(this.comments)) {
-        transition.deploy(envName, Constants.CLEANUP_DESCRIPTION);
+        return transition.deploy(envName, Constants.CLEANUP_DESCRIPTION);
       } else {
-        transition.deploy(envName, comments);
+        return transition.deploy(envName, comments);
       }
     } catch (Exception e) {
       // Ignore
     }
+    return null;
   }
 
   /**

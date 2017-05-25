@@ -137,16 +137,22 @@ public class ITBuildAllPlatforms extends BooTest {
   // one pass from the users perspective
   private void removeAssembly() throws OneOpsClientAPIException, InterruptedException {
     System.out.println("Assembly removal started...");
-    BuildAllPlatforms cleanBuild = new BuildAllPlatforms(oo, config, null);
     for (int i = 0; i < 10; i++) {
+      BuildAllPlatforms cleanBuild = new BuildAllPlatforms(oo, config, null);
       try {
+        System.out.println("attempt # " + i);
         cleanBuild.cleanup();
       } catch (Exception ex) {
-        // ignore
+        if (ex.getMessage() != null && ex.getMessage().matches(".*assembly with name.*404 Not Found")) {
+          break; //Assembly already deleted
+        }
+        ex.printStackTrace();
       }
       while (cleanBuild.getStatus() != null && cleanBuild.getStatus().equalsIgnoreCase("active")) {
+        System.out.println("Env deployment still in progress");
         TimeUnit.SECONDS.sleep(10);
       }
+      System.out.println("deployment status: " + cleanBuild.getStatus());
       TimeUnit.SECONDS.sleep(10);
     }
     System.out.println("Assembly removal finished.");

@@ -345,17 +345,7 @@ public class BooCli {
           }
         }
       } else if (cmd.hasOption("r")) {
-        List<String> assemblies;
-        if (config.getYaml().getAssembly().getAutoGen()) {
-          assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());
-        } else {
-          assemblies = new ArrayList<String>();
-          String asb = this.config.getYaml().getAssembly().getName();
-          if (this.flow.isAssemblyExist(asb)) {
-            assemblies.add(asb);
-          }
-        }
-        this.cleanup(assemblies);
+        deleteAssemblies();
       } else if (cmd.hasOption("get-ips")) {
         if (!flow.isAssemblyExist()) {
           System.err.printf(Constants.NOTFOUND_ERROR, config.getYaml().getAssembly().getName());
@@ -425,6 +415,20 @@ public class BooCli {
       e.printStackTrace(new PrintStream(System.err));
     }
     return exit;
+  }
+
+  public List<Deployment> deleteAssemblies() {
+    List<String> assemblies;
+    if (config.getYaml().getAssembly().getAutoGen()) {
+      assemblies = this.listFiles(this.config.getYaml().getAssembly().getName());
+    } else {
+      assemblies = new ArrayList<String>();
+      String asb = this.config.getYaml().getAssembly().getName();
+      if (this.flow.isAssemblyExist(asb)) {
+        assemblies.add(asb);
+      }
+    }
+    return this.cleanup(assemblies);
   }
 
   /**
@@ -677,20 +681,21 @@ public class BooCli {
    *
    * @param assemblies the assemblies
    */
-  public void cleanup(List<String> assemblies) {
+  public List<Deployment> cleanup(List<String> assemblies) {
     if (assemblies.size() == 0) {
       System.out.println("There is no instance to remove");
-      return;
+      return null;
     }
     if (isForced == false) {
       String str =
           String.format(YES_NO, assemblies.size(), this.config.getYaml().getAssembly().getName());
       str = this.userInput(str);
       if (!"y".equalsIgnoreCase(str.trim())) {
-        return;
+        return null;
       }
 
     }
+    List<Deployment> decommissionDeployments = new ArrayList<>();
     boolean isSuc = true;
     for (String assembly : assemblies) {
       LogUtils.info("Destroying OneOps assembly %s \n", assembly);
@@ -698,7 +703,7 @@ public class BooCli {
       if (flow.isAssemblyExist(assembly)) {
         boolean isDone;
         try {
-          isDone = flow.removeAllEnvs();
+          decommissionDeployments.addAll(flow.removeAllEnvs());
           isDone = flow.removeAllPlatforms();
           if (!isDone && isSuc) {
             isSuc = false;
@@ -711,6 +716,7 @@ public class BooCli {
     if (!isSuc) {
       LogUtils.error(Constants.NEED_ANOTHER_CLEANUP);
     }
+    return decommissionDeployments;
   }
 
   /**
