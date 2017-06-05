@@ -26,8 +26,12 @@ public class PlatformBean implements Comparable<Object> {
   private Map<String, String> variables;
   private Map<String, String> secureVariables;
   private Map<String, Object> components;
+  private Map<String, Object> autoHealing;
   private List<String> links;
 
+  public static final String REPLACE_AFTER_MINUTES = "replace_after_minutes";
+  public static final String REPLACE_AFTER_REPAIRS = "replace_after_repairs";
+  
   /**
    * Instantiates a new platform bean.
    *
@@ -42,6 +46,7 @@ public class PlatformBean implements Comparable<Object> {
     this.components = builder.components;
     this.deployOrder = builder.deployOrder;
     this.links = builder.links;
+    this.autoHealing = builder.autoHealing;
     if (pack != null) {
       this.packs = pack.split("[\\/\\s]");
     }
@@ -85,7 +90,13 @@ public class PlatformBean implements Comparable<Object> {
 
   public List<String> getLinks() {
 	return links;
-}
+  }
+
+  public Map<String, Object> getAutoHealing() {
+	return autoHealing;
+  }
+
+
 
 public static class PlatformBeanBuilder {
     private String name;
@@ -97,6 +108,7 @@ public static class PlatformBeanBuilder {
     private Map<String, String> variables;
     private Map<String, String> secureVariables;
     private List<String> links;
+    private Map<String, Object> autoHealing;
 
     public PlatformBeanBuilder setVariables(Map<String, String> variables) {
       this.variables = variables;
@@ -136,6 +148,11 @@ public static class PlatformBeanBuilder {
 
 	public PlatformBeanBuilder setLinks(List<String> links) {
 		this.links = links;
+		return this;
+	}
+
+	public PlatformBeanBuilder setAutoHealing(Map<String, Object> autoHealing) {
+		this.autoHealing = autoHealing;
 		return this;
 	}
 

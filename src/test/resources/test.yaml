@@ -76,6 +76,11 @@ environment: # Only support one environment for now.
   availability: 'redundant'
   platforms:
     tomcat:
+      auto_healing:
+        autorepair: false
+        autoreplace: true
+        replace_after_minutes: 60
+        replace_after_repairs: 4
       components:
         lb:
           ecv_map: '{"8080":"GET /"}'

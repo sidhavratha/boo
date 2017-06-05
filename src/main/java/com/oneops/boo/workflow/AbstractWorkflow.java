@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -348,6 +349,7 @@ public abstract class AbstractWorkflow {
    */
   public boolean addAttachment(String platformName, String componentName, String uniqueName,
       Map<String, String> attributes) throws OneOpsClientAPIException {
+	  
     design.addNewAttachment(platformName, componentName, uniqueName, attributes);
     return true;
   }
@@ -899,6 +901,42 @@ public abstract class AbstractWorkflow {
     return true;
   }
 
+  /**
+   * Update platform auto healing options.
+   *
+   * @return true, if successful
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
+  public boolean updatePlatformHealingOptions() throws OneOpsClientAPIException {
+	  List<PlatformBean> platforms = this.config.getYaml().getEnvironmentBean().getPlatformsList();
+	  if (platforms == null) {
+	      return false;
+	  }
+     for (PlatformBean platform : platforms) {
+      if(platform.getAutoHealing() == null || platform.getAutoHealing().isEmpty()) {
+    	  return false;
+      }
+      if (this.platformExist(platform.getName())) {
+        int repairCount = -1, repairTime = -1;
+        for(Entry<String, Object> entry : platform.getAutoHealing().entrySet()) {
+        	if(entry.getKey().startsWith("auto")) {
+        		op.updatePlatformAutoHealingStatus(envName, platform.getName(), entry.getKey(), (Boolean)entry.getValue());
+        	}
+        	if(PlatformBean.REPLACE_AFTER_MINUTES.equals(entry.getKey())) {
+        		repairTime = (Integer)entry.getValue();
+        	}
+        	if(PlatformBean.REPLACE_AFTER_REPAIRS.equals(entry.getKey())) {
+        		repairCount = (Integer)entry.getValue();
+        	}
+        }
+        if(repairCount != -1 && repairTime != -1) {
+        	op.updatePlatformAutoReplaceConfig(envName, platform.getName(), repairCount, repairTime);
+        }
+      }
+    }
+    return true;
+  }
+  
   /**
    * Pull design.
    *
