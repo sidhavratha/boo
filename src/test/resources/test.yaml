@@ -27,6 +27,15 @@ platforms: # In OneOps design.
     components:
       library:
         packages: '["mosh"]'
+        attachments:
+          attachment1:
+            priority: '1'
+            exec_cmd: ''
+            run_on: 'before-add,before-update,before-replace'
+          attachment2:
+            priority: '1'
+            exec_cmd: ''
+            run_on: 'before-add,before-update,before-replace'
       artifact:
         artifact-app:
           repository: thirdparty # Example labs_snapshots
@@ -34,6 +43,11 @@ platforms: # In OneOps design.
           location: org.apache.tomcat:sample:war # example org.apache.tomcat:sample:war
           version: '1.0'
           configure: '%x(rm -rf /opt/tomcat7/webapps/sample/ || true && ln -s /current/ /opt/tomcat7/webapps/sample)'
+          attachments:
+            attachment3:
+              priority: '1'
+              exec_cmd: ''
+              run_on: 'before-add,before-update,before-replace'
       secgroup:
         inbound: '[
                     "22 22 tcp 0.0.0.0/0",
