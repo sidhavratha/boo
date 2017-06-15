@@ -13,6 +13,18 @@
  */
 package com.oneops.boo;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
+
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheException;
@@ -22,87 +34,47 @@ import com.github.mustachejava.util.Wrapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
+import com.oneops.client.OneOpsConfigReader;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.List;
-import java.util.Map;
-
-public class ClientConfigInterpolator {
+public class BooConfigInterpolator {
 
   private static final String HOME = System.getProperty("user.home");
   private static final String WORK = System.getProperty("user.dir");
   private final static Splitter splitter = Splitter.on(",").omitEmptyStrings().trimResults();
-  private final ClientConfigIniReader iniReader;
+  private final OneOpsConfigReader iniReader;
 
-  public ClientConfigInterpolator() {
-    iniReader = new ClientConfigIniReader();
+  public BooConfigInterpolator() {
+    iniReader = new OneOpsConfigReader();
   }
 
-  /**
-   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template
-   * with them.
-   * 
-   * @param booYamlFile template to use
-   * @param booConfigFile to use for key/value pairs
-   * @param profile in configuration file to use for key/value pairs
-   * @return Interpolate Boo YAML template
-   * @throws IOException throw if there are errors interpolating the template
-   */
-  public String interpolate(File booYamlFile, File booConfigFile, String profile)
-      throws IOException {
-    String booYaml = new String(Files.readAllBytes(booYamlFile.toPath()));
-    return interpolate(booYaml, booConfigFile, profile);
-  }
-
-  /**
-   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template in
-   * InputStream with them.
-   * 
-   * @see ClientConfigInterpolator#interpolate(File, File, String)
-   * @param booYamlIn InputStream containing the Boo Yaml configuration.
-   */
+  // For testing
   public String interpolate(InputStream booYamlIn, File booConfigFile, String profile)
-      throws IOException {
+    throws IOException {
     String booYaml = new String(ByteStreams.toByteArray(booYamlIn));
     return interpolate(booYaml, booConfigFile, profile);
   }
 
-  /**
-   * Take key/value pairs from a OneOps configuration profile and interpolate a Boo YAML template in
-   * string format with them.
-   * 
-   * @see ClientConfigInterpolator#interpolate(File, File, String)
-   * @param booYaml the template string
-   */
+  public String interpolate(InputStream booYamlIn, String profile)
+    throws IOException {
+    String booYaml = new String(ByteStreams.toByteArray(booYamlIn));
+    return interpolate(booYaml, profile);
+  }
+
+  public String interpolate(String booYaml, String profile) throws IOException {
+    File defaultConfig = iniReader.defaultConfig();
+    return interpolate(booYaml, defaultConfig, profile);
+  }
+
   public String interpolate(String booYaml, File booConfigFile, String profile) throws IOException {
     if (booConfigFile.exists()) {
-      // Extract the requested config profile
       Map<String, String> config = iniReader.read(booConfigFile, profile);
-      // Interpolate the Boo YAML with the values from the profile
       return interpolate(booYaml, config);
     } else {
       return booYaml;
     }
   }
-  
-  /**
-   * Take key/value pairs of configuration and interpolate a Boo YAML template in straing format
-   * with them.
-   * 
-   * @see ClientConfigInterpolator#interpolate(File, File, String)
-   * @param booYaml the template string
-   * @param config the key/value pairs
-   */
-  public String interpolate(String booYaml, Map<String, String> config) throws IOException {    
+
+  public String interpolate(String booYaml, Map<String, String> config) throws IOException {
     Map<String, Object> mustacheMap = Maps.newHashMap();
     for (Map.Entry<String, String> e : config.entrySet()) {
       String key = e.getKey();
@@ -160,8 +132,8 @@ public class ClientConfigInterpolator {
 
   private String deliteral(String str) {
     return str.substring(1, str.length() - 1);
-  }  
-  
+  }
+
   private String defunction(String str) {
     return str.substring(str.indexOf('(') + 1, str.length() - 1);
   }
@@ -178,8 +150,7 @@ public class ClientConfigInterpolator {
       return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
     } catch (IOException e) {
       // Content that might be required for the compute to function may be ommitted so just fail
-      // fast.
-      // If it's an ssh public key that is meant to be injected and it doesn't work it will result
+      // fast. If it's an ssh public key that is meant to be injected and it doesn't work it will result
       // in a compute you can't log in to.
       throw new RuntimeException(String.format("%s cannot be found or cannot be read.", path));
     }

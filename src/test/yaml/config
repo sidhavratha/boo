@@ -3,3 +3,4 @@ host = https://localhost:9090
 organization = bfd
 api_key = BOO!!
 email = boo@walmart.com
+cloud = stg-dfw2

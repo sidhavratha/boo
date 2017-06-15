@@ -40,7 +40,7 @@ import com.oneops.api.resource.model.CiResource;
 import com.oneops.api.resource.model.Deployment;
 import com.oneops.api.resource.model.Procedure;
 import com.oneops.api.resource.model.Release;
-import com.oneops.boo.ClientConfig;
+import com.oneops.boo.BooConfig;
 import com.oneops.boo.LogUtils;
 import com.oneops.boo.utils.ProgressBar;
 import com.oneops.boo.yaml.AssemblyBean;
@@ -79,7 +79,7 @@ public abstract class AbstractWorkflow {
   Operation op;
 
   /** The config. */
-  ClientConfig config;
+  BooConfig config;
 
   /** The instance. */
   OOInstance instance;
@@ -100,7 +100,7 @@ public abstract class AbstractWorkflow {
    * @param config the config
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public AbstractWorkflow(OOInstance instance, ClientConfig config, String comment)
+  public AbstractWorkflow(OOInstance instance, BooConfig config, String comment)
       throws OneOpsClientAPIException {
 
     this.instance = instance;
@@ -207,7 +207,7 @@ public abstract class AbstractWorkflow {
    *
    * @return the config
    */
-  public ClientConfig getConfig() {
+  public BooConfig getConfig() {
     return config;
   }
 

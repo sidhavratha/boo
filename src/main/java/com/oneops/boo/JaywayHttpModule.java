@@ -37,7 +37,7 @@ public class JaywayHttpModule extends AbstractModule {
   private static Logger LOG = LoggerFactory.getLogger(JaywayHttpModule.class);
 
   /** The client. */
-  private static ClientConfig CLIENT = null;
+  private static BooConfig CLIENT = null;
 
   /** The yaml. */
   private File yaml;
@@ -97,14 +97,14 @@ public class JaywayHttpModule extends AbstractModule {
    */
   @Provides
   @Singleton
-  ClientConfig getClientConfig()
+  BooConfig getClientConfig()
       throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
     // test
     if (CLIENT == null) {
       if (variables != null) {
-        CLIENT = new ClientConfig(this.yaml, variables);
+        CLIENT = new BooConfig(this.yaml, variables);
       } else {
-        CLIENT = new ClientConfig(this.yaml, this.profile);
+        CLIENT = new BooConfig(this.yaml, this.profile);
       }
     }
 
@@ -124,7 +124,7 @@ public class JaywayHttpModule extends AbstractModule {
   OOInstance getOoInstance()
       throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
     OOInstance instance = new OOInstance();
-    ClientConfig client = this.getClientConfig();
+    BooConfig client = this.getClientConfig();
     instance.setAuthtoken(client.getYaml().getBoo().getApikey());
     instance.setOrgname(client.getYaml().getBoo().getOrg());
     instance.setEndpoint(client.getYaml().getBoo().getHost());

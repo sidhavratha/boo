@@ -13,14 +13,12 @@
  */
 package com.oneops.boo;
 
-import static com.oneops.boo.ClientConfig.ONEOPS_CONFIG;
-import static com.oneops.boo.ClientConfig.ONEOPS_DEFAULT_PROFILE;
+import static com.oneops.client.OneOpsClientUtils.developerConfigurationPresent;
+import static com.oneops.client.OneOpsClientUtils.oneOpsAvailable;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -44,32 +42,8 @@ public class ITBuildAllPlatforms extends BooTest {
 
   @Before
   public void beforeMethod() throws Exception {
-    assumeTrue(oneOpsAvailable() && developerEnvironment());
+    assumeTrue(oneOpsAvailable(oo.getEndpoint(), 443) && developerConfigurationPresent());
     build = new BuildAllPlatforms(oo, config, null);
-  }
-
-  private boolean developerEnvironment() throws IOException {
-    if (ONEOPS_CONFIG.exists()) {
-      ClientConfigIniReader reader = new ClientConfigIniReader();
-      Map<String, String> config = reader.read(ONEOPS_CONFIG, ONEOPS_DEFAULT_PROFILE);
-      String organization = config.get("organization");
-      if (organization != null) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean oneOpsAvailable() {
-    try (Socket s = new Socket(new java.net.URI(oo.getEndpoint()).getHost(), 443)) {
-      return true;
-    } catch (IOException ex) {
-      System.out.format("Unable to reach %s. Skipping tests%n", oo.getEndpoint());
-      return false;
-    } catch (java.net.URISyntaxException ex) {
-      System.out.format("%s is not a valid URI. Skipping tests%n", oo.getEndpoint());
-      return false;
-    }
   }
 
   @Test

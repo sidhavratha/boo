@@ -15,15 +15,14 @@ package com.oneops.boo;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
-import com.oneops.boo.ClientConfigInterpolator;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ClientConfigInterpolatorTest {
 
@@ -36,7 +35,7 @@ public class ClientConfigInterpolatorTest {
 
   @Test
   public void validateInliningFiles() throws Exception {
-    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    BooConfigInterpolator interpolator = new BooConfigInterpolator();
     File f0 = resource("f0.txt");
     assertEquals("f0", interpolator.interpolate(String.format("{{file(%s)}}", f0.getAbsolutePath()),
         new HashMap<String, String>()));
@@ -44,14 +43,14 @@ public class ClientConfigInterpolatorTest {
 
   @Test
   public void validateBooConfigWithArrays() throws Exception {
-    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    BooConfigInterpolator interpolator = new BooConfigInterpolator();
     Map<String,String> config = ImmutableMap.of("clouds", "foo, bar, baz");
     assertEquals("foobarbaz", interpolator.interpolate("{{#clouds}}{{.}}{{/clouds}}", config));
   }
   
   @Test
   public void validateBooConfigWithStringLiterals() throws Exception {
-    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    BooConfigInterpolator interpolator = new BooConfigInterpolator();
     Map<String,String> config = ImmutableMap.of("cloud", "\"foo, bar, baz\"");
     assertEquals("foo, bar, baz", interpolator.interpolate("{{cloud}}", config));
   }

@@ -19,7 +19,7 @@ import com.oneops.boo.yaml.Yaml;
 
 import java.io.IOException;
 
-public class ClientConfigReader {
+public class BooYamlReader {
 
   private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
