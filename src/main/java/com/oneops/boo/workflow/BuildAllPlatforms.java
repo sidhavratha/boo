@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.oneops.api.resource.model.Deployment;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.oneops.api.OOInstance;
 import com.oneops.api.exception.OneOpsClientAPIException;
 import com.oneops.api.resource.model.CiResource;
+import com.oneops.api.resource.model.Deployment;
 import com.oneops.api.resource.model.RedundancyConfig;
 import com.oneops.boo.BooCli;
 import com.oneops.boo.ClientConfig;
@@ -138,6 +138,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       return null;
     }
     this.updateScaling();
+    this.updatePlatformHealingOptions();
     this.bar.update(70, 100);
     // Added retries
     boolean retry = true;
@@ -285,20 +286,51 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   @SuppressWarnings("unchecked")
   private void handleAttachmentsIntl(Map<String, Object> components, String platformName,
       String componentName) throws OneOpsClientAPIException {
-    if (components.get(Constants.ATTACHMENTS) != null) {
-      Map<String, Object> attachments = (Map<String, Object>) components.get(Constants.ATTACHMENTS);
-      for (Map.Entry<String, Object> entry : attachments.entrySet()) {
-        String attachment = entry.getKey();
-        Map<String, String> attributes = (Map<String, String>) entry.getValue();
-        if (this.isAttachmentExists(platformName, componentName, attachment)) {
-          this.updateAttachment(platformName, componentName, attachment, attributes);
-        } else {
-          this.addAttachment(platformName, componentName, attachment, attributes);
-        }
-      }
-    }
+	
+	  for (Map.Entry<String, Object> entry : components.entrySet()) {
+		  String key = entry.getKey();
+	      Object value = entry.getValue();
+	      // Another Map, so key is ciName
+	      if (value instanceof Map) {
+	    	  Map<String, Object> attr = (Map<String, Object>)value;
+	    	  addOrUpdateAttachments(platformName, componentName, key, attr);
+	      } else if (value instanceof String) {
+	    	  addOrUpdateAttachments(platformName, componentName, componentName, components);
+	      }
+	  
+	  }
 
   }
+
+  @SuppressWarnings("unchecked")
+   private void addOrUpdateAttachments(String platformName, String componentName, String uniqueName,
+		Map<String, Object> attr) throws OneOpsClientAPIException {
+	if (attr.get(Constants.ATTACHMENTS) != null) {
+	      Map<String, Object> attachments = (Map<String, Object>) attr.get(Constants.ATTACHMENTS);
+	      for (Map.Entry<String, Object> entry : attachments.entrySet()) {
+	        String attachment = entry.getKey();
+			Map<String, String> attributes = (Map<String, String>) entry.getValue();
+	        if (this.isAttachmentExists(platformName, uniqueName, attachment)) {
+	          this.updateAttachment(platformName, uniqueName, attachment, attributes);
+	        } else {
+	        	try {
+					if(this.isComponentExist(platformName, uniqueName)) {
+						//if component exists simply add the attachment
+					}
+				} catch (OneOpsComponentExistException e) {
+					//add component first then add attachment
+					attr.remove(Constants.ATTACHMENTS);
+					
+					Map<String, Object> att = new HashMap<String, Object>();
+					att.put(uniqueName, attr);
+					this.updateComponentVariables(platformName, componentName, att);
+				}
+	        	design.addNewAttachment(platformName, uniqueName, attachment, attributes);
+//	          this.addAttachment(platformName, uniqueName, attachment, attributes);
+	        }
+	      }
+	    }
+   }
 
   /**
    * Creates the platform.

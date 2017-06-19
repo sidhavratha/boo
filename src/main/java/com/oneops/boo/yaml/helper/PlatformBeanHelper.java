@@ -41,6 +41,9 @@ public final class PlatformBeanHelper {
   
   /** The Constant LINKS. */
   private static final String LINKS = "links";
+  
+  /** The Constant AUTO_HEALING. */
+  private static final String AUTO_HEALING = "auto_healing";
 
   /**
    * Gets the platforms.
@@ -66,6 +69,7 @@ public final class PlatformBeanHelper {
                 .setSecureVariables((Map<String, String>) platformMap.get(ENCRYPTED_VARIABLES))
                 .setVariables((Map<String, String>) platformMap.get(VARIABLES))
                 .setDeployOrder(deployOrder)
+                .setAutoHealing((Map<String, Object>) platformMap.get(AUTO_HEALING))
                 .setLinks((List<String>) platformMap.get(LINKS)).build());
       }
     }
