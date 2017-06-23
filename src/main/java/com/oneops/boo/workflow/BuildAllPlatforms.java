@@ -415,7 +415,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       List<CiResource> response = design.listPlatformVariables(platform.getName());
 //      List<String> servVarList = response.getList(Constants.CINAME);
       for (CiResource resource : response) {
-        if (!yamlVarSet.contains(resource.getCiName())) {
+        if (!yamlVarSet.contains(resource.getCiName()) && isUserCustomizedVariable(platform.getName(), resource.getCiName())) {
           design.deletePlatformVariable(platform.getName(), resource.getCiName());
         }
       }

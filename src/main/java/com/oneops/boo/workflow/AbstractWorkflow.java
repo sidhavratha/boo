@@ -400,7 +400,26 @@ public abstract class AbstractWorkflow {
     if(componentDetails != null && componentDetails.getAttrProps() != null 
     		&& componentDetails.getAttrProps().getAdditionalProperties() != null 
     		&& componentDetails.getAttrProps().getAdditionalProperties().get(Constants.OWNER) != null) {
-    	Map<String, String> ownersMap = (Map<String, String>) componentDetails.getAttrProps().getAdditionalProperties().get(Constants.OWNER);
+    	@SuppressWarnings("unchecked")
+		Map<String, String> ownersMap = (Map<String, String>) componentDetails.getAttrProps().getAdditionalProperties().get(Constants.OWNER);
+    	if(ownersMap != null && ownersMap.size() > 0)
+    		return true;
+    }
+      return false;
+  }
+  
+  /**
+   * Checks whether the component is user related.
+   *
+   */
+  public boolean isUserCustomizedVariable(String platformName, String variableName)
+      throws OneOpsClientAPIException {
+    CiResource variableDetails = design.getPlatformVariable(platformName, variableName);
+    if(variableDetails != null && variableDetails.getAttrProps() != null 
+    		&& variableDetails.getAttrProps().getAdditionalProperties() != null 
+    		&& variableDetails.getAttrProps().getAdditionalProperties().get(Constants.OWNER) != null) {
+    	@SuppressWarnings("unchecked")
+		Map<String, String> ownersMap = (Map<String, String>) variableDetails.getAttrProps().getAdditionalProperties().get(Constants.OWNER);
     	if(ownersMap != null && ownersMap.size() > 0)
     		return true;
     }

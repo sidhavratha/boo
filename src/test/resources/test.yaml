@@ -73,9 +73,13 @@ platforms: # In OneOps design.
       os:
         ostype: 'centos-7.2'
       user: # support multi-user by addding more users.
-        user-tester:
-          username: 'tester'
+        user-tester1:
+          username: 'tester1'
           authorized_keys: '["ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhIM7HH3KMss88DJ2fKHcgoxAc0wOjx6hdHNLAH85SwqntRxr8yieIpuVWSYck8/15Z2MypGwdNQapg3PjF/By+nC9aMgj6yx1Yl+2hIincgyvLEx2hclmW0xCa5XfGC+ibekAlzuXZZQqSSk3lTe93+erXoQyOKlj7Xut503xJcyF8rHP0tGNmY0AoTCptw1s2nfLBYkBrdsDrSCLfHc7n30PFIRcN00AROR87IEbGO/QBiexXu8HOJ+gxonvv3xdQHkmbbdV1XUCfFtRUD/qwqu9y6xVw4d/P3caiNacL2IXGvi98HdesHtqSijIwxGvK3PRzDoK7q0wlJegaMDh"]' # copy the authorized_keys into ""
+        user-tester2:
+          username: 'tester2'
+          authorized_keys: '["ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhIM7HH3KMss88DJ2fKHcgoxAc0wOjx6hdHNLAH85SwqntRxr8yieIpuVWSYck8/15Z2MypGwdNQapg3PjF/By+nC9aMgj6yx1Yl+2hIincgyvLEx2hclmW0xCa5XfGC+ibekAlzuXZZQqSSk3lTe93+erXoQyOKlj7Xut503xJcyF8rHP0tGNmY0AoTCptw1s2nfLBYkBrdsDrSCLfHc7n30PFIRcN00AROR87IEbGO/QBiexXu8HOJ+gxonvv3xdQHkmbbdV1XUCfFtRUD/qwqu9y6xVw4d/P3caiNacL2IXGvi98HdesHtqSijIwxGvK3PRzDoK7q0wlJegaMDh"]' # copy the authorized_keys into ""
+          sibling_depends_on: '["user-tester1"]'
 
 scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.
     tomcat: # Platform name
