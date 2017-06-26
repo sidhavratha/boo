@@ -145,7 +145,9 @@ public class ITBuildAllPlatforms extends BooTest {
       } catch (Exception ex) {
         if (ex.getMessage() != null && ex.getMessage().matches(".*assembly with name.*404 Not Found")) {
           break; //Assembly already deleted
-        }
+        } else if (ex.getMessage() != null && ex.getMessage().matches(".*assembly with name .* HTTP/1.1 422 Unprocessable Entity")) {
+            //ignore the error
+          } else 
         ex.printStackTrace();
       }
       while (cleanBuild.getStatus() != null && cleanBuild.getStatus().equalsIgnoreCase("active")) {

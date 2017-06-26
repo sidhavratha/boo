@@ -268,10 +268,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       this.handleAttachmentsIntl(components, platformName, componentName);
     } catch (Exception e) {
       // Ignore
-    } finally {
-      if (components.get(Constants.ATTACHMENTS) != null) {
-        components.remove(Constants.ATTACHMENTS);
-      }
     }
   }
 
@@ -294,8 +290,14 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 	      if (value instanceof Map) {
 	    	  Map<String, Object> attr = (Map<String, Object>)value;
 	    	  addOrUpdateAttachments(platformName, componentName, key, attr);
+	    	  if (attr.get(Constants.ATTACHMENTS) != null) {
+	    		  attr.remove(Constants.ATTACHMENTS);
+	    	  }
 	      } else if (value instanceof String) {
 	    	  addOrUpdateAttachments(platformName, componentName, componentName, components);
+	    	  if (components.get(Constants.ATTACHMENTS) != null) {
+	    	     components.remove(Constants.ATTACHMENTS);
+	    	  }
 	      }
 	  
 	  }
@@ -314,9 +316,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 	          this.updateAttachment(platformName, uniqueName, attachment, attributes);
 	        } else {
 	        	try {
-					if(this.isComponentExist(platformName, uniqueName)) {
+					this.isComponentExist(platformName, uniqueName) ;
 						//if component exists simply add the attachment
-					}
+					
 				} catch (OneOpsComponentExistException e) {
 					//add component first then add attachment
 					attr.remove(Constants.ATTACHMENTS);
@@ -415,7 +417,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       List<CiResource> response = design.listPlatformVariables(platform.getName());
 //      List<String> servVarList = response.getList(Constants.CINAME);
       for (CiResource resource : response) {
-        if (!yamlVarSet.contains(resource.getCiName())) {
+        if (!yamlVarSet.contains(resource.getCiName()) && isUserCustomizedVariable(platform.getName(), resource.getCiName())) {
           design.deletePlatformVariable(platform.getName(), resource.getCiName());
         }
       }
@@ -488,20 +490,10 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       // Another Map, so key is ciName
       if (value instanceof Map) {
         Map<String, String> attris = (Map<String, String>) value;
-        if (attris.containsKey(Constants.AUTHO_KEYS)) {
-          Runnable worker = new UpdateComponentTask(this, platformName, componentName, key, attris);
-          executor.execute(worker);
-        } else {
           this.updateComponentVariablesInternal(platformName, componentName, key, attris);
-        }
       } else if (value instanceof String) {
         Map<String, String> att = (Map) attributes;
-        if (att.containsKey(Constants.AUTHO_KEYS)) {
-          Runnable worker = new UpdateComponentTask(this, platformName, componentName, key, att);
-          executor.execute(worker);
-        } else {
           this.updateComponentVariablesInternal(platformName, componentName, componentName, att);
-        }
         break;
       }
     }
@@ -523,7 +515,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    */
   private boolean updateComponentVariablesInternal(String platformName, String componentName,
       String uniqueName, Map<String, String> attributes) throws OneOpsClientAPIException {
-    LogUtils.info(Constants.UPDATE_COMPONENTS, componentName, platformName);
+    LogUtils.info(Constants.UPDATE_COMPONENTS, uniqueName, platformName);
     boolean isExist = Boolean.FALSE;
     try {
       isExist = this.isComponentExist(platformName, uniqueName);
