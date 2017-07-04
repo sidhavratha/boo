@@ -18,6 +18,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.oneops.boo.yaml.Yaml;
 
 import java.io.IOException;
+import java.io.Reader;
 
 public class BooYamlReader {
 
@@ -26,4 +27,8 @@ public class BooYamlReader {
   public Yaml read(String yaml) throws IOException {
     return mapper.readValue(yaml, Yaml.class);
   }
+  
+  public Yaml read(Reader yaml) throws IOException {
+    return mapper.readValue(yaml, Yaml.class);
+  }  
 }
