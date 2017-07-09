@@ -15,20 +15,24 @@ package com.oneops.boo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.oneops.boo.yaml.Constants;
 import com.oneops.boo.yaml.Yaml;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.util.Map;
 
 public class BooYamlReader {
 
   private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
   public Yaml read(String yaml) throws IOException {
-    return mapper.readValue(yaml, Yaml.class);
+    return read(new StringReader(yaml));
   }
   
   public Yaml read(Reader yaml) throws IOException {
-    return mapper.readValue(yaml, Yaml.class);
+    Yaml booYaml = mapper.readValue(yaml, Yaml.class);    
+    return booYaml;
   }  
 }

@@ -171,4 +171,9 @@ public static class PlatformBeanBuilder {
   public String getPackId() {
     return pack;
   }
+  
+  @SuppressWarnings("unchecked")
+  public Map<String,String> getComponent(String name) {
+    return (Map<String,String>) components.get(name);
+  }
 }
