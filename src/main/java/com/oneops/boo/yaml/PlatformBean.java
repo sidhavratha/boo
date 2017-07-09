@@ -167,4 +167,8 @@ public static class PlatformBeanBuilder {
   public int compareTo(Object object) {
     return this.deployOrder - ((PlatformBean) object).deployOrder;
   }
+
+  public String getPackId() {
+    return pack;
+  }
 }
