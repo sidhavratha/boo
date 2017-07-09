@@ -27,6 +27,7 @@ import com.oneops.api.OOInstance;
 import com.oneops.boo.exception.BooException;
 import com.oneops.boo.utils.BooUtils;
 import com.oneops.boo.yaml.Constants;
+import com.oneops.client.OneOpsConfigReader;
 
 /**
  * Parent class of all unit testing.
@@ -34,10 +35,10 @@ import com.oneops.boo.yaml.Constants;
 public abstract class BooTest {
   private static final Logger LOG = LoggerFactory.getLogger(BooTest.class);
   private static final Injector injector =
-      Guice.createInjector(new JaywayHttpModule(getConfig(), ClientConfig.ONEOPS_DEFAULT_PROFILE));
+      Guice.createInjector(new JaywayHttpModule(getConfig(), OneOpsConfigReader.ONEOPS_DEFAULT_PROFILE));
 
   /** The config. */
-  ClientConfig config;
+  BooConfig config;
   OOInstance oo;
   String assemblyName;
   String envName;
@@ -80,7 +81,7 @@ public abstract class BooTest {
   void init() throws BooException, ProvisionException {
     if (oo == null) {
       oo = injector.getInstance(OOInstance.class);
-      config = injector.getInstance(ClientConfig.class);
+      config = injector.getInstance(BooConfig.class);
 
       assemblyName = config.getYaml().getAssembly().getName();
       envName = config.getYaml().getBoo().getEnvName();
@@ -89,7 +90,7 @@ public abstract class BooTest {
 
   void initOld() throws BooException, ProvisionException {
     if (oo == null) {
-      config = injector.getInstance(ClientConfig.class);
+      config = injector.getInstance(BooConfig.class);
       booUtils.verifyTemplate(config);
       oo = injector.getInstance(OOInstance.class);
       assemblyName = config.getYaml().getAssembly().getName();

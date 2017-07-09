@@ -14,6 +14,8 @@
 package com.oneops.boo;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +24,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
-import com.oneops.api.resource.model.Deployment;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -38,10 +39,12 @@ import com.google.inject.Injector;
 import com.jayway.restassured.RestAssured;
 import com.oneops.api.OOInstance;
 import com.oneops.api.exception.OneOpsClientAPIException;
+import com.oneops.api.resource.model.Deployment;
 import com.oneops.boo.exception.BooException;
 import com.oneops.boo.utils.BooUtils;
 import com.oneops.boo.workflow.BuildAllPlatforms;
 import com.oneops.boo.yaml.Constants;
+import com.oneops.client.OneOpsConfigReader;
 
 /**
  * The Class BooCli.
@@ -76,7 +79,7 @@ public class BooCli {
   private Options options = new Options();
 
   /** The config. */
-  private ClientConfig config;
+  private BooConfig config;
 
   /** The injector. */
   private Injector injector;
@@ -86,7 +89,7 @@ public class BooCli {
 
   private String comment = null;
 
-  private String profile = ClientConfig.ONEOPS_DEFAULT_PROFILE;
+  private String profile = OneOpsConfigReader.ONEOPS_DEFAULT_PROFILE;
 
   /**
    * Instantiates a new boo cli.
@@ -192,7 +195,7 @@ public class BooCli {
     } else {
       injector = Guice.createInjector(new JaywayHttpModule(this.configFile, this.profile));
     }
-    config = injector.getInstance(ClientConfig.class);
+    config = injector.getInstance(BooConfig.class);
     booUtils.verifyTemplate(config);
     if (assembly != null) {
       config.getYaml().getAssembly().setName(assembly);
@@ -206,7 +209,7 @@ public class BooCli {
    * @param config the config
    * @param assembly the assembly
    */
-  public void initOo(ClientConfig config, String assembly, String comment) {
+  public void initOo(BooConfig config, String assembly, String comment) {
     OOInstance oo = injector.getInstance(OOInstance.class);
     oo.setGzipEnabled(config.getYaml().getBoo().isGzipEnabled());
     try {
@@ -272,27 +275,26 @@ public class BooCli {
       }
 
       String yaml = "";
-
-      if (ClientConfig.ONEOPS_CONFIG.exists()) {
+      OneOpsConfigReader iniReader = new OneOpsConfigReader();
+      File defaultConfig = iniReader.defaultConfig();      
+      if (defaultConfig != null) {
         if (cmd.hasOption("profile")) {
           this.profile = cmd.getOptionValue("profile");
         }
-        ClientConfigIniReader iniReader = new ClientConfigIniReader();
-        if (iniReader.read(ClientConfig.ONEOPS_CONFIG, profile) == null) {
-          System.out.format("%n%s is not a valid profile in %s.%n%n", profile,
-              ClientConfig.ONEOPS_CONFIG);
+        if (iniReader.readDefaultConfig(profile) == null) {
+          System.out.format("%n%s is not a valid profile in %s.%n%n", profile, defaultConfig);
           return Constants.EXIT_INVALID_PROFILE;
         }
-
-        ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-        yaml = interpolator.interpolate(this.configFile, ClientConfig.ONEOPS_CONFIG, this.profile);
+        BooConfigInterpolator interpolator = new BooConfigInterpolator();
+        try (InputStream is = new FileInputStream(this.configFile)) {
+          yaml = interpolator.interpolate(is, this.profile);
+        }
       }
 
       if (cmd.hasOption('v')) {
         System.out.println(yaml);
-        if (!ClientConfig.ONEOPS_CONFIG.exists()) {
-          System.out.format("%nYou do not have a %s file. No interpolation can be performed.%n%n",
-              ClientConfig.ONEOPS_CONFIG);
+        if (defaultConfig == null) {
+          System.out.format("%nYou do not have a %s file. No interpolation can be performed.%n%n", OneOpsConfigReader.ONEOPS_CONFIG_MESSAGE);
         }
         return exit;
       }
