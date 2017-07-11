@@ -3,7 +3,6 @@ boo:
   organization: 'organization'
   api_key: 'api_key'
   email: 'email'
-  environment_name: 'environment_name'
   ip_output: 'json'
 
 assembly:
@@ -39,26 +38,107 @@ platforms: # In OneOps design.
           username: 'jvanzyl'
           description: "Development VM for {{username}}"
           authorized_keys: '["{{file(~/.ssh/id_rsa.pub)}}"]'
+        user-klohia:
+          system_account: true
+          sudoer: true
+          username: 'klohia'
+          description: "Development VM for {{username}}"
+          authorized_keys: '["{{file(~/.ssh/id_rsa.pub)}}"]'
+          dependson:
+            - user-jvanzyl
+  platform-1:
+    deploy_order: 1
+    pack: source/pack-platform-0
+    pack_version: '1'
+    links:
+      - platform-0
+    variables:
+      LOCAL-VAR-NAME: 'local-var-value'
+    components:
+      component-0:
+        config-0: config-0-value
+        config-1: config-1-value
+        attahcments:
+          attachment-1:
+            priority: '1'
+            exec_cmd: ''
+            run_on: 'before-add,before-update,before-replace'
+          attachment-2:
+            priority: '1'
+            exec_cmd: ''
+            run_on: 'before-add,before-update,before-replace'
+      component-1: # for optional components, use component type here e.g. artifact and then name is meaningful in next line
+        optional-component-name:
+          config-0: config-0-value
+          config-1: $OO_LOCAL{LOCAL-VAR-NAME}
 
-scale: # Because OneOps is not standard design to update the Scaling and other common components in transition, we have to separate them here.
-  platform-0: # Platform name
-    scaling: # Don't change this
-      compute: # Component name
-        current: '2' # Currently set current=min=max as the total number of computes
-        min: '2'
-        max: '2'
-
-environment: # Only support one environment for now.
-  global_dns: 'true'
-  availability: 'redundant'
-  subdomain: 'subdomain' # environment_name.assembly_name
-  profile: 'DEV'
-  clouds: # Can support multiple clouds (the sum of pct_scale should be 100, currently priority and dpmt_order should be both 1)
-    dev-cdc002:
-      priority: '1' # 1 or 2
-      dpmt_order: '1'
-      pct_scale: '30'
-    dev-cdc003:
-      priority: '1'
-      dpmt_order: '1'
-      pct_scale: '70'
+environments:
+  environment-0:
+    global_dns: 'true'
+    profile: 'QA'
+    availability: 'redundant'
+    clouds:
+      dev-cloud0:
+        priority: '1'
+        dpmt_order: '1'
+        pct_scale: '100'
+    relays:
+      relay-0:
+        emails: 'YOUR-TEAM_DL'
+        severity: 'info,warning,critical'
+        correlation: 'true'
+        ns_paths: '["/path-1","/path-2"]'
+        source: 'deployment,procedure,ci'
+        enabled: 'true'
+    variables:
+      variable-1: variable-new-value-1
+    platforms:
+      platform-1:
+        auto_healing:
+          autorepair: false
+          autoreplace: true
+          autoscale: false
+          replace_after_minutes: 60
+          replace_after_repairs: 4
+        scale:
+          component-0: #name of component flexing is defined in pack
+            min: '1'
+            max: '3'
+            current: '1'
+        variables:
+          pack-platform-variable-1: pack-platform-0-variable-1-value-new
+        components:
+          component-0:
+            config-0: config-0-new-value
+  environment-1:
+    global_dns: 'false'
+    profile: 'DEV'
+    availability: 'single'
+    clouds:
+      dev-cloud0:
+        priority: '1'
+        dpmt_order: '1'
+        pct_scale: '100'
+    relays:
+      relay-0:
+        emails: 'YOUR-TEAM_DL'
+        severity: 'info,warning,critical'
+        correlation: 'true'
+        ns_paths: '["/path-1"]'
+        source: 'deployment,procedure,ci'
+        enabled: 'false'
+    variables:
+      variable-1: variable-new-value-1
+    platforms:
+      platform-1:
+        auto_healing:
+          autorepair: false
+          autoreplace: true
+          autoscale: false
+          replace_after_minutes: 60
+          replace_after_repairs: 4
+        variables:
+          pack-platform-variable-1: pack-platform-0-variable-1-value-new
+        components:
+          component-0:
+            config-0: config-0-new-value   
