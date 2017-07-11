@@ -167,4 +167,18 @@ public static class PlatformBeanBuilder {
   public int compareTo(Object object) {
     return this.deployOrder - ((PlatformBean) object).deployOrder;
   }
+
+  public String getPackId() {
+    return pack;
+  }
+  
+  @SuppressWarnings("unchecked")
+  public Map<String,String> getComponentAsStringMap(String name) {
+    return (Map<String,String>) components.get(name);
+  }
+  
+  @SuppressWarnings("unchecked")
+  public Map<String,Object> getComponent(String name) {
+    return (Map<String,Object>) components.get(name);
+  }  
 }
