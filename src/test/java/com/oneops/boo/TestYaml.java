@@ -50,7 +50,7 @@ public class TestYaml extends BooTest {
 
   @Test
   public void testGetEnvironmentBean() throws OneOpsClientAPIException {
-    assertNotNull(config.getYaml().getEnvironmentBean().getOthers());
+    assertNotNull(config.getYaml().getEnvironmentList().get(0).getOthers());
   }
 
   @Test
@@ -92,7 +92,7 @@ public class TestYaml extends BooTest {
 
   @Test
   public void testGetEnvironments() throws OneOpsClientAPIException {
-    assertNotNull(config.getYaml().getEnvironment());
+    assertNotNull(config.getYaml().getEnvironmentList());
     // this.printMap(config.getYaml().getEnvironment(), 0);
   }
 

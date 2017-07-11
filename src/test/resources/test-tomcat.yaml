@@ -1,0 +1,119 @@
+---
+# Create a sample tomcat
+
+boo:
+  oneops_host: '{{host}}'
+  organization: '{{organization}}' # OneOps org name
+  api_key: '{{api_key}}' # Copy from OneOps UI->profile->authentication->API Token
+  email: '{{email}}'
+  environment_name: 'dev' # All the deployment in this template adds to this environment.
+  ip_output: 'json'
+
+assembly:
+  name: 'unit-test-tomcat' # Underscores are not allowed
+  auto_gen: false # If turn on, then this tool will generate random assembly name for you.
+  tags: {"tag-key1":"tag-value1", "tag-key2":"tag-value2", "tag-key3":"tag-value3", "tag-key4":"tag-value4"}
+  description: 'some good description of the assembly'
+variables: # Optional, global variables.
+  var1: value1
+platforms: # In OneOps design.
+  tomcat: # This is as your platform name as well
+    deploy_order: 1
+    pack: oneops/tomcat
+    pack_version: '1'
+    encrypted_variables:
+    variables:
+    components:
+      artifact:
+        artifact-app:
+          repository: thirdparty # Example labs_snapshots
+          url: http://gec-maven-nexus.walmart.com/nexus/
+          location: org.apache.tomcat:sample:war # example org.apache.tomcat:sample:war
+          version: '1.0'
+          configure: '%x(rm -rf /opt/tomcat7/webapps/sample/ || true && ln -s /current/ /opt/tomcat7/webapps/sample)'
+      secgroup:
+        inbound: '[
+                    "22 22 tcp 0.0.0.0/0",
+                    "null null 4 0.0.0.0/0",
+                    "60000 61000 udp 0.0.0.0/0",
+                    "8080 8080 tcp 0.0.0.0/0"
+                ]'
+      tomcat:
+        advanced_security_options: 'true'
+        enable_method_options: 'false'
+        enable_method_connect: 'false'
+        autodeploy_enabled: 'true'
+        tlsv1_protocol_enabled: 'false'
+        mirrors: '["http://gec-maven-nexus.walmart.com/nexus/content/repositories/apache-dist/"]'
+        version: '7.0'
+        build_version: '75'
+      java:
+        flavor: oracle
+        jrejdk: server-jre
+      compute:
+        size: M
+        require_public_ip: true
+      os:
+        ostype: 'centos-7.2'
+
+environments: # Only support one environment for now.
+  dev:
+    global_dns: 'true'
+    availability: 'redundant'
+    platforms:
+      tomcat:
+        auto_healing:
+          autorepair: false
+          autoreplace: true
+          replace_after_minutes: 60
+          replace_after_repairs: 4
+        scale: # Don't change this
+          compute: # Component name
+            current: '3' # Currently set current=min=max as the total number of computes
+            min: '1'
+            max: '5'
+        components:
+          lb:
+            ecv_map: '{"8080":"GET /"}'
+    clouds:
+      {{cloud}}:
+        priority: '1'
+        dpmt_order: '1'
+        pct_scale: '100'
+  dev0:
+    global_dns: 'true'
+    availability: 'single'
+    platforms:
+      tomcat:
+        auto_healing:
+          autorepair: true
+          autoreplace: true
+          replace_after_minutes: 40
+          replace_after_repairs: 2
+    clouds:
+      stub-dfw2a:
+        priority: '1'
+        dpmt_order: '1'
+        pct_scale: '100'
+      stub-dfw2b:
+        priority: '2'
+        dpmt_order: '1'
+        pct_scale: '100'
+  dev1:
+    global_dns: 'true'
+    availability: 'redundant'
+    platforms:
+      tomcat:
+        auto_healing:
+          autorepair: true
+          autoreplace: false
+          replace_after_minutes: 10
+          replace_after_repairs: 1
+        components:
+          lb:
+            ecv_map: '{"8080":"GET /paas-perf"}'
+    clouds:
+      {{cloud}}:
+        priority: '1'
+        dpmt_order: '5'
+        pct_scale: '100'

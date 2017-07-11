@@ -54,36 +54,6 @@ public class BooUtils {
   }
 
   /**
-   * Parse Ip list.
-   * 
-   * @param platformName the platform name
-   * @param componentName the component name
-   * @param workFlow the work flow
-   * @return the ips
-   * @throws OneOpsClientAPIException the one ops client API exception
-   */
-
-  public String getIps(String platformName, String componentName, AbstractWorkflow workFlow)
-      throws OneOpsClientAPIException {
-    String result = null;
-    StringBuilder str = new StringBuilder();
-    Yaml yaml = workFlow.getConfig().getYaml();
-    Map<String, PlatformConfigBean> platformConfigs = yaml.getExtractBean();
-    List<Map<String, Object>> ips = workFlow.getIpsInternal(platformName, componentName);
-    // for (PlatformConfigBean pfConfig : platformConfigs) {
-    for (Map.Entry<String, PlatformConfigBean> pfConfig : platformConfigs.entrySet()) {
-      PlatformConfigBean config = pfConfig.getValue();
-      if (pfConfig.getKey().equals(platformName)) {
-        String split = yaml.getBoo().getCustom().get(config.getCustomSplit().substring(1));
-        String format = yaml.getBoo().getCustom().get(config.getCustomFormat().substring(1));
-        str.append(this.parseIps(split, format, ips));
-      }
-    }
-    result = str.toString();
-    return result;
-  }
-
-  /**
    * Wait certain time.
    *
    * @param seconds the seconds

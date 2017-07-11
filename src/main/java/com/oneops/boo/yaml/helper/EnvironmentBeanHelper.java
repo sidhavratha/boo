@@ -105,4 +105,47 @@ public final class EnvironmentBeanHelper {
     return env;
   }
 
+  
+  /**
+   * Gets the environment.
+   *
+   * @param environmentsMap the environments map
+   * @return the environment
+   */
+  @SuppressWarnings("unchecked")
+  public static List<EnvironmentBean> getEnvironments(Map<String, Object> environmentsMap) {
+    List<EnvironmentBean> ebList = new ArrayList<EnvironmentBean>();
+    for (Map.Entry<String, Object> entry : environmentsMap.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      EnvironmentBean env = new EnvironmentBean();
+      Map<String, String> attris = new HashMap<String, String>();
+      env.setEnvName(key);
+      if (value instanceof Map) {
+	      Map<String, Object> map = (Map<String, Object>) value;
+    	  for (Map.Entry<String, Object> entry0 : map.entrySet()) {
+    		String key0 = entry0.getKey();
+    	    Object value0 = entry0.getValue();
+    	    
+    	    if (CLOUDS.equalsIgnoreCase(key0)) {
+    	        Map<String, Object> cmap = (Map<String, Object>) value0;
+    	        for (Map.Entry<String, Object> entry1 : cmap.entrySet()) {
+    	          Map<String, String> config = (Map<String, String>) entry1.getValue();
+    	          CloudBean cloud = new CloudBean(entry1.getKey(), config.get(PCT_SCALE), config.get(DPMT_ORDER), config.get(PRIORITY));
+    	          env.addClouds(cloud);
+    	        }
+
+    	      } else if (PLATFORMS.equalsIgnoreCase(key0)) {
+    	        env.setPlatformsList(PlatformBeanHelper.getPlatforms((Map<String, Object>) value0));
+    	      } else if (value0 instanceof String) {
+    	        attris.put(key0, (String) value0);
+    	      }
+    	  }
+      }
+      env.setOthers(attris);
+      ebList.add(env);
+    }
+
+    return ebList;
+  }
 }
