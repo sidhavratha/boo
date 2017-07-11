@@ -130,8 +130,8 @@ public class Yaml {
 
   @SuppressWarnings("unchecked")
   @JsonIgnore
-  public Map<String, Object> getGlobalVariables() {
-    return (Map<String, Object>) this.others.get(Constants.VARIABLES);
+  public Map<String, String> getGlobalVariables() {
+    return (Map<String, String>) this.others.get(Constants.VARIABLES);
   }
 
   public void setEnvironment(Map<String, Object> environments) {

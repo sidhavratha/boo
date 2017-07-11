@@ -33,7 +33,7 @@ import com.oneops.api.resource.model.CiResource;
 import com.oneops.api.resource.model.Deployment;
 import com.oneops.api.resource.model.RedundancyConfig;
 import com.oneops.boo.BooCli;
-import com.oneops.boo.ClientConfig;
+import com.oneops.boo.BooConfig;
 import com.oneops.boo.LogUtils;
 import com.oneops.boo.utils.BooUtils;
 import com.oneops.boo.yaml.Constants;
@@ -75,7 +75,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @throws OneOpsClientAPIException the one ops client API exception
    */
 
-  public BuildAllPlatforms(OOInstance instance, ClientConfig config, String comment)
+  public BuildAllPlatforms(OOInstance instance, BooConfig config, String comment)
       throws OneOpsClientAPIException {
     super(instance, config, comment);
   }

@@ -15,16 +15,14 @@ package com.oneops.boo;
 
 import static org.junit.Assert.assertEquals;
 
-import com.oneops.boo.ClientConfig;
-import com.oneops.boo.ClientConfigInterpolator;
-import com.oneops.boo.ClientConfigReader;
-import com.oneops.boo.yaml.Yaml;
+import java.io.File;
+import java.io.FileInputStream;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
+import com.oneops.boo.yaml.Yaml;
+import com.oneops.client.OneOpsConfigReader;
 
 public class ClientConfigProcessorTest {
 
@@ -37,19 +35,19 @@ public class ClientConfigProcessorTest {
 
   @Test
   public void validateBooYamlProcessing() throws Exception {
-    ClientConfigReader reader = new ClientConfigReader();
-    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-    Yaml yaml = reader.read(interpolator.interpolate(resource("boo.yaml"), resource("config"),
-        ClientConfig.ONEOPS_DEFAULT_PROFILE));
+    BooYamlReader reader = new BooYamlReader();
+    BooConfigInterpolator interpolator = new BooConfigInterpolator();
+    Yaml yaml = reader.read(interpolator.interpolate(new FileInputStream(resource("boo.yaml")), resource("config"),
+        OneOpsConfigReader.ONEOPS_DEFAULT_PROFILE));
     doAssert(yaml);
   }
 
   @Test
   public void validateBooYamlProcessingInputStream() throws Exception {
-    ClientConfigReader reader = new ClientConfigReader();
-    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+    BooYamlReader reader = new BooYamlReader();
+    BooConfigInterpolator interpolator = new BooConfigInterpolator();
     Yaml yaml = reader.read(interpolator.interpolate(new FileInputStream(resource("boo.yaml")),
-        resource("config"), ClientConfig.ONEOPS_DEFAULT_PROFILE));
+        resource("config"), OneOpsConfigReader.ONEOPS_DEFAULT_PROFILE));
     doAssert(yaml);
   }
 

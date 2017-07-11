@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.oneops.api.exception.OneOpsClientAPIException;
-import com.oneops.boo.ClientConfig;
+import com.oneops.boo.BooConfig;
 import com.oneops.boo.exception.BooException;
 import com.oneops.boo.workflow.AbstractWorkflow;
 import com.oneops.boo.workflow.BuildAllPlatforms;
@@ -45,7 +45,7 @@ public class BooUtils {
    * @return true, if successful
    * @throws BooException the boo exception
    */
-  public boolean verifyTemplate(ClientConfig config) throws BooException {
+  public boolean verifyTemplate(BooConfig config) throws BooException {
     if (config == null || config.getYaml() == null || config.getYaml().getAssembly() == null
         || config.getYaml().getPlatforms() == null) {
       throw new BooException(Constants.YAML_ERROR);
@@ -69,7 +69,7 @@ public class BooUtils {
    * @param config the config
    * @return the string
    */
-  public String isCustomized(String val, ClientConfig config) {
+  public String isCustomized(String val, BooConfig config) {
 
     if (val.indexOf(Constants.DOLLAR) >= 0) {
       config.getYaml().getExtractBean().get(val.substring(1));
@@ -201,7 +201,7 @@ public class BooUtils {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean createPlatforms(ClientConfig config, BuildAllPlatforms workflow)
+  public boolean createPlatforms(BooConfig config, BuildAllPlatforms workflow)
       throws OneOpsClientAPIException {
     List<PlatformBean> platforms = config.getYaml().getPlatformsList();
     Collections.sort(platforms);

@@ -18,7 +18,8 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AssemblyBean {
-	@JsonProperty("name")
+  
+  @JsonProperty("name")
 	private String name;
 
 	@JsonProperty("auto_gen")

@@ -17,17 +17,15 @@ import com.google.inject.Singleton;
 import com.oneops.boo.yaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Map;
 
 @Singleton
-public class ClientConfig {
+public class BooConfig {
 
-  public static final File ONEOPS_CONFIG =
-      new File(new File(System.getProperty("user.home"), ".boo"), "config");
-  public static final String ONEOPS_DEFAULT_PROFILE = "default";
   private Yaml yaml;
 
   // For add user component in design
@@ -48,10 +46,12 @@ public class ClientConfig {
    * @param profile the profile
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public ClientConfig(File booYamlFile, String profile) throws IOException {
-    ClientConfigReader reader = new ClientConfigReader();
-    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-    this.yaml = reader.read(interpolator.interpolate(booYamlFile, ONEOPS_CONFIG, profile));
+  public BooConfig(File booYamlFile, String profile) throws IOException {
+    BooYamlReader reader = new BooYamlReader();
+    BooConfigInterpolator interpolator = new BooConfigInterpolator();
+    try (InputStream is = new FileInputStream(booYamlFile)) {
+      this.yaml = reader.read(interpolator.interpolate(is, profile));
+    }
   }
 
   /**
@@ -60,9 +60,9 @@ public class ClientConfig {
    * @param config the boo template config file which contains variables
    * @throws IOException
    */
-  public ClientConfig(File booYamlFile, Map<String, String> config) throws IOException {
-    ClientConfigReader reader = new ClientConfigReader();
-    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
+  public BooConfig(File booYamlFile, Map<String, String> config) throws IOException {
+    BooYamlReader reader = new BooYamlReader();
+    BooConfigInterpolator interpolator = new BooConfigInterpolator();
     this.yaml = reader.read(interpolator.interpolate(new String(Files.readAllBytes(booYamlFile.toPath())), config));
   }
 
@@ -73,10 +73,10 @@ public class ClientConfig {
    * @param profile the profile
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public ClientConfig(InputStream input, String profile) throws IOException {
-    ClientConfigReader reader = new ClientConfigReader();
-    ClientConfigInterpolator interpolator = new ClientConfigInterpolator();
-    this.yaml = reader.read(interpolator.interpolate(input, ONEOPS_CONFIG, profile));
+  public BooConfig(InputStream input, String profile) throws IOException {
+    BooYamlReader reader = new BooYamlReader();
+    BooConfigInterpolator interpolator = new BooConfigInterpolator();
+    this.yaml = reader.read(interpolator.interpolate(input, profile));
   }
 
   public Yaml getYaml() {
