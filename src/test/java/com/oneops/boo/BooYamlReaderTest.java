@@ -68,14 +68,19 @@ public class BooYamlReaderTest {
     Map<String,Object> components = p0.getComponents();
     assertNotNull(components);
     // component -> component-0
-    Map<String,String> component0 = p0.getComponent("component-0");
+    Map<String,String> component0 = p0.getComponentAsStringMap("component-0");
     assertEquals("platform-0-config-0-value", component0.get("config-0"));
     assertEquals("platform-0-config-1-value", component0.get("config-1"));
     // component -> compute
-    Map<String,String> compute = p0.getComponent("compute");
+    Map<String,String> compute = p0.getComponentAsStringMap("compute");
     assertEquals("XXL", compute.get("size"));
     assertEquals(Boolean.TRUE, compute.get("require_public_ip"));  
-    // Users
+    // component -> user
+    Map<String,Object> users = p0.getComponent("user");
+    Map<String,String> jvanzyl = (Map<String,String>)users.get("user-jvanzyl");    
+    assertEquals(Boolean.TRUE, jvanzyl.get("system_account"));  
+    assertEquals(Boolean.TRUE, jvanzyl.get("sudoer"));  
+    assertEquals("jvanzyl", jvanzyl.get("username"));  
     // Scale 
     List<ScaleBean> scales = yaml.getScales();
     ScaleBean s0 = scales.get(0);

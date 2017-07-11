@@ -173,7 +173,12 @@ public static class PlatformBeanBuilder {
   }
   
   @SuppressWarnings("unchecked")
-  public Map<String,String> getComponent(String name) {
+  public Map<String,String> getComponentAsStringMap(String name) {
     return (Map<String,String>) components.get(name);
   }
+  
+  @SuppressWarnings("unchecked")
+  public Map<String,Object> getComponent(String name) {
+    return (Map<String,Object>) components.get(name);
+  }  
 }
