@@ -87,7 +87,7 @@ scale: # Because OneOps is not standard design to update the Scaling and other c
         compute: # Component name
           current: '2' # Currently set current=min=max as the total number of computes
           min: '2'
-          max: '10'
+          max: '5'
 
 environment: # Only support one environment for now.
   global_dns: 'true'

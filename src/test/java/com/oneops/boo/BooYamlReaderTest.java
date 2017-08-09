@@ -13,6 +13,7 @@ import org.junit.Test;
 import com.oneops.boo.BooYamlReader;
 import com.oneops.boo.yaml.AssemblyBean;
 import com.oneops.boo.yaml.BooBean;
+import com.oneops.boo.yaml.CloudBean;
 import com.oneops.boo.yaml.EnvironmentBean;
 import com.oneops.boo.yaml.PlatformBean;
 import com.oneops.boo.yaml.ScaleBean;
@@ -36,7 +37,6 @@ public class BooYamlReaderTest {
     assertEquals("api_key", boo.getApikey());
     assertEquals("organization", boo.getOrg());
     assertEquals("email", boo.getEmail());
-    assertEquals("environment_name", boo.getEnvName());
     assertEquals("json", boo.getIpOutput());    
     // Assembly
     AssemblyBean assembly = yaml.getAssembly();
@@ -59,43 +59,92 @@ public class BooYamlReaderTest {
     assertEquals("platform-0", p0.getName());
     assertEquals("source/pack-platform-0", p0.getPackId());
     assertEquals("1", p0.getPackVersion());
-    // Links (not supported in Boo)
+    // Links 
+    PlatformBean p1 = platforms.get(1);
+    assertNotNull(p1.getLinks());
+    
     // Variables
     Map<String,String> platformVariables = p0.getVariables();
     assertEquals("pack-platform-0-variable-0-value", platformVariables.get("pack-platform-variable-0"));
     assertEquals("pack-platform-0-variable-1-value", platformVariables.get("pack-platform-variable-1")); 
+   
     // Components
     Map<String,Object> components = p0.getComponents();
     assertNotNull(components);
+    
     // component -> component-0
     Map<String,String> component0 = p0.getComponentAsStringMap("component-0");
     assertEquals("platform-0-config-0-value", component0.get("config-0"));
     assertEquals("platform-0-config-1-value", component0.get("config-1"));
+    
     // component -> compute
     Map<String,String> compute = p0.getComponentAsStringMap("compute");
     assertEquals("XXL", compute.get("size"));
     assertEquals(Boolean.TRUE, compute.get("require_public_ip"));  
+    
     // component -> user
     Map<String,Object> users = p0.getComponent("user");
     Map<String,String> jvanzyl = (Map<String,String>)users.get("user-jvanzyl");    
     assertEquals(Boolean.TRUE, jvanzyl.get("system_account"));  
     assertEquals(Boolean.TRUE, jvanzyl.get("sudoer"));  
     assertEquals("jvanzyl", jvanzyl.get("username"));  
-    // Scale 
-    List<ScaleBean> scales = yaml.getScales();
-    ScaleBean s0 = scales.get(0);
-    assertEquals(s0.getPlatform(), "platform-0");
-    assertEquals(s0.getCurrent(), 2);
-    assertEquals(s0.getMin(), 2);
-    assertEquals(s0.getMax(), 2);  
+    
+    // component- dependsOn
+    Map<String,Object> klohia = (Map<String,Object>)users.get("user-klohia"); 
+    assertNotNull(klohia.get("dependson"));  
+    
     // Environment
-    EnvironmentBean environment = yaml.getEnvironmentBean();
-    assertNotNull(environment);
-    assertNotNull(environment.getOthers());
-    assertEquals("DEV", environment.getOthers().get("profile"));
-    assertEquals("true", environment.getOthers().get("global_dns"));
-    assertEquals("subdomain", environment.getOthers().get("subdomain"));
-    assertEquals("redundant", environment.getOthers().get("availability"));
+    List<EnvironmentBean> environmentList = yaml.getEnvironmentList();
+    assertNotNull(environmentList);
+    assertTrue(environmentList.size() > 0);
+    environmentList.forEach(env -> {
+      assertNotNull(env.getEnvName());
+      assertNotNull(env.getOthers());
+      
+      //env clouds
+      List<CloudBean> clouds = env.getClouds();
+      assertNotNull(clouds);
+      clouds.forEach(cl -> {
+    	  assertEquals("dev-cloud0", cl.getCloudName());
+    	  assertEquals("1", cl.getPriority());
+    	  assertEquals("1", cl.getDpmtOrder());
+    	  assertEquals("100", cl.getPctScale());
+      });
+      
+      //relays //TODO not implemented in current boo
+      
+      //global variables //TODO not implemented in current boo
+      
+      //env platforms
+      List<PlatformBean> plist = env.getPlatformsList();
+      plist.forEach(pb -> {
+    	  //env platform variables
+    	  assertNotNull(pb.getVariables());
+    	  assertEquals("pack-platform-0-variable-1-value-new", pb.getVariables().get("pack-platform-variable-1"));
+    	  
+    	  assertNotNull(pb.getComponents());
+    	  Map<String,String> comp0 = pb.getComponentAsStringMap("component-0");
+    	  assertEquals("config-0-new-value", comp0.get("config-0"));
+    	  
+    	  //env platform auto healing
+    	  assertNotNull(pb.getAutoHealing());
+    	  assertTrue(pb.getAutoHealing().containsKey("autorepair"));
+    	  assertTrue(pb.getAutoHealing().containsKey("autoreplace"));
+    	  assertTrue(pb.getAutoHealing().containsKey("autoscale"));
+    	  assertTrue(pb.getAutoHealing().containsKey("replace_after_minutes"));
+    	  assertTrue(pb.getAutoHealing().containsKey("replace_after_repairs"));
+    	  
+    	  //env platform scaling
+    	  if("redundant".equals(env.getOthers().get("availability"))) {
+    		  ScaleBean scale = pb.getScale();
+    		  assertEquals(1, scale.getCurrent());
+    		  assertEquals(1, scale.getMin());
+    		  assertEquals(3, scale.getMax());
+    		  assertEquals("component-0", scale.getComponent());
+    	  }
+      });
+    });
+    
   }
   
   protected File yaml(String name) {

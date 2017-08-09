@@ -13,6 +13,7 @@
  */
 package com.oneops.boo.workflow;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,15 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.util.concurrent.Uninterruptibles;
 import com.oneops.api.OOInstance;
 import com.oneops.api.exception.OneOpsClientAPIException;
 import com.oneops.api.resource.model.CiResource;
@@ -39,6 +37,7 @@ import com.oneops.boo.BooConfig;
 import com.oneops.boo.LogUtils;
 import com.oneops.boo.utils.BooUtils;
 import com.oneops.boo.yaml.Constants;
+import com.oneops.boo.yaml.EnvironmentBean;
 import com.oneops.boo.yaml.PlatformBean;
 import com.oneops.boo.yaml.ScaleBean;
 import com.oneops.client.api.exception.OneOpsComponentExistException;
@@ -90,7 +89,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @throws OneOpsClientAPIException
    */
   @Override
-  public Deployment process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
+  public void process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
     boolean isAssemblyExist = this.isAssemblyExist();
     if (isUpdate && !isAssemblyExist) {
       throw new OneOpsClientAPIException(this.assemblyBean.getName() + " not exists!");
@@ -110,24 +109,38 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     }
     this.updatePlatformVariables(isUpdate);
     this.bar.update(20, 100);
-    this.createEnv();
-    this.bar.update(30, 100);
+    
+    List<EnvironmentBean> environmentList = config.getYaml().getEnvironmentList();
+	List<Deployment> deployments = new ArrayList<>();
+	AtomicInteger progress = new AtomicInteger(1);
+	environmentList.parallelStream().parallel().forEach(eb -> {
+		progress.incrementAndGet();
+		Deployment deployment = envProccessing(eb, progress, isUpdate);
+		deployments.add(deployment);
+	});
+	
+  }
+
+  Deployment envProccessing(EnvironmentBean eb, AtomicInteger progress, boolean isUpdate) {
+	try {
+    this.createEnv(eb);
+    this.bar.update(30 + progress.get(), 100);
     if (isUpdate) {
-      this.updatePlatformCloudScale();
+      this.updatePlatformCloudScale(eb);
     }
-    this.updateEnv();
-    this.bar.update(40, 100);
+    this.updateEnv(eb);
+    this.bar.update(40 + progress.get(), 100);
     utils.waitTimeout(1);
     if (isUpdate) {
       try {
-        this.pullDesign();
+        this.pullDesign(eb.getEnvName());
       } catch (Exception e) {
         // Ignore
         // e.printStackTrace();
       }
     }
-    this.bar.update(50, 100);
-    String status = this.getStatus();
+    this.bar.update(50 + progress.get(), 100);
+    String status = this.getStatus(eb.getEnvName());
     if (ACTIVE.equalsIgnoreCase(status)) {
       LogUtils.info(Constants.ACTIVE_DEPLOYMENT_EXISTING);
       return null;
@@ -137,16 +150,16 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       LogUtils.info(Constants.FAIL_DEPLOYMENT_EXISTING);
       return null;
     }
-    this.updateScaling();
-    this.updatePlatformHealingOptions();
-    this.bar.update(70, 100);
+    this.updateScaling(eb);
+    this.updatePlatformHealingOptions(eb);
+    this.bar.update(70 + progress.get(), 100);
+    
     // Added retries
     boolean retry = true;
     String deployError = null;
-    this.relayEnableDelivery(config.getYaml().getBoo().isEnable());
-    if (isUpdate) {
-      this.commitEnv();
-    }
+    this.relayEnableDelivery(eb.getEnvName(), config.getYaml().getBoo().isEnable());
+    this.commitEnv(eb.getEnvName());
+    
     if (BooCli.isNoDeploy()) {
       this.bar.update(100, 100);
       LogUtils.info(Constants.CREATE_WITHOUT_DEPLOYMENT);
@@ -157,7 +170,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     while (retry && retries > 0) {
       utils.waitTimeout(2);
       try {
-        deployment = this.deploy(isUpdate);
+        deployment = this.deploy(eb.getEnvName(), isUpdate);
         retry = false;
       } catch (Exception e) {
         deployError = e.getMessage();
@@ -177,9 +190,11 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 
       System.out.println();
     }
+	} catch(OneOpsClientAPIException e) {
+		throw new RuntimeException(e);
+	}
     return null;
   }
-
 
   /**
    * Relay enable delivery.
@@ -187,9 +202,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @param enable the enable
    * @return true, if successful
    */
-  public boolean relayEnableDelivery(boolean enable) {
+  public boolean relayEnableDelivery(String envName, boolean enable) {
     try {
-      transition.updateRelay(this.envName, "default", null, null, null, null, null, false, enable);
+      transition.updateRelay(envName, "default", null, null, null, null, null, false, enable);
       return Boolean.TRUE;
     } catch (OneOpsClientAPIException e) {
       System.err.println("Cannot update relay!");
@@ -481,8 +496,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void updateComponentVariables(String platformName, String componentName,
       Map<String, Object> attributes) throws OneOpsClientAPIException {
-    // Create thread pool to add users parallel
-    ExecutorService executor = Executors.newFixedThreadPool(numOfThreads);
 
     for (Map.Entry<String, Object> entry : attributes.entrySet()) {
       String key = entry.getKey();
@@ -496,10 +509,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
           this.updateComponentVariablesInternal(platformName, componentName, componentName, att);
         break;
       }
-    }
-    executor.shutdown();
-    while (!executor.isTerminated()) {
-      Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS);
     }
   }
 
@@ -533,19 +542,6 @@ public class BuildAllPlatforms extends AbstractWorkflow {
   }
 
   /**
-   * Gets the custom ips.
-   *
-   * @param platformName the platform name
-   * @param componentName the component name
-   * @return the custom ips
-   * @throws OneOpsClientAPIException the one ops client API exception
-   */
-  public String getCustomIps(String platformName, String componentName)
-      throws OneOpsClientAPIException {
-    return utils.getIps(platformName, componentName, this);
-  }
-
-  /**
    * Prints the ips.
    *
    * @param platformName the platform name
@@ -553,9 +549,9 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @return the string
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public String printIps(String platformName, String componentName)
+  public String printIps(String envName, String platformName, String componentName)
       throws OneOpsClientAPIException {
-    List<Map<String, Object>> ips = this.getIpsInternal(platformName, componentName);
+    List<Map<String, Object>> ips = this.getIpsInternal(envName, platformName, componentName);
     StringBuilder str = new StringBuilder();
     for (Map<String, Object> ip : ips) {
       str.append(ip.get(Constants.PRIVATE_IP));
@@ -570,7 +566,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean updateScaling() throws OneOpsClientAPIException {
+  public boolean updateScaling(String envName) throws OneOpsClientAPIException {
     List<ScaleBean> scales = this.config.getYaml().getScales();
     if (scales == null) {
       return false;
@@ -584,6 +580,39 @@ public class BuildAllPlatforms extends AbstractWorkflow {
       LogUtils.info(Constants.COMPUTE_SIZE, envName, scale.getPlatform());
       transition.updatePlatformRedundancyConfig(envName, scale.getPlatform(), scale.getComponent(), config);
     }
+    if (StringUtils.isBlank(this.comments)) {
+      transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
+    } else {
+      transition.commitEnvironment(envName, null, comments);
+    }
+    return true;
+  }
+  
+  public boolean updateScaling(EnvironmentBean eb) throws OneOpsClientAPIException {
+	  List<ScaleBean> scales = this.config.getYaml().getScales(); 
+      if (scales != null) { // do this for backward compatibility
+    	return updateScaling(eb.getEnvName()); //this method should be removed eventually
+      } 
+	  
+	List<PlatformBean> platformsList = eb.getPlatformsList();
+    if(platformsList == null || platformsList.size() == 0) {
+    	return false;
+    }
+    
+    String envName = eb.getEnvName();
+    for(PlatformBean p : platformsList) {
+      ScaleBean scale = p.getScale();
+	  if(scale != null) {
+		RedundancyConfig config = new RedundancyConfig();
+	    config.setCurrent(scale.getCurrent());
+	    config.setMin(scale.getMin());
+	    config.setMax(scale.getMax());
+	    config.setPercentDeploy(scale.getPercentDeploy());
+	    LogUtils.info(Constants.COMPUTE_SIZE, envName, scale.getPlatform());
+	    transition.updatePlatformRedundancyConfig(envName, p.getName(), scale.getComponent(), config);
+	  }
+    }
+	   
     if (StringUtils.isBlank(this.comments)) {
       transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
     } else {
@@ -626,7 +655,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
     return true;
   }
 
-  public Deployment getDeployment(Long deploymentId) throws OneOpsClientAPIException {
+  public Deployment getDeployment(String envName, Long deploymentId) throws OneOpsClientAPIException {
     return transition.getDeploymentStatus(envName, deploymentId);
   }
 }

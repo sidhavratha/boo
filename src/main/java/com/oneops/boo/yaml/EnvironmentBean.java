@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 public class EnvironmentBean {
-
+  
+  private String envName;
   private Map<String, String> others = new HashMap<String, String>();
   private List<CloudBean> clouds = new ArrayList<CloudBean>();
 
@@ -51,4 +52,14 @@ public class EnvironmentBean {
   public void setPlatformsList(List<PlatformBean> platformsList) {
     this.platformsList = platformsList;
   }
+
+  public String getEnvName() {
+	return envName;
+  }
+
+  public void setEnvName(String envName) {
+	this.envName = envName;
+  }
+
+  
 }

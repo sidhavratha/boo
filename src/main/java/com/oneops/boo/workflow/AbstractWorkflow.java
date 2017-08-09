@@ -46,6 +46,7 @@ import com.oneops.boo.utils.ProgressBar;
 import com.oneops.boo.yaml.AssemblyBean;
 import com.oneops.boo.yaml.CloudBean;
 import com.oneops.boo.yaml.Constants;
+import com.oneops.boo.yaml.EnvironmentBean;
 import com.oneops.boo.yaml.PlatformBean;
 import com.oneops.boo.yaml.helper.EnvironmentBeanHelper;
 
@@ -63,9 +64,6 @@ public abstract class AbstractWorkflow {
   /** The Assembly Bean */
   AssemblyBean assemblyBean;
   
-  /** The env name. */
-  String envName;
-
   /** The assembly. */
   Assembly assembly;
 
@@ -74,9 +72,6 @@ public abstract class AbstractWorkflow {
 
   /** The transition. */
   Transition transition;
-
-  /** The op. */
-  Operation op;
 
   /** The config. */
   BooConfig config;
@@ -106,7 +101,6 @@ public abstract class AbstractWorkflow {
     this.instance = instance;
     this.config = config;
     this.assemblyBean = config.getYaml().getAssembly();
-    this.envName = config.getYaml().getBoo().getEnvName();
     this.cloud = new Cloud(instance);
     
     String assemblyName = assemblyBean.getName();
@@ -114,7 +108,6 @@ public abstract class AbstractWorkflow {
     assembly = new Assembly(instance);
     design = new Design(instance, assemblyName);
     transition = new Transition(instance, assemblyName);
-    op = new Operation(instance, assemblyName, envName);
     this.config = config;
 
     this.bar = new ProgressBar();
@@ -131,26 +124,27 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public abstract Deployment process(boolean isUpdate, boolean isAssemblyOnly)
+  public abstract void process(boolean isUpdate, boolean isAssemblyOnly)
       throws OneOpsClientAPIException;
 
+  
   /**
    * Cleanup.
    *
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean cleanup() throws OneOpsClientAPIException {
-    for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
-      if (this.platformExist(platform.getName())) {
-        LogUtils.info(Constants.DESTROY_PLATFORM, platform.getName());
-        this.cleanupInt(platform.getName());
-      }
-    }
-    this.deleteAssembly();
-    return true;
+  public boolean cleanup() throws OneOpsClientAPIException, InterruptedException {
+	  if(this.isAssemblyExist()) {
+		  removeAllEnvs();
+		  while (this.getStatus() != null && this.getStatus().contains("active")) {
+			LogUtils.info("Env deployment still in progress");
+	        TimeUnit.SECONDS.sleep(10);
+	      }
+		  return deleteAssembly();
+	  }
+	  return true;
   }
-
   /**
    * Removes the all envs.
    *
@@ -161,19 +155,22 @@ public abstract class AbstractWorkflow {
     if (design == null) {
       return null;
     }
+    
     List<Deployment> deployments = new ArrayList<>();
-    for (String env : this.listEnvs()) {
-      this.cancelDeployment(env);
-      Deployment deployment = this.disableAllPlatforms(env);
-      if (deployment != null) {
-        deployments.add(deployment);
-      }
-      try {
-        transition.deleteEnvironment(env);
-      } catch (Exception e) {
-        // Do nothing
-      }
-    }
+    List<String> envList = listEnvs();
+    envList.forEach(env -> {
+    	this.cancelDeployment(env);
+        Deployment deployment = this.disableAllPlatforms(env);
+        if (deployment != null) {
+          deployments.add(deployment);
+        }
+        try {
+          transition.deleteEnvironment(env);
+        } catch (Exception e) {
+          // Do nothing
+        }
+    });
+   	
     return deployments;
   }
 
@@ -209,44 +206,6 @@ public abstract class AbstractWorkflow {
    */
   public BooConfig getConfig() {
     return config;
-  }
-
-  /**
-   * Cleanup int.
-   *
-   * @param platformName the platform name
-   * @return true, if successful
-   * @throws OneOpsClientAPIException the one ops client API exception
-   */
-  private boolean cleanupInt(String platformName) throws OneOpsClientAPIException {
-    return this.cleanupInt(this.envName, platformName);
-  }
-
-  /**
-   * Cleanup int.
-   *
-   * @param envName the env name
-   * @param platformName the platform name
-   * @return true, if successful
-   * @throws OneOpsClientAPIException the one ops client API exception
-   */
-  private boolean cleanupInt(String envName, String platformName) throws OneOpsClientAPIException {
-    if (design == null) {
-      return true;
-    }
-    this.cancelDeployment();
-    this.disableAllPlatforms();
-    try {
-      transition.deleteEnvironment(envName);
-    } catch (Exception e) {
-      // Do nothing
-    }
-    if (this.isPlatformsExist()) {
-      design.deletePlatform(platformName);
-    }
-    op = null;
-    design = null;
-    return true;
   }
 
   /**
@@ -427,14 +386,6 @@ public abstract class AbstractWorkflow {
   }
 
 
-  /**
-   * Cancel deployment.
-   *
-   * @return true, if successful
-   */
-  boolean cancelDeployment() {
-    return this.cancelDeployment(this.envName);
-  }
 
   /**
    * Cancel deployment.
@@ -469,11 +420,11 @@ public abstract class AbstractWorkflow {
 
   /**
    * Sometimes we have to retry a few times to make the deployment done.
+ * @param envName 
    *
    * @return true, if successful
    */
-	public Deployment retryDeployment() {
-		boolean isSuc = false;
+	public Deployment retryDeployment(String envName) {
         long deploymentId = 0;
 		try {
 			Deployment response = transition.getLatestDeployment(envName);
@@ -484,10 +435,13 @@ public abstract class AbstractWorkflow {
 				LOG.debug("deploymentId:" + deploymentId + "; releaseId: " + releaseId);
 			}
 			response = transition.getDeploymentStatus(envName, deploymentId);
-			Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
-			response = transition.retryDeployment(envName, deploymentId, releaseId);
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Retry deployment: " + (response == null ? "" : response.getComments()));
+			if(response != null && "complete".equalsIgnoreCase(response.getDeploymentState())) {
+				LOG.info("Deployment already completed");
+			} else {
+				response = transition.retryDeployment(envName, deploymentId, releaseId);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Retry deployment: " + (response == null ? "" : response.getComments()));
+				}
 			}
 			return response;
 		} catch (Exception e) {
@@ -496,13 +450,6 @@ public abstract class AbstractWorkflow {
 
 		return null;
 	}
-
-  /**
-   * Disable all platforms.
-   */
-  Deployment disableAllPlatforms() {
-    return this.disableAllPlatforms(this.envName);
-  }
 
   /**
    * Disable all platforms.
@@ -581,8 +528,34 @@ public abstract class AbstractWorkflow {
    * @return the list
    * @throws OneOpsClientAPIException the one ops client API exception
    */
+  public List<String> listActions(String envName, String platformName, String componentName)
+      throws OneOpsClientAPIException {
+	Operation op = new Operation(instance, this.assemblyBean.getName(), envName);
+    JsonPath response = op.listActions(platformName, componentName);
+    return response.getList("actionName");
+  }
+  
+  /**
+   * List actions.
+   *
+   * @param platformName the platform name
+   * @param componentName the component name
+   * @return the list
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   public List<String> listActions(String platformName, String componentName)
       throws OneOpsClientAPIException {
+	
+	String envName = null;
+	List<EnvironmentBean> environmentList = this.config.getYaml().getEnvironmentList();
+	if(environmentList != null && environmentList.size() > 0) {
+		envName = environmentList.get(0).getEnvName();
+	}
+	if(envName == null) {
+		throw new OneOpsClientAPIException("No valid environment found!!!");
+	}
+	  
+    Operation op = new Operation(instance, this.assemblyBean.getName(), envName);
     JsonPath response = op.listActions(platformName, componentName);
     return response.getList("actionName");
   }
@@ -595,8 +568,9 @@ public abstract class AbstractWorkflow {
    * @return the map
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public Map<String, Long> listInstancesMap(String platformName, String componentName)
+  public Map<String, Long> listInstancesMap(String envName, String platformName, String componentName)
       throws OneOpsClientAPIException {
+	Operation op = new Operation(instance, this.assemblyBean.getName(), envName);
     List<CiResource> response = op.listInstances(platformName, componentName);
     Map<String, Long> map = new HashMap<String, Long>();
     for (CiResource ciResource : response) {
@@ -614,8 +588,38 @@ public abstract class AbstractWorkflow {
    * @return the list
    * @throws OneOpsClientAPIException the one ops client API exception
    */
+  public List<String> listInstances(String envName, String platformName, String componentName)
+      throws OneOpsClientAPIException {
+	Operation op = new Operation(instance, this.assemblyBean.getName(), envName);
+    List<CiResource> response = op.listInstances(platformName, componentName);
+    List<String> names = new ArrayList<String>();
+    for (CiResource ciResource : response) {
+		names.add(ciResource.getCiName());
+	}
+   
+    return names;
+  }
+  
+  /**
+   * List instances.
+   *
+   * @param platformName the platform name
+   * @param componentName the component name
+   * @return the list
+   * @throws OneOpsClientAPIException the one ops client API exception
+   */
   public List<String> listInstances(String platformName, String componentName)
       throws OneOpsClientAPIException {
+	  
+	String envName = null;
+	List<EnvironmentBean> environmentList = this.config.getYaml().getEnvironmentList();
+	if(environmentList != null && environmentList.size() > 0) {
+		envName = environmentList.get(0).getEnvName();
+	}
+	if(envName == null) {
+		throw new OneOpsClientAPIException("No valid environment found!!!");
+	}
+	Operation op = new Operation(instance, this.assemblyBean.getName(), envName);
     List<CiResource> response = op.listInstances(platformName, componentName);
     List<String> names = new ArrayList<String>();
     for (CiResource ciResource : response) {
@@ -632,7 +636,8 @@ public abstract class AbstractWorkflow {
    * @return the procedure status
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public String getProcedureStatus(Long procedureId) throws OneOpsClientAPIException {
+  public String getProcedureStatus(String envName, Long procedureId) throws OneOpsClientAPIException {
+	Operation op = new Operation(instance, this.assemblyBean.getName(), envName);
     Procedure response = op.getProcedureStatus(procedureId);
     return response.getProcedureState();
   }
@@ -645,8 +650,9 @@ public abstract class AbstractWorkflow {
    * @return the list
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  private List<Long> listInstanceIds(String platformName, String componentName)
+  private List<Long> listInstanceIds(String envName, String platformName, String componentName)
       throws OneOpsClientAPIException {
+	Operation op = new Operation(instance, this.assemblyBean.getName(), envName);
     List<CiResource> response = op.listInstances(platformName, componentName);
     List<Long> Ids = new ArrayList<Long>();
     for (CiResource ciResource : response) {
@@ -667,18 +673,19 @@ public abstract class AbstractWorkflow {
    * @return the string
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public Long executeAction(String platformName, String componentName, String actionName,
+  public Long executeAction(String envName, String platformName, String componentName, String actionName,
       String arglist, List<String> instanceList, int rollAt) throws OneOpsClientAPIException {
     List<Long> list = new ArrayList<Long>();
     if (instanceList == null || instanceList.size() == 0) {
 
-      list = this.listInstanceIds(platformName, componentName);
+      list = this.listInstanceIds(envName, platformName, componentName);
     } else {
-      Map<String, Long> map = this.listInstancesMap(platformName, componentName);
+      Map<String, Long> map = this.listInstancesMap(envName, platformName, componentName);
       for (String name : instanceList) {
         list.add(map.get(name));
       }
     }
+    Operation op = new Operation(instance, this.assemblyBean.getName(), envName);
     Procedure response =
         op.executeAction(platformName, componentName, actionName, list, arglist, rollAt);
     return response == null ? null : response.getProcedureId();
@@ -802,13 +809,13 @@ public abstract class AbstractWorkflow {
    * @param platformName the platform name
    * @return true, if is env exist
    */
-  public boolean isEnvExist(String platformName) {
+  public boolean isEnvExist(String envName) {
     CiResource response = null;
     try {
       response = transition.getEnvironment(envName);
     } catch (OneOpsClientAPIException e) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug(Constants.ENV_NOT_EXISTING, platformName, e.getMessage());
+        LOG.debug(Constants.ENV_NOT_EXISTING, envName, e.getMessage());
       }
     }
     return (response == null ? false : true);
@@ -820,7 +827,8 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean createEnv() throws OneOpsClientAPIException {
+  public boolean createEnv(EnvironmentBean environmentBean) throws OneOpsClientAPIException {
+	String envName = environmentBean.getEnvName();
     boolean isExist = this.isEnvExist(envName);
     CiResource response = null;
     if (!isExist) {
@@ -829,7 +837,8 @@ public abstract class AbstractWorkflow {
 
       Map<String, Map<String, String>> cloudMaps = new HashMap<String, Map<String, String>>();
 
-      List<CloudBean> clouds = config.getYaml().getEnvironmentBean().getClouds();
+//      EnvironmentBean environmentBean = config.getYaml().getEnvironmentBean();
+	List<CloudBean> clouds = environmentBean.getClouds();
       for (CloudBean cloud : clouds) {
         Map<String, String> cloudMap = new HashMap<String, String>();
         cloudMap.put(EnvironmentBeanHelper.PRIORITY, cloud.getPriority());
@@ -839,8 +848,8 @@ public abstract class AbstractWorkflow {
       }
 
       response = transition.createEnvironment(envName,
-    		  config.getYaml().getEnvironmentBean().getOthers().get(Constants.ENV_PROFILE),
-          config.getYaml().getEnvironmentBean().getOthers(), null, cloudMaps,
+    		  environmentBean.getOthers().get(Constants.ENV_PROFILE),
+          environmentBean.getOthers(), null, cloudMaps,
           Constants.DESCRIPTION);
       
       response = transition.getEnvironment(envName);
@@ -864,8 +873,8 @@ public abstract class AbstractWorkflow {
    * @throws OneOpsClientAPIException the one ops client API exception
    */
   @SuppressWarnings("unchecked")
-  public boolean updateEnv() throws OneOpsClientAPIException {
-    List<PlatformBean> platforms = config.getYaml().getEnvironmentBean().getPlatformsList();
+  public boolean updateEnv(EnvironmentBean environmentBean) throws OneOpsClientAPIException {
+    List<PlatformBean> platforms = environmentBean.getPlatformsList();
     if (platforms == null) {
       return false;
     }
@@ -873,7 +882,7 @@ public abstract class AbstractWorkflow {
       Map<String, Object> map = platform.getComponents();
       if (map != null) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-          transition.updatePlatformComponent(envName, platform.getName(), entry.getKey(),
+          transition.updatePlatformComponent(environmentBean.getEnvName(), platform.getName(), entry.getKey(),
               (Map<String, String>) entry.getValue());
         }
       }
@@ -887,13 +896,13 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean updatePlatformCloudScale() throws OneOpsClientAPIException {
+  public boolean updatePlatformCloudScale(EnvironmentBean environmentBean) throws OneOpsClientAPIException {
     for (PlatformBean platform : this.config.getYaml().getPlatformsList()) {
       if (this.platformExist(platform.getName())) {
-        CiResource environment = transition.getEnvironment(envName);
-        Map<String, Object> sysClouds = (Map<String, Object>) environment.getAdditionalProperties().get(Constants.CLOUDS);
-//		Map<String, Object> sysClouds = environment.getMap(Constants.CLOUDS);
-        List<CloudBean> clouds = config.getYaml().getEnvironmentBean().getClouds();
+        CiResource environment = transition.getEnvironment(environmentBean.getEnvName());
+        @SuppressWarnings("unchecked")
+		Map<String, Object> sysClouds = (Map<String, Object>) environment.getAdditionalProperties().get(Constants.CLOUDS);
+        List<CloudBean> clouds = environmentBean.getClouds();
         for (CloudBean cloud : clouds) {
         	String cloudId = String.valueOf(this.getCloudId(cloud.getCloudName()));
           if (sysClouds.containsKey(cloudId)) {
@@ -902,7 +911,7 @@ public abstract class AbstractWorkflow {
             cloudMap.put(EnvironmentBeanHelper.PRIORITY, cloud.getPriority());
             cloudMap.put(EnvironmentBeanHelper.DPMT_ORDER, cloud.getDpmtOrder());
             cloudMap.put(EnvironmentBeanHelper.PCT_SCALE, cloud.getPctScale());
-            transition.updatePlatformCloudScale(envName, platform.getName(),
+            transition.updatePlatformCloudScale(environmentBean.getEnvName(), platform.getName(),
                 String.valueOf(getCloudId(cloud.getCloudName())), cloudMap);
             // If cloud exists in yaml, remove the cloud name from the system clouds map after
             // updating cloud.
@@ -913,7 +922,7 @@ public abstract class AbstractWorkflow {
         for (String cloud : sysClouds.keySet()) {
           Map<String, String> cloudMap = new HashMap<String, String>();
           cloudMap.put(EnvironmentBeanHelper.ADMINSTATUS, Constants.OFFLINE);
-          transition.updatePlatformCloudScale(envName, platform.getName(), cloud, cloudMap);
+          transition.updatePlatformCloudScale(environmentBean.getEnvName(), platform.getName(), cloud, cloudMap);
         }
       }
     }
@@ -926,11 +935,12 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean updatePlatformHealingOptions() throws OneOpsClientAPIException {
-	  List<PlatformBean> platforms = this.config.getYaml().getEnvironmentBean().getPlatformsList();
+  public boolean updatePlatformHealingOptions(EnvironmentBean environmentBean) throws OneOpsClientAPIException {
+	  List<PlatformBean> platforms = environmentBean.getPlatformsList();
 	  if (platforms == null) {
 	      return false;
 	  }
+	  Operation op = new Operation(instance, this.assemblyBean.getName(), environmentBean.getEnvName());
      for (PlatformBean platform : platforms) {
       if(platform.getAutoHealing() == null || platform.getAutoHealing().isEmpty()) {
     	  return false;
@@ -939,7 +949,7 @@ public abstract class AbstractWorkflow {
         int repairCount = -1, repairTime = -1;
         for(Entry<String, Object> entry : platform.getAutoHealing().entrySet()) {
         	if(entry.getKey().startsWith("auto")) {
-        		op.updatePlatformAutoHealingStatus(envName, platform.getName(), entry.getKey(), (Boolean)entry.getValue());
+        		op.updatePlatformAutoHealingStatus(environmentBean.getEnvName(), platform.getName(), entry.getKey(), (Boolean)entry.getValue());
         	}
         	if(PlatformBean.REPLACE_AFTER_MINUTES.equals(entry.getKey())) {
         		repairTime = (Integer)entry.getValue();
@@ -949,7 +959,7 @@ public abstract class AbstractWorkflow {
         	}
         }
         if(repairCount != -1 && repairTime != -1) {
-        	op.updatePlatformAutoReplaceConfig(envName, platform.getName(), repairCount, repairTime);
+        	op.updatePlatformAutoReplaceConfig(environmentBean.getEnvName(), platform.getName(), repairCount, repairTime);
         }
       }
     }
@@ -961,7 +971,7 @@ public abstract class AbstractWorkflow {
    *
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public void pullDesign() throws OneOpsClientAPIException {
+  public void pullDesign(String envName) throws OneOpsClientAPIException {
     transition.pullDesign(envName);
   }
 
@@ -971,7 +981,7 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public boolean commitEnv() throws OneOpsClientAPIException {
+  public boolean commitEnv(String envName) throws OneOpsClientAPIException {
     Release response;
     if (StringUtils.isBlank(this.comments)) {
       response = transition.commitEnvironment(envName, null, Constants.DESCRIPTION);
@@ -987,7 +997,7 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public Deployment deploy(boolean isUpdate) throws OneOpsClientAPIException {
+  public Deployment deploy(String envName, boolean isUpdate) throws OneOpsClientAPIException {
     Deployment response;
     if (StringUtils.isBlank(this.comments)) {
       if (isUpdate) {
@@ -1010,8 +1020,9 @@ public abstract class AbstractWorkflow {
    * @return the ips internal
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public List<Map<String, Object>> getIpsInternal(String platformName, String componentName)
+  public List<Map<String, Object>> getIpsInternal(String envName, String platformName, String componentName)
       throws OneOpsClientAPIException {
+	Operation op = new Operation(instance, this.assemblyBean.getName(), envName);
     List<CiResource> response = op.listInstances(platformName, componentName);
     List<Map<String, Object>> attrList = new ArrayList<Map<String, Object>>();
     for (CiResource ciResource : response) {
@@ -1037,7 +1048,7 @@ public abstract class AbstractWorkflow {
    *
    * @return the deployment id
    */
-  Long getDeploymentId() {
+  Long getDeploymentId(String envName) {
 	  Long id = null;
     try {
       Deployment latestDeployment = transition.getLatestDeployment(envName);
@@ -1053,14 +1064,34 @@ public abstract class AbstractWorkflow {
    *
    * @return the status
    */
-  public String getStatus() {
+  public String getStatus(String envName) {
     String status = null;
     try {
-      Deployment response = transition.getDeploymentStatus(envName, this.getDeploymentId());
+      Deployment response = transition.getDeploymentStatus(envName, this.getDeploymentId(envName));
       status = response.getDeploymentState();
     } catch (OneOpsClientAPIException e) {
       // Ignore
     }
     return status;
+  }
+  
+  /**
+   * Gets the status.
+   *
+   * @return the status
+   */
+  public String getStatus() {
+    StringBuilder sb = new StringBuilder();
+    for(EnvironmentBean eb : this.config.getYaml().getEnvironmentList()) {
+    	try {
+    	      Deployment response = transition.getDeploymentStatus(eb.getEnvName(), this.getDeploymentId(eb.getEnvName()));
+    	      String status = response.getDeploymentState();
+    	      sb.append("\n").append(eb.getEnvName()).append(" deployment status:").append(status);
+    	    } catch (OneOpsClientAPIException e) {
+    	      // Ignore
+    	    }
+    }
+    
+    return sb.toString();
   }
 }

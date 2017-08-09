@@ -27,6 +27,7 @@ public class PlatformBean implements Comparable<Object> {
   private Map<String, String> secureVariables;
   private Map<String, Object> components;
   private Map<String, Object> autoHealing;
+  private ScaleBean scale;
   private List<String> links;
 
   public static final String REPLACE_AFTER_MINUTES = "replace_after_minutes";
@@ -47,6 +48,7 @@ public class PlatformBean implements Comparable<Object> {
     this.deployOrder = builder.deployOrder;
     this.links = builder.links;
     this.autoHealing = builder.autoHealing;
+    this.scale = builder.scale;
     if (pack != null) {
       this.packs = pack.split("[\\/\\s]");
     }
@@ -96,7 +98,9 @@ public class PlatformBean implements Comparable<Object> {
 	return autoHealing;
   }
 
-
+  public ScaleBean getScale() {
+	return scale;
+  }
 
 public static class PlatformBeanBuilder {
     private String name;
@@ -109,6 +113,7 @@ public static class PlatformBeanBuilder {
     private Map<String, String> secureVariables;
     private List<String> links;
     private Map<String, Object> autoHealing;
+    private ScaleBean scale;
 
     public PlatformBeanBuilder setVariables(Map<String, String> variables) {
       this.variables = variables;
@@ -156,6 +161,35 @@ public static class PlatformBeanBuilder {
 		return this;
 	}
 
+	
+	public PlatformBeanBuilder setScale(Map<String, Object> scale) {
+		if(scale == null || scale.size() ==0 ) {
+			return this;
+		}
+	    for (Map.Entry<String, Object> entry : scale.entrySet()) {
+	      Object value = entry.getValue();
+	      String component = entry.getKey();
+	      if (value instanceof Map) {
+	        @SuppressWarnings("unchecked")
+			Map<String, String> map = (Map<String, String>) value;
+	          this.scale = new ScaleBean.ScalBeanBuilder().setComponent(component)
+	    		  .setCurrent(map.get(CURRENT))
+	    		  .setMax(map.get(MAX))
+	    		  .setMin(map.get(MIN))
+	              .setStepDown(map.get(STEP_DOWN))
+	              .setStepUp(map.get(STEP_UP))
+	              .setPercentDeploy(map.get(PERCENT_DEPLOY)).build();
+	      }
+	    }
+	  return this;
+	}
+	
+	 private static final String CURRENT = "current";
+	  private static final String MIN = "min";
+	  private static final String MAX = "max";
+	  private static final String STEP_UP = "step_up";
+	  private static final String STEP_DOWN = "step_down";
+	  private static final String PERCENT_DEPLOY = "percent_deploy";
   }
 
   /*

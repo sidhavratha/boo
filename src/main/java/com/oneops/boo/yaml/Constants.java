@@ -25,6 +25,7 @@ public class Constants {
   public static final String CREATE_DESCRIPTION = "BOO created new assembly";
   public static final String CLEANUP_DESCRIPTION = "BOO cleaned up instance";
   public static final String PLATFORMS = "platforms";
+  public static final String ENVIRONMENTS = "environments";
   public static final String CLOUDS = "clouds";
   public static final String EXTRACT = "extract";
   public static final String VARIABLES = "variables";

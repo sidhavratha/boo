@@ -21,6 +21,7 @@ import com.oneops.boo.yaml.helper.EnvironmentBeanHelper;
 import com.oneops.boo.yaml.helper.PlatformBeanHelper;
 import com.oneops.boo.yaml.helper.PlatformConfigBeanHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class Yaml {
   private AssemblyBean assembly;
   private BooBean boo;
   private Map<String, Object> environment;
+  private Map<String, Object> environments;
   private Map<String, Object> scale;
   private Map<String, Object> extract;
   private Map<String, Object> others = new HashMap<String, Object>();
@@ -42,7 +44,7 @@ public class Yaml {
   private List<ScaleBean> envList;
 
   @JsonIgnore
-  private EnvironmentBean environmentBean;
+  private List<EnvironmentBean> environmentList;
 
   public AssemblyBean getAssembly() {
     return assembly;
@@ -113,8 +115,17 @@ public class Yaml {
   }
 
   @JsonIgnore
-  public EnvironmentBean getEnvironmentBean() {
-    return EnvironmentBeanHelper.getEnvironment(this.environment);
+  public List<EnvironmentBean> getEnvironmentList() {
+	List<EnvironmentBean> list = new ArrayList<EnvironmentBean>();
+	if(this.environment != null) {
+		EnvironmentBean env = EnvironmentBeanHelper.getEnvironment(this.environment);
+		env.setEnvName(boo.getEnvName());
+		list.add(env);
+	} else {
+		list.addAll(EnvironmentBeanHelper.getEnvironments(this.environments));
+	}
+	
+    return list;
   }
 
   @SuppressWarnings("unchecked")
@@ -123,13 +134,13 @@ public class Yaml {
     return (Map<String, String>) this.others.get(Constants.VARIABLES);
   }
 
-  public Map<String, Object> getEnvironment() {
-    return environment;
-  }
-
   public void setEnvironment(Map<String, Object> environments) {
     this.environment = environments;
   }
+  
+  public void setEnvironments(Map<String, Object> environments) {
+	    this.environments = environments;
+	  }
 
   public Map<String, Object> getScale() {
     return scale;

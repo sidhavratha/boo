@@ -44,6 +44,7 @@ import com.oneops.boo.exception.BooException;
 import com.oneops.boo.utils.BooUtils;
 import com.oneops.boo.workflow.BuildAllPlatforms;
 import com.oneops.boo.yaml.Constants;
+import com.oneops.boo.yaml.EnvironmentBean;
 import com.oneops.client.OneOpsConfigReader;
 
 /**
@@ -65,9 +66,7 @@ public class BooCli {
 
   /** The Constant YES_NO. */
   private static final String YES_NO =
-      "WARNING! There are %s instances using the %s configuration. Do you want to destroy all of them? (y/n)";
-
-  private static int DEPLOYMENT_TIMEOUT_SECONDS = 90 * 60; //90 minutes
+      "WARNING! There are %s assemblies using the %s configuration. Do you want to destroy all of them? (y/n)";
 
   /** The config file. */
   private File configFile;
@@ -110,7 +109,7 @@ public class BooCli {
 
     Option cleanup = Option.builder("r").longOpt("remove")
         .desc("Remove all deployed configurations specified by -f").build();
-    Option list = Option.builder("l").longOpt("list").numberOfArgs(1).optionalArg(Boolean.TRUE)
+    Option list = Option.builder("l").longOpt("list").numberOfArgs(2).optionalArg(Boolean.TRUE)
         .desc("Return a list of instances applicable to the identifier provided..").build();
 
     Option force = Option.builder().longOpt("force").desc("Do not prompt for --remove").build();
@@ -123,13 +122,13 @@ public class BooCli {
     getIps.setOptionalArg(true);
     getIps.setArgs(Option.UNLIMITED_VALUES);
 
-    Option retry = Option.builder().longOpt("retry")
-        .desc("Retry deployments of configurations specified by -f").build();
+    Option retry = Option.builder().longOpt("retry").numberOfArgs(1).optionalArg(Boolean.TRUE)
+        .desc("Retry deployments of environment specified in the args").build();
     Option quiet = Option.builder().longOpt("quiet").desc("Silence the textual output.").build();
     Option assembly = Option.builder("a").longOpt("assembly").hasArg()
         .desc("Override the assembly name.").build();
-    Option action = Option.builder().longOpt("procedure").numberOfArgs(3).optionalArg(Boolean.TRUE)
-        .argName("platform> <component> <action")
+    Option action = Option.builder().longOpt("procedure").numberOfArgs(4).optionalArg(Boolean.TRUE)
+        .argName("environment> <platform> <component> <action")
         .desc("Execute actions. Use 'list' as an action to show available actions.").build();
     Option procedureArguments =
         Option.builder().longOpt("procedure-arguments").argName("arglist").hasArg()
@@ -188,7 +187,6 @@ public class BooCli {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Loading {}", template);
     }
-    LOG.info("Boo variables : " + variables);
     this.configFile = template;
     if (variables != null) {
       injector = Guice.createInjector(new JaywayHttpModule(this.configFile, variables));
@@ -362,14 +360,23 @@ public class BooCli {
           getIps2(cmd.getOptionValues("get-ips")[0], cmd.getOptionValues("get-ips")[1]);
         }
       } else if (cmd.hasOption("retry")) {
-        this.retryDeployment();
+    	  String[] args = cmd.getOptionValues("retry");
+    	  if (args == null || args.length != 1) {
+              System.err
+                  .println("Wrong parameters! --retry <environmentName>");
+              return Constants.EXIT_WRONG_PRAMETER;
+            } else {
+            	this.retryDeployment(args[0]);
+            }
+        
       } else if (cmd.hasOption("procedure")) {
-        if (cmd.getOptionValues("procedure").length != 3) {
+    	String[] optionValues = cmd.getOptionValues("procedure");
+        if (optionValues.length != 4) {
           System.err
-              .println("Wrong parameters! --prodedure <platformName> <componentName> <actionName>");
+              .println("Wrong parameters! --prodedure <environmentName> <platformName> <componentName> <actionName>");
           return Constants.EXIT_WRONG_PRAMETER;
         } else {
-          String[] args = cmd.getOptionValues("procedure");
+          String[] args = optionValues;
           String arglist = "";
           int rollAt = 100;
           if (cmd.hasOption("procedure-arguments")) {
@@ -394,15 +401,15 @@ public class BooCli {
               instances = Arrays.asList(ins.split(","));
             }
           }
-          if ("list".equalsIgnoreCase(args[2])) {
-            List<String> list = flow.listActions(args[0], args[1]);
+          if ("list".equalsIgnoreCase(args[3])) {
+            List<String> list = flow.listActions(args[1], args[2]);
             if (list != null) {
               for (String instance : list) {
                 System.out.println(instance);
               }
             }
           } else {
-            exit = this.executeAction(args[0], args[1], args[2], arglist, instances, rollAt);
+            exit = this.executeAction(args[0], args[1], args[2], args[3], arglist, instances, rollAt);
           }
 
         }
@@ -443,13 +450,13 @@ public class BooCli {
    * @param instanceList the instance list
    * @param rollAt the roll at
    */
-  private int executeAction(String platformName, String componentName, String actionName,
+  private int executeAction(String envName, String platformName, String componentName, String actionName,
       String arglist, List<String> instanceList, int rollAt) {
     int returnCode = 0;
     Long procedureId = null;
     try {
       System.out.println(Constants.PROCEDURE_RUNNING);
-      procedureId = flow.executeAction(platformName, componentName, actionName, arglist,
+      procedureId = flow.executeAction(envName, platformName, componentName, actionName, arglist,
           instanceList, rollAt);
 
     } catch (OneOpsClientAPIException e) {
@@ -461,7 +468,7 @@ public class BooCli {
       try {
         while (procStatus != null
             && (procStatus.equalsIgnoreCase("active") || procStatus.equalsIgnoreCase("pending"))) {
-          procStatus = flow.getProcedureStatus(procedureId);
+          procStatus = flow.getProcedureStatus(envName, procedureId);
           try {
             Thread.sleep(3000);
           } catch (InterruptedException e) {
@@ -503,14 +510,17 @@ public class BooCli {
   private void getIps0() {
     Map<String, Object> platforms = flow.getConfig().getYaml().getPlatforms();
     List<String> computes = booUtils.getComponentOfCompute(this.flow);
-    System.out.println("Environment name: " + flow.getConfig().getYaml().getBoo().getEnvName());
-    for (String pname : platforms.keySet()) {
-      System.out.println("Platform name: " + pname);
-      for (String cname : computes) {
-        System.out.println("Compute name: " + cname);
-        System.out.printf(getIps(pname, cname));
-      }
+    for(EnvironmentBean eb : flow.getConfig().getYaml().getEnvironmentList()) {
+    	System.out.println("Environment name: " + eb.getEnvName());
+        for (String pname : platforms.keySet()) {
+          System.out.println("Platform name: " + pname);
+          for (String cname : computes) {
+            System.out.println("Compute name: " + cname);
+            System.out.printf(getIps(eb.getEnvName(), pname, cname));
+          }
+        }
     }
+    
   }
 
   /**
@@ -520,9 +530,25 @@ public class BooCli {
    * @return the ips 1
    */
   private void getIps1(String inputEnv) {
-    String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
-    if (yamlEnv.equals(inputEnv)) {
-      getIps0();
+    List<EnvironmentBean> envList = flow.getConfig().getYaml().getEnvironmentList();
+    EnvironmentBean eb = null;
+    for (EnvironmentBean environmentBean : envList) {
+		if(inputEnv.equals(environmentBean.getEnvName())) {
+			eb = environmentBean;
+		}
+	}
+    if (eb != null) {
+    	Map<String, Object> platforms = flow.getConfig().getYaml().getPlatforms();
+    	List<String> computes = booUtils.getComponentOfCompute(this.flow);
+    	
+    	System.out.println("Environment name: " + inputEnv);
+        for (String pname : platforms.keySet()) {
+          System.out.println("Platform name: " + pname);
+          for (String cname : computes) {
+            System.out.println("Compute name: " + cname);
+            System.out.printf(getIps(eb.getEnvName(), pname, cname));
+          }
+        }
     } else {
       System.out.println(Constants.NO_ENVIRONMENT);
     }
@@ -536,8 +562,14 @@ public class BooCli {
    * @return the ips 2
    */
   private void getIps2(String inputEnv, String componentName) {
-    String yamlEnv = flow.getConfig().getYaml().getBoo().getEnvName();
-    if (inputEnv.equals("*") || yamlEnv.equals(inputEnv)) {
+    List<EnvironmentBean> envList = flow.getConfig().getYaml().getEnvironmentList();
+    EnvironmentBean eb = null;
+    for (EnvironmentBean environmentBean : envList) {
+		if(inputEnv.equals(environmentBean.getEnvName())) {
+			eb = environmentBean;
+		}
+	}
+    if (eb != null) {
       Map<String, Object> platforms = flow.getConfig().getYaml().getPlatforms();
       List<String> computes = booUtils.getComponentOfCompute(this.flow);
       for (String s : computes) {
@@ -547,7 +579,7 @@ public class BooCli {
           for (String pname : platforms.keySet()) {
             System.out.println("Platform name: " + pname);
             System.out.println("Compute name: " + componentName);
-            System.out.printf(getIps(pname, componentName));
+            System.out.printf(getIps(inputEnv, pname, componentName));
           }
           return;
         }
@@ -565,9 +597,9 @@ public class BooCli {
    * @param componentName the component name
    * @return the ips
    */
-  private String getIps(String platformName, String componentName) {
+  private String getIps(String envName, String platformName, String componentName) {
     try {
-      return flow.printIps(platformName, componentName);
+      return flow.printIps(envName, platformName, componentName);
     } catch (OneOpsClientAPIException e) {
       e.printStackTrace();
     }
@@ -579,12 +611,12 @@ public class BooCli {
    *
    * @return true, if successful
    */
-  public Deployment retryDeployment() {
-    return flow.retryDeployment();
+  public Deployment retryDeployment(String envName) {
+    return flow.retryDeployment(envName);
   }
 
-  public Deployment getDeployment(long deploymentId) throws OneOpsClientAPIException {
-    return flow.getDeployment(deploymentId);
+  public Deployment getDeployment(String envName, long deploymentId) throws OneOpsClientAPIException {
+    return flow.getDeployment(envName, deploymentId);
   }
 
   /**
@@ -630,23 +662,6 @@ public class BooCli {
   public void createPacks(boolean isUpdate, boolean isAssemblyOnly)
       throws BooException, OneOpsClientAPIException {
     flow.process(isUpdate, isAssemblyOnly);
-  }
-
-  /**
-   *  Creates platforms if the assembly does not exist. Updates the platform/components if assembly already exists
-   * @throws BooException
-   * @throws OneOpsClientAPIException
-   */
-  public Deployment createOrUpdatePlatforms()
-          throws BooException, OneOpsClientAPIException, InterruptedException {
-    Deployment deployment = null;
-    if (flow.isAssemblyExist()) {
-      deployment = flow.process(Boolean.TRUE, Boolean.FALSE);
-    } else {
-      deployment = flow.process(Boolean.FALSE, Boolean.FALSE);
-    }
-
-    return deployment;
   }
 
   /**

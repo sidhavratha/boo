@@ -59,8 +59,8 @@ public class ITBuildAllPlatforms extends BooTest {
     removeAssembly();
 
     System.out.println("Deploy");
-    assertNotNull(build.process(false, false));
-    while (build.getStatus().equalsIgnoreCase("active")) {
+    build.process(false, false);
+    while (build.getStatus().contains("active")) {
       TimeUnit.SECONDS.sleep(10);
     }
     System.out.println("Deploy Done");
@@ -74,7 +74,7 @@ public class ITBuildAllPlatforms extends BooTest {
     // Actions
     System.out.println("Actions");
     assertTrue(build.listActions("tomcat", "compute").size() > 2);
-    assertTrue(build.executeAction("tomcat", "compute", "status", "", null, 100) > 0);
+    assertTrue(build.executeAction("dev", "tomcat", "compute", "status", "", null, 100) > 0);
 
     // Attachments
     System.out.println("Attachments");
@@ -88,10 +88,10 @@ public class ITBuildAllPlatforms extends BooTest {
     // Instances
     System.out.println("Instances");
     assertTrue(build.listInstances("tomcat", "compute").size() > 0);
-    assertTrue(build.listInstancesMap("tomcat", "compute").size() > 0);
+    assertTrue(build.listInstancesMap("dev", "tomcat", "compute").size() > 0);
 
     System.out.println("Platform cloud scale update");
-    assertTrue(build.updatePlatformCloudScale());
+    assertTrue(build.updatePlatformCloudScale(config.getYaml().getEnvironmentList().get(0)));
 
     System.out.println("Platform component update");
     assertTrue(build.updatePlatformComponents());
@@ -100,7 +100,7 @@ public class ITBuildAllPlatforms extends BooTest {
     assertTrue(build.updatePlatformVariables(true));
 
     System.out.println("Get Ips");
-    assertTrue(build.getIpsInternal("tomcat", "compute").size() > 0);
+    assertTrue(build.getIpsInternal("dev", "tomcat", "compute").size() > 0);
 
     removeAssembly();
 
@@ -115,16 +115,17 @@ public class ITBuildAllPlatforms extends BooTest {
       BuildAllPlatforms cleanBuild = new BuildAllPlatforms(oo, config, null);
       try {
         System.out.println("attempt # " + i);
-        cleanBuild.cleanup();
-      } catch (Exception ex) {
-        if (ex.getMessage() != null && ex.getMessage().matches(".*assembly with name.*404 Not Found")) {
-          break; //Assembly already deleted
-        } else if (ex.getMessage() != null && ex.getMessage().matches(".*assembly with name .* HTTP/1.1 422 Unprocessable Entity")) {
-            //ignore the error
-          } else 
-        ex.printStackTrace();
+        if(cleanBuild.cleanup()) {
+        	break;
+        }
+      } catch (OneOpsClientAPIException ex) {
+        if(ex.getMessage() != null && ex.getMessage().contains("No bom releases found for environment")) {
+        	//ignore this error
+        } else {
+        	ex.getMessage();
+        }
       }
-      while (cleanBuild.getStatus() != null && cleanBuild.getStatus().equalsIgnoreCase("active")) {
+      while (cleanBuild.getStatus() != null && cleanBuild.getStatus().contains("active")) {
         System.out.println("Env deployment still in progress");
         TimeUnit.SECONDS.sleep(10);
       }
