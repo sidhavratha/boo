@@ -48,7 +48,7 @@
     </developer>
   </developers>
   <properties>
-    <jackson.version>2.8.2</jackson.version>
+    <jackson.version>2.8.8</jackson.version>
     <slf4j.version>1.7.21</slf4j.version>
     <main-class>com.oneops.boo.Main</main-class>
     <java.version>1.8</java.version>
@@ -151,7 +151,7 @@
     <dependency>
       <groupId>com.oneops</groupId>
       <artifactId>oneops-client</artifactId>
-      <version>5.0.10</version>
+      <version>5.0.14</version>
     </dependency>
   </dependencies>
   <build>
