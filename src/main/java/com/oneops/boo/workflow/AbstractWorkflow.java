@@ -124,7 +124,7 @@ public abstract class AbstractWorkflow {
    * @return true, if successful
    * @throws OneOpsClientAPIException the one ops client API exception
    */
-  public abstract void process(boolean isUpdate, boolean isAssemblyOnly)
+  public abstract List<Deployment> process(boolean isUpdate, boolean isAssemblyOnly)
       throws OneOpsClientAPIException;
 
   

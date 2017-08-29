@@ -89,7 +89,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
    * @throws OneOpsClientAPIException
    */
   @Override
-  public void process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
+  public List<Deployment> process(boolean isUpdate, boolean isAssemblyOnly) throws OneOpsClientAPIException {
     boolean isAssemblyExist = this.isAssemblyExist();
     if (isUpdate && !isAssemblyExist) {
       throw new OneOpsClientAPIException(this.assemblyBean.getName() + " not exists!");
@@ -119,6 +119,7 @@ public class BuildAllPlatforms extends AbstractWorkflow {
 		deployments.add(deployment);
 	});
 	
+	return deployments;
   }
 
   Deployment envProccessing(EnvironmentBean eb, AtomicInteger progress, boolean isUpdate) {

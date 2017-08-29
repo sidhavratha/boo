@@ -611,6 +611,31 @@ public class BooCli {
    *
    * @return true, if successful
    */
+  public Deployment retryDeployment() {
+	String envName = getFirstEnvName();
+    return flow.retryDeployment(envName);
+  }
+
+  private String getFirstEnvName() {
+	List<EnvironmentBean> envList = flow.getConfig().getYaml().getEnvironmentList();
+	String envName = null;
+	if (envList != null && envList.size() > 0) {
+    	EnvironmentBean eb = envList.get(0);
+    	envName = eb.getEnvName();
+	}
+	return envName;
+  }
+
+  public Deployment getDeployment(long deploymentId) throws OneOpsClientAPIException {
+	String envName = getFirstEnvName();
+    return flow.getDeployment(envName, deploymentId);
+  }
+  
+  /**
+   * Retry deployment.
+   *
+   * @return true, if successful
+   */
   public Deployment retryDeployment(String envName) {
     return flow.retryDeployment(envName);
   }
@@ -790,4 +815,24 @@ public class BooCli {
   public static boolean isNoDeploy() {
     return isNoDeploy;
   }
+  
+  /**
+   *  Creates platforms if the assembly does not exist. Updates the platform/components if assembly already exists
+    * @throws BooException
+    * @throws OneOpsClientAPIException
+    */
+   public Deployment createOrUpdatePlatforms()
+           throws BooException, OneOpsClientAPIException, InterruptedException {
+	   List<Deployment> deployments = null;
+     if (flow.isAssemblyExist()) {
+       deployments = flow.process(Boolean.TRUE, Boolean.FALSE);
+     } else {
+       deployments = flow.process(Boolean.FALSE, Boolean.FALSE);
+     }
+     if(deployments != null && deployments.size() > 0)
+    	 return deployments.get(0);
+     else
+    	 return null;
+   }
+
 }
