@@ -66,7 +66,7 @@ public class BooConfigInterpolator {
   }
 
   public String interpolate(String booYaml, File booConfigFile, String profile) throws IOException {
-    if (booConfigFile.exists()) {
+    if (booConfigFile != null && booConfigFile.exists()) {
       Map<String, String> config = iniReader.read(booConfigFile, profile);
       return interpolate(booYaml, config);
     } else {
