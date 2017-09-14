@@ -42,6 +42,14 @@ public class ClientConfigInterpolatorTest {
   }
 
   @Test
+  public void validateInliningMultilineFiles() throws Exception {
+    BooConfigInterpolator interpolator = new BooConfigInterpolator();
+    File f1 = resource("f1.txt");
+    assertEquals("f0\012\012f1\012\012f2\012", interpolator.interpolate(String.format("{{multilineFile(%s)}}", f1.getAbsolutePath()),
+        new HashMap<String, String>()));
+  }
+
+  @Test
   public void validateBooConfigWithArrays() throws Exception {
     BooConfigInterpolator interpolator = new BooConfigInterpolator();
     Map<String,String> config = ImmutableMap.of("clouds", "foo, bar, baz");
