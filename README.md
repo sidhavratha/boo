@@ -129,6 +129,43 @@ user:
 
 Again, you can see what the result will be using `boo -f your.yml -v`.
 
+When using `file()`, multiple lines will be combined together when the YAML file is processed.  In order to preserve
+multiple lines, use `multilineFile()`.
+
+For example, the following can be used to create an INI file template from an external file.  If you have:
+
+sample.ini
+```
+[general]
+environment=dev
+user=bob
+```
+
+then this configuration:
+
+```
+file:
+  file-config:
+    path: '/etc/sample.ini'
+    content: '{{multilineFile(sample.ini)}}'
+```
+
+will expand to:
+
+```
+file:
+  file-config:
+    path: '/etc/sample.ini'
+    content: '[general]
+
+environment=dev
+
+user=bob
+'
+```
+
+The blank lines are inserted so that when the YAML is processed, the resulting string will contain the line breaks.
+
 # Development
 
 ## Build the source code to an executable command:
