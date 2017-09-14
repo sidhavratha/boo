@@ -13,7 +13,10 @@
  */
 package com.oneops.boo;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -126,6 +129,15 @@ public class BooConfigInterpolator {
           }
         };
       }
+      else if (name.startsWith("multilineFile(") && name.endsWith(")")) {
+        return new Wrapper() {
+          @Override
+          public Object call(List<Object> scopes) throws GuardException {
+            // Keep the lines in a multiline file
+            return file(defunction(name), true);
+          }
+        };
+      }
       return super.find(name, scopes);
     }
   }
@@ -139,6 +151,10 @@ public class BooConfigInterpolator {
   }
 
   private String file(String path) {
+    return file(path, false);
+  }
+
+  private String file(String path, boolean keepNewlines) {
     if (path.startsWith("~")) {
       path = path.replace("~", HOME);
     } else if (path.startsWith("@")) {
@@ -147,12 +163,54 @@ public class BooConfigInterpolator {
       path = path.replace("./", String.format("%s%s", WORK, File.separator));
     }
     try {
-      return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
+      return keepNewlines ? readFileToString(new File(path)) : FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
     } catch (IOException e) {
       // Content that might be required for the compute to function may be ommitted so just fail
       // fast. If it's an ssh public key that is meant to be injected and it doesn't work it will result
       // in a compute you can't log in to.
       throw new RuntimeException(String.format("%s cannot be found or cannot be read.", path));
     }
+  }
+
+  // Read the file specified into a string.  If there are newlines
+  // in the file, duplicate them to preserve the multi line
+  // formatting in a YAML value.
+  private String readFileToString(File inputFile) throws IOException {
+    BufferedReader bufrdr = new BufferedReader(new FileReader(inputFile));
+    StringWriter strWr = new StringWriter();
+    BufferedWriter wr = new BufferedWriter(strWr);
+
+    try {
+      char[] copyBuffer = new char[1024];
+      int readChars;
+
+      do {
+        readChars = bufrdr.read(copyBuffer, 0, 1024);
+        if (readChars != -1) {
+          boolean addNewLine = false;
+
+          for (int charIndex = 0; charIndex < readChars; charIndex++) {
+            char thisChar = copyBuffer[charIndex];
+            if (thisChar == '\n') {
+              // Append the newline to the output. Add
+              // another newline before the next character.
+              wr.append('\n');
+              addNewLine = true;
+            } else {
+              if (addNewLine) {
+                wr.append('\n');
+                addNewLine = false;
+              }
+              wr.append(thisChar);
+            }
+          }
+        }
+      } while (readChars != -1);
+    } finally {
+      bufrdr.close();
+      wr.close();
+    }
+
+    return strWr.toString();
   }
 }
