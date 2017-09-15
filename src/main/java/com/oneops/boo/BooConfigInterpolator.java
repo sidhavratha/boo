@@ -117,7 +117,7 @@ public class BooConfigInterpolator {
         return new Wrapper() {
           @Override
           public Object call(List<Object> scopes) throws GuardException {
-            return file(defunction(name));
+            return file(dename(name), false, denumws(name));
           }
         };
       }
@@ -147,8 +147,8 @@ public class BooConfigInterpolator {
     if (idx < 0) {
       return 0;
     } else {
-      str = str.trim();
-      return Integer.parseInt(str.substring(idx + 1, str.length() - 1));
+      str = str.substring(idx + 1).trim();
+      return Integer.parseInt(str.substring(0, str.length() - 1));
     }
   }
 
