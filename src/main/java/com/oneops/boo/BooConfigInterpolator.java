@@ -13,21 +13,6 @@
  */
 package com.oneops.boo;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheException;
@@ -38,6 +23,13 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.oneops.client.OneOpsConfigReader;
+import org.apache.commons.io.FileUtils;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class BooConfigInterpolator {
 
@@ -125,7 +117,7 @@ public class BooConfigInterpolator {
         return new Wrapper() {
           @Override
           public Object call(List<Object> scopes) throws GuardException {
-            return file(defunction(name));
+            return file(dename(name), false, denumws(name));
           }
         };
       }
@@ -134,11 +126,29 @@ public class BooConfigInterpolator {
           @Override
           public Object call(List<Object> scopes) throws GuardException {
             // Keep the lines in a multiline file
-            return file(defunction(name), true);
+            return file(dename(name), true, denumws(name));
           }
         };
       }
       return super.find(name, scopes);
+    }
+  }
+
+  private String dename(String str) {
+    int lastIndex = str.length() - 1;
+    if (str.contains(",")) {
+      lastIndex = str.indexOf(",");
+    }
+    return str.substring(str.indexOf('(') + 1, lastIndex);
+  }
+
+  private int denumws(String str) {
+    int idx = str.indexOf(",");
+    if (idx < 0) {
+      return 0;
+    } else {
+      str = str.substring(idx + 1).trim();
+      return Integer.parseInt(str.substring(0, str.length() - 1));
     }
   }
 
@@ -151,10 +161,10 @@ public class BooConfigInterpolator {
   }
 
   private String file(String path) {
-    return file(path, false);
+    return file(path, false, 0);
   }
 
-  private String file(String path, boolean keepNewlines) {
+  private String file(String path, boolean keepNewlines, int numWhitespaceToBePrepend) {
     if (path.startsWith("~")) {
       path = path.replace("~", HOME);
     } else if (path.startsWith("@")) {
@@ -163,7 +173,25 @@ public class BooConfigInterpolator {
       path = path.replace("./", String.format("%s%s", WORK, File.separator));
     }
     try {
-      return keepNewlines ? readFileToString(new File(path)) : FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
+      final String contents =  keepNewlines ? readFileToString(new File(path)) : FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
+      if (numWhitespaceToBePrepend > 0) {
+        final String lines[] = contents.split("\\r?\\n");
+        final StringBuilder sb = new StringBuilder();
+        final String whitespaces = String.join("", Collections.nCopies(numWhitespaceToBePrepend, " "));
+        boolean isFirstLineVisited = false;
+        for (String line : lines) {
+          if (isFirstLineVisited) {
+            sb.append(whitespaces).append(line).append('\n');
+          } else {
+            sb.append(line).append('\n');
+            isFirstLineVisited = true;
+          }
+        }
+        return sb.toString();
+      } else {
+        return contents;
+      }
+
     } catch (IOException e) {
       // Content that might be required for the compute to function may be ommitted so just fail
       // fast. If it's an ssh public key that is meant to be injected and it doesn't work it will result
