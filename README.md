@@ -112,7 +112,7 @@ user:
     sudoer: true
     username: 'jvanzyl'
     description: "JvZ"
-    authorized_keys: '["{{file(~/.ssh/id_rsa.pub}})"]'
+    authorized_keys: '["{{file(~/.ssh/id_rsa.pub)}}"]'
 ```
 
 The result will look something like:
