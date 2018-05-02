@@ -61,7 +61,6 @@ platforms: # In OneOps design.
         enable_method_connect: 'false'
         autodeploy_enabled: 'true'
         tlsv1_protocol_enabled: 'false'
-        mirrors: '["http://gec-maven-nexus.walmart.com/nexus/content/repositories/apache-dist/"]'
         version: '7.0'
         build_version: '75'
       java:
