@@ -9,6 +9,13 @@ OneOps pack by attemping to instantiate the updated pack and executing tests on 
 OneOps user, it provides an command-line tool to deploy, update, destroy and operator their OneOps assemblies. The boo
 tool is an addition to the OneOps UI interfaces.
 
+It requires a [YAML](http://yaml.org/) configuration file and uses the OneOps client API to primarily interact with OneOps via `https:443`.
+
+##Prerequisite
+
+- [OneOps](http://oneops.com/user/).
+- Cloud computing fundamentals.
+
 ## Usage
 
 To use Boo you download the executable JAR and place it in your `$PATH`. Use the latest version available from
@@ -165,6 +172,87 @@ user=bob
 ```
 
 The blank lines are inserted so that when the YAML is processed, the resulting string will contain the line breaks.
+
+# Sample Boo Operations
+
+- **Create an assembly, environment and deploy your instance to OneOps.**
+
+     `boo -f boo.yml -create`
+     
+         Creating the environment DEV.
+          32% **************** 
+         
+          42% ********************* 
+         
+          52% ************************** 
+         
+         Updating the compute size in DEV - empty-vm
+          72% ************************************ 
+         
+         Starting the deployment now.
+         100% ************************************************** 
+     
+-  **Check the status of your deployment**
+
+    `boo -f boo.yml -status`
+    
+    ``DEV deployment status:active``
+    
+- **Update a configuration and deploy your changes to OneOps**  
+
+  `boo -f boo.yml -update`      
+                              
+          Updating component daemon for empty-vm ...
+          Updating component lb for empty-vm ...
+          Updating component secgroup for empty-vm ...
+          Updating component os for empty-vm ...
+          Updating component java for empty-vm ...
+          Updating component user-test for empty-vm ...
+           15% ******* 
+          
+           20% ********** 
+          
+          Environment exist, skip create environment DEV.
+           32% **************** 
+          
+           42% ********************* 
+          
+           52% ************************** 
+  
+          Starting the deployment now.
+          100% ************************************************** 
+ 
+- **Delete an assembly & platform**
+
+  First `-remove` destroys the resource. Second `-remove` destroys the orphaned assembly. 
+    
+    One can use `-force` to destroy all at once without the `y/n` prompt.
+
+    `boo -f boo.yml -remove`
+    
+        WARNING! There are 1 assemblies using the my-first-assembly-dev configuration. Do you want to destroy all of them? (y/n)
+         y
+         Destroying OneOps assembly my-first-assembly-dev 
+         
+         A deployment has been started to remove active nodes. Please execute this command again once the deployment is complete to finish deleting remaining elements.
+
+- **Update a configuration and do not deploy it to OneOps**
+
+    `boo -f boo.yml -update --no-deploy`
+    
+       Environment exist, skip create environment DEV.
+       32% **************** 
+      
+       42% ********************* 
+      
+       52% ************************** 
+      
+      Updating the compute size in DEV - empty-vm
+       72% ************************************ 
+      
+      100% ************************************************** 
+      
+      Created/updated assembly without deployments.
 
 # Development
 
