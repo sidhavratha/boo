@@ -1,4 +1,4 @@
-# Boo
+# Boo  [![Maven Central][maven-svg]][maven-url]
 
 The purpose of Boo is to provide a simple command-line tool for the OneOps developers and OneOps users to deploy,
 update, destroy and operate their OneOps assemblies.
@@ -22,11 +22,9 @@ To use Boo you download the executable JAR and place it in your `$PATH`. Use the
 [http://repo1.maven.org/maven2/com/oneops/boo/boo](http://repo1.maven.org/maven2/com/oneops/boo/boo) e.g.:
 
 ```
-curl -o boo http://repo1.maven.org/maven2/com/oneops/boo/boo/1.0.18/boo-1.0.18-executable.jar
-
-chmod +x boo
-
-boo <options>
+$ curl -o boo http://repo1.maven.org/maven2/com/oneops/boo/boo/1.0.19/boo-1.0.19-executable.jar
+$ chmod +x boo
+$ boo <options>
 ```
 
 For debug use:
@@ -328,4 +326,10 @@ Boo uses the Google code style. The formatter for Eclipse you can find here:
 https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml
 
 
+-----------------
+ <sup><b>**</b></sup>Require [Java 8 or later][java-download]
+ 
+ <!-- Badges -->
+[maven-url]: http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.oneops.boo%22%20AND%20a%3A%22boo%22
+[maven-svg]: https://img.shields.io/maven-central/v/com.oneops.boo/boo.svg?label=Maven%20Central&style=flat-square
 [1]: https://github.com/spullara/mustache.java
